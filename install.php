@@ -6,7 +6,7 @@
         $block_form = true;
     }
 
-    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db'])) {
+    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_pass'])) {
         $mysql_host = $_POST['mysql_host'];
         $mysql_login = $_POST['mysql_login'];
         $mysql_db = $_POST['mysql_login'];
@@ -15,24 +15,50 @@
         $instance_title = (!empty($_POST['instance_title'])) ? $_POST['instance_title'] : 'Bouffe@Ulm';
 
         try {
-            $db = new PDO("mysql:host=".$mysql_host.";dbname=".$mysql_db, $mysql_login, $mysql_password);
-        }
-        catch (PDOException $e) {
+            $db = new Storage(array('host'=>$mysql_host, 'login'=>$mysql_login, 'password'=>$mysql_password, 'db'=>$mysql_db);
+            //TODO : Create tables
+        } catch (PDOException $e) {
             $error = 'Unable to connect to database, check your credentials.';
         }
 
         if(empty($error)) {
-            $config = "
-                define('VERSION_NUMBER', '2.0');
+                if(function_exists('mcrypt_create_iv')) {
+                    $salt = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
+                }
+                else {
+                    mt_srand(microtime(true)*100000 + memory_get_usage(true));
+                    $salt = md5(uniqid(mt_rand(), true));
+                }
 
-                define('MYSQL_HOST', '".$mysql_host."');
-                define('MYSQL_LOGIN', '".$mysql_login."');
-                define('MYSQL_PASSWORD', '".$mysql_password."');
-                define('MYSQL_DB', '".$mysql_db."');
-                define('MYSQL_PREFIX', '".$mysql_prefix."');
+                define('SALT', $salt);
+                
+                $config = "
+                    define('VERSION_NUMBER', '2.0');
+                    define('MYSQL_HOST', '".$mysql_host."');
+                    define('MYSQL_LOGIN', '".$mysql_login."');
+                    define('MYSQL_PASSWORD', '".$mysql_password."');
+                    define('MYSQL_DB', '".$mysql_db."');
+                    define('MYSQL_PREFIX', '".$mysql_prefix."');
+                    define('INSTANCE_TITLE', '".$instance_title."');
+                    define('BASE_URL', '".$_POST['base_url']."');
+                    define('SALT', '".$salt."');";
 
-                define('INSTANCE_TITLE', '".$instance_title."');";
-            file_put_contents("inc/config.php", $config);
+                if(file_put_contents("inc/config.php", $config)) {
+                    try {
+                        $admin = new User();
+                        $admin->setLogin($_POST['admin_login']);
+                        $admin->setPassword($_POST['admin_password']);
+                        $admin->setAdmin(true);
+                        $admin->save();
+                        header('location: index.php');
+                        exit();
+                    } catch ($e) {
+                        //TODO
+                    }
+                }
+                else
+                    $error = 'Unable to write configuration to config file inc/config.php.';
+            }
         }
     }
 ?>
@@ -70,8 +96,16 @@
             <fieldset>
                 <legend>General options</legend>
                 <p><label for="instance_title">Title to display in pages : </label><input type="text" name="instance_title" id="instance_title" value="Bouffe@Ulm"/></p>
+                <p>
+                    <label for="base_url">Base URL : </label><input type="text" size="30" name="base_url" id="base_url" value="<?php echo 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].str_replace("install.php", "", $_SERVER['REQUEST_URI']); ?>"/><br/>
+                    <em>Note :</em> This is the base URL from which you access this website. You must keep the trailing "/" in the above address.
+                </p>
             </fieldset>
-
+            <fieldset>
+                <legend>Administrator</legend>
+                <p><label for="admin_login">Username of the admin : </label><input type="text" name="admin_login" id="admin_login"/></p>
+                <p><label for="admin_mdp">Password for the admin : </label><input type="password" name="admin_pass" id="admin_pass"/></p>
+            </fieldset>
             <p><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" class="center"></p>
         </form>
     </body>

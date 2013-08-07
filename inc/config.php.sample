@@ -4,7 +4,9 @@
     define('MYSQL_HOST', 'localhost');
     define('MYSQL_LOGIN', '');
     define('MYSQL_PASSWORD', '');
-    define('MYSQL_BDD', '');
+    define('MYSQL_DB', '');
     define('MYSQL_PREFIX', '');
 
     define('TITLE', 'Bouffe@Ulm');
+    define('BASE_URL', 'http://monsite.com/BouffeAtUlm/');
+    define('SALT', 'longandcomplicatedstring');

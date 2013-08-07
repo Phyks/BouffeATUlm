@@ -1,0 +1,16 @@
+/* TEAM */
+    Name : Phyks
+    Site : http://www.phyks.me
+    E-mail : phyks@phyks.me
+    Location : France.
+
+    Name : Cphyc
+    Site : http://www.cphyc.me
+    E-mail : contact@cphyc.me
+    Location : France.
+
+/* THANKS */
+    Baltazar for the algorithm to simplify the matrix of debts
+
+/* LICENSE */
+    BEER-WARE LICENSE (see LICENSE or README.md file for more infos)
