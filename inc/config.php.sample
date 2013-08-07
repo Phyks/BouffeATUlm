@@ -1,0 +1,10 @@
+<?php
+    define('VERSION_NUMBER', '2.0');
+
+    define('MYSQL_HOST', 'localhost');
+    define('MYSQL_LOGIN', '');
+    define('MYSQL_PASSWORD', '');
+    define('MYSQL_BDD', '');
+    define('MYSQL_PREFIX', '');
+
+    define('TITLE', 'Bouffe@Ulm');
