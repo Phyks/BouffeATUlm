@@ -1,3 +1,12 @@
+body {
+    font-family: sans-serif;
+}
+
+fieldset {
+    border: 1px solid #999;
+    margin-bottom: 1em;
+}
+
 .center {
     text-align: center;
 }
@@ -6,4 +15,27 @@
     font-size: 1.5em;
     color: red;
     font-weight: bold;
+}
+
+input[type=submit] {
+    background-color: green;
+    color: white;
+    border-radius: 10px;
+}
+
+#install {
+    margin: 0;
+}
+
+#install form {
+    width: 67%;
+    margin: auto;
+}
+
+#install h1 {
+    background-color: #333;
+    border-bottom: 0.3em solid green;
+    color: white;
+    padding: 0.5em;
+    margin: 0;
 }

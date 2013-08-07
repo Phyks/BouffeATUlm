@@ -15,50 +15,49 @@
         $instance_title = (!empty($_POST['instance_title'])) ? $_POST['instance_title'] : 'Bouffe@Ulm';
 
         try {
-            $db = new Storage(array('host'=>$mysql_host, 'login'=>$mysql_login, 'password'=>$mysql_password, 'db'=>$mysql_db);
+            $db = new Storage(array('host'=>$mysql_host, 'login'=>$mysql_login, 'password'=>$mysql_password, 'db'=>$mysql_db));
             //TODO : Create tables
         } catch (PDOException $e) {
             $error = 'Unable to connect to database, check your credentials.';
         }
 
         if(empty($error)) {
-                if(function_exists('mcrypt_create_iv')) {
-                    $salt = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
-                }
-                else {
-                    mt_srand(microtime(true)*100000 + memory_get_usage(true));
-                    $salt = md5(uniqid(mt_rand(), true));
-                }
-
-                define('SALT', $salt);
-                
-                $config = "
-                    define('VERSION_NUMBER', '2.0');
-                    define('MYSQL_HOST', '".$mysql_host."');
-                    define('MYSQL_LOGIN', '".$mysql_login."');
-                    define('MYSQL_PASSWORD', '".$mysql_password."');
-                    define('MYSQL_DB', '".$mysql_db."');
-                    define('MYSQL_PREFIX', '".$mysql_prefix."');
-                    define('INSTANCE_TITLE', '".$instance_title."');
-                    define('BASE_URL', '".$_POST['base_url']."');
-                    define('SALT', '".$salt."');";
-
-                if(file_put_contents("inc/config.php", $config)) {
-                    try {
-                        $admin = new User();
-                        $admin->setLogin($_POST['admin_login']);
-                        $admin->setPassword($_POST['admin_password']);
-                        $admin->setAdmin(true);
-                        $admin->save();
-                        header('location: index.php');
-                        exit();
-                    } catch ($e) {
-                        //TODO
-                    }
-                }
-                else
-                    $error = 'Unable to write configuration to config file inc/config.php.';
+            if(function_exists('mcrypt_create_iv')) {
+                $salt = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
             }
+            else {
+                mt_srand(microtime(true)*100000 + memory_get_usage(true));
+                $salt = md5(uniqid(mt_rand(), true));
+            }
+
+            define('SALT', $salt);
+            
+            $config = "
+                define('VERSION_NUMBER', '2.0');
+                define('MYSQL_HOST', '".$mysql_host."');
+                define('MYSQL_LOGIN', '".$mysql_login."');
+                define('MYSQL_PASSWORD', '".$mysql_password."');
+                define('MYSQL_DB', '".$mysql_db."');
+                define('MYSQL_PREFIX', '".$mysql_prefix."');
+                define('INSTANCE_TITLE', '".$instance_title."');
+                define('BASE_URL', '".$_POST['base_url']."');
+                define('SALT', '".$salt."');";
+
+            if(file_put_contents("inc/config.php", $config)) {
+                try {
+                    $admin = new User();
+                    $admin->setLogin($_POST['admin_login']);
+                    $admin->setPassword($_POST['admin_password']);
+                    $admin->setAdmin(true);
+                    $admin->save();
+                    header('location: index.php');
+                    exit();
+                } catch (Exception $e) {
+                    //TODO
+                }
+            }
+            else
+                $error = 'Unable to write configuration to config file inc/config.php.';
         }
     }
 ?>
@@ -69,8 +68,8 @@
         <title>Bouffe@Ulm - Installation</title>
         <link rel="stylesheet" media="screen" type="text/css" href="tpl/css/style.css" />
     </head>
-    <body>
-        <h1>Bouffe@Ulm - Installation</h1>
+    <body id="install">
+        <h1 class="center">Bouffe@Ulm - Installation</h1>
 
         <?php
             if(!empty($error)) {
@@ -78,7 +77,7 @@
             }
         ?>
 
-        <p>This small form will guide you through the installation of Bouffe@Ulm.</p>
+        <p class="center">This small form will guide you through the installation of Bouffe@Ulm.</p>
 
         <form action="install.php" method="post">
             <fieldset>
@@ -106,7 +105,7 @@
                 <p><label for="admin_login">Username of the admin : </label><input type="text" name="admin_login" id="admin_login"/></p>
                 <p><label for="admin_mdp">Password for the admin : </label><input type="password" name="admin_pass" id="admin_pass"/></p>
             </fieldset>
-            <p><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" class="center"></p>
+            <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit"></p>
         </form>
     </body>
 </html>
