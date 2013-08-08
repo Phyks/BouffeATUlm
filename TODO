@@ -1,1 +1,2 @@
 * i18n
+* Vérification des variables dans les classes + throw exception

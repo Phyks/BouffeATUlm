@@ -5,18 +5,11 @@ class Storage {
     private $host, $login, $password, $db;
     private $connection = null;
 
-    private function __construct($connection_params = null) {
-        if(is_array($connection_params) && !empty($connection_params)) {
-            $this->setHost($connection_params['host']);
-            $this->setLogin($connection_params['login']);
-            $this->setPassword($connection_params['password']);
-            $this->setDb($connection_params['db']);
-
-            $this->connect();
-        }
+    public function __construct() {
+        $this->connect();
     }
 
-    private function __destruct() {
+    public function __destruct() {
         $this->disconnect();
     }
 
@@ -60,36 +53,77 @@ class Storage {
     }
 
     public function setDb($db) {
-        this->db = $db;
+        $this->db = $db;
     }
 
     public function typeToSQL($type) {
         $return = false;
         switch($type) {
             case 'key':
-                    $return = 'INT(11) NOT NULL AUTO_INCREMENT PRIMARY_KEY'; 
+                $return = 'INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY'; 
                 break;
 
             case 'string':
-                    $return = 'VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci';
+                $return = 'VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci';
                 break;
 
             case 'bool':
-                    $return = 'TINYINT(1)';
+                $return = 'TINYINT(1)';
+                break;
+
+            case 'password':
+                $return = 'VARCHAR(130)';
                 break;
 
             default:
-                    $return = 'TEXT CHARACTER SET utf8 COLLATE utf8_general_ci';
+                $return = 'TEXT CHARACTER SET utf8 COLLATE utf8_general_ci';
                 break;
         }
     }
 
-    public function createTable($table_name = null) {
+    public function save() {
+        if(!empty($this->id)) {
+            $query = 'UPDATE `'.MYSQL_PREFIX.$this->TABLE_NAME.'` SET ';
 
+            $i = false;
+            foreach($this->fields as $field=>$type) {
+                if($i) { $query .= ','; } else { $i = true; }
+
+                $id = $this->$field;
+                $query .= '`'.$field.'` = "'.$this($id).'"';
+            }
+
+            $query .= 'WHERE `id`="'.$this->id.'"';
+        }
+        else {
+            $query = 'INSERT INTO '.MYSQL_PREFIX.$this->TABLE_NAME.'(';
+
+            $i = false;
+            foreach($this->fields as $field=>$type) {
+                if($i) { $query .= ','; } else { $i = true; }
+
+                $query .= $field;
+            }
+
+            $query .= ') VALUES(';
+            
+            $i = false;
+            foreach($this->fields as $field=>$type) {
+                if($i) { $query .= ','; } else { $i = true; }
+                
+                $query .= ':'.$field;
+            }
+
+            $query .= ')';
+        }
+        $query = $this->connection->prepare($query);
+
+        foreach($this->fields as $field=>$type) {
+            $query->bindParam(':'.$field, $this->$field);
+        }
+        
+        $query->execute();
+
+        $this->id = (!isset($this->id) ? $this->connection->lastInsertId() : $this->id);
     }
-
-    public function initTables() {
-        $this->createTable('users');
-        $this->createTable('invoices');
-    } 
 }

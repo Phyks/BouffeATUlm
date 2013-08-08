@@ -11,12 +11,6 @@ fieldset {
     text-align: center;
 }
 
-.error {
-    font-size: 1.5em;
-    color: red;
-    font-weight: bold;
-}
-
 input[type=submit] {
     background-color: green;
     color: white;
@@ -38,4 +32,11 @@ input[type=submit] {
     color: white;
     padding: 0.5em;
     margin: 0;
+}
+
+#install .error {
+    font-size: 1.5em;
+    color: red;
+    font-weight: bold;
+    text-align: center;
 }

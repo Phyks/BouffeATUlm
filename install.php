@@ -6,45 +6,55 @@
         $block_form = true;
     }
 
-    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_pass'])) {
+    if(!is_writable('inc/')) {
+        $error = "The script seems to be unable to write to <em>inc/</em> folder (to write the <em>inc/config.php</em> configuration file). You should give write access during install and disable them after (chmod 777 -R inc/ to install and chmod 755 -R inc/ after installation for example).";
+        $block_form = true;
+    }
+
+    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password'])) {
         $mysql_host = $_POST['mysql_host'];
         $mysql_login = $_POST['mysql_login'];
-        $mysql_db = $_POST['mysql_login'];
+        $mysql_db = $_POST['mysql_db'];
         $mysql_password = $_POST['mysql_password'];
-        $mysql_prefix = $_POST['mysql_prefix'];
+        $mysql_prefix = (!empty($_POST['mysql_prefix'])) ? $_POST['mysql_prefix'] : '';
         $instance_title = (!empty($_POST['instance_title'])) ? $_POST['instance_title'] : 'Bouffe@Ulm';
 
         try {
-            $db = new Storage(array('host'=>$mysql_host, 'login'=>$mysql_login, 'password'=>$mysql_password, 'db'=>$mysql_db));
-            //TODO : Create tables
-        } catch (PDOException $e) {
-            $error = 'Unable to connect to database, check your credentials.';
-        }
+            $db = new PDO('mysql:host='.$mysql_host.';dbname='.$mysql_db, $mysql_login, $mysql_password);
 
+            //Create table "Users"
+            $dump = $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), password VARCHAR(130), admin TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+ 
+            //Create table "Invoices" - TODO
+            //Create table "Payback" - TODO
+        } catch (PDOException $e) {
+            $error = 'Unable to connect to database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
+        }
+        
         if(empty($error)) {
             if(function_exists('mcrypt_create_iv')) {
-                $salt = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
+                $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
             }
             else {
                 mt_srand(microtime(true)*100000 + memory_get_usage(true));
                 $salt = md5(uniqid(mt_rand(), true));
             }
+            $salt = sprintf("$2a$%02d$", 10) . $salt; //prefix for blowfish
 
-            define('SALT', $salt);
-            
-            $config = "
-                define('VERSION_NUMBER', '2.0');
-                define('MYSQL_HOST', '".$mysql_host."');
-                define('MYSQL_LOGIN', '".$mysql_login."');
-                define('MYSQL_PASSWORD', '".$mysql_password."');
-                define('MYSQL_DB', '".$mysql_db."');
-                define('MYSQL_PREFIX', '".$mysql_prefix."');
-                define('INSTANCE_TITLE', '".$instance_title."');
-                define('BASE_URL', '".$_POST['base_url']."');
-                define('SALT', '".$salt."');";
+            $config = "<?php
+    define('VERSION_NUMBER', '2.0');
+    define('MYSQL_HOST', '".$mysql_host."');
+    define('MYSQL_LOGIN', '".$mysql_login."');
+    define('MYSQL_PASSWORD', '".$mysql_password."');
+    define('MYSQL_DB', '".$mysql_db."');
+    define('MYSQL_PREFIX', '".$mysql_prefix."');
+    define('INSTANCE_TITLE', '".$instance_title."');
+    define('BASE_URL', '".$_POST['base_url']."');
+    define('SALT', '".$salt."');";
 
             if(file_put_contents("inc/config.php", $config)) {
                 try {
+                    require_once('inc/User.class.php');
                     $admin = new User();
                     $admin->setLogin($_POST['admin_login']);
                     $admin->setPassword($_POST['admin_password']);
@@ -53,7 +63,7 @@
                     header('location: index.php');
                     exit();
                 } catch (Exception $e) {
-                    //TODO
+                    $erreur = 'An error occurred when inserting user in the database.<br/> Error message : '.$e->getMessage().'.';
                 }
             }
             else
@@ -77,7 +87,7 @@
             }
         ?>
 
-        <p class="center">This small form will guide you through the installation of Bouffe@Ulm.</p>
+        <p class="center">This small form will guide you through the installation of Bouffe@Ulm. You must fill in all the fields.</p>
 
         <form action="install.php" method="post">
             <fieldset>
@@ -90,20 +100,21 @@
                 <label for="mysql_db">Name of the MySQL database to use : </label><input type="text" name="mysql_db" id="mysql_db" value="<?php echo (!empty($_POST['mysql_db'])) ? htmlspecialchars($_POST['mysql_db']) : 'Bouffe@Ulm';?>"/><br/>
                     <em>Note :</em> You <em>must</em> create this database first.
                 </p>
-                <p><label for="mysql_prefix">Prefix for the created tables : </label><input type="text" name="mysql_prefix" id="mysql_prefix" value="<?php echo (!empty($_POST['mysql_prefix'])) ? htmlspecialchars($_POST['mysql_prefix']) : 'bouffeatulm_';?>"/></p>
+                <p><label for="mysql_prefix">Prefix for the created tables : </label><input type="text" name="mysql_prefix" id="mysql_prefix" value="<?php echo (!empty($_POST['mysql_prefix'])) ? htmlspecialchars($_POST['mysql_prefix']) : 'bouffeatulm_';?>"/><br/>
+                    <em>Note :</em> Leave the field blank to not use any.</p>
             </fieldset>
             <fieldset>
                 <legend>General options</legend>
-                <p><label for="instance_title">Title to display in pages : </label><input type="text" name="instance_title" id="instance_title" value="Bouffe@Ulm"/></p>
+                <p><label for="instance_title">Title to display in pages : </label><input type="text" name="instance_title" id="instance_title" value="<?php echo (!empty($_POST['instance_title'])) ? htmlspecialchars($_POST['instance_title']) : 'Bouffe@Ulm';?>"/></p>
                 <p>
-                    <label for="base_url">Base URL : </label><input type="text" size="30" name="base_url" id="base_url" value="<?php echo 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].str_replace("install.php", "", $_SERVER['REQUEST_URI']); ?>"/><br/>
-                    <em>Note :</em> This is the base URL from which you access this website. You must keep the trailing "/" in the above address.
+                    <label for="base_url">Base URL : </label><input type="text" size="30" name="base_url" id="base_url" value="<?php echo (!empty($_POST['base_url'])) ? htmlspecialchars($_POST['base_url']) : 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].str_replace("install.php", "", $_SERVER['REQUEST_URI']); ?>"/><br/>
+                    <em>Note :</em> This is the base URL from which you access this page. You must keep the trailing "/" in the above address.
                 </p>
             </fieldset>
             <fieldset>
                 <legend>Administrator</legend>
-                <p><label for="admin_login">Username of the admin : </label><input type="text" name="admin_login" id="admin_login"/></p>
-                <p><label for="admin_mdp">Password for the admin : </label><input type="password" name="admin_pass" id="admin_pass"/></p>
+                <p><label for="admin_login">Username of the admin : </label><input type="text" name="admin_login" id="admin_login" <?php echo (!empty($_POST['admin_login'])) ? 'value="'.htmlspecialchars($_POST['admin_login']).'"' : '';?>/></p>
+                <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/></p>
             </fieldset>
             <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit"></p>
         </form>

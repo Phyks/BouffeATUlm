@@ -1,6 +1,6 @@
 <?php
-    if(!file_exists('config.php')) header('location: install.php');
+    if(!file_exists('inc/config.php')) header('location: install.php');
     
     session_start();
 
-    require_once('config.php');
+    require_once('inc/config.php');

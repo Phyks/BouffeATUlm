@@ -1,17 +1,18 @@
 <?php
 require_once('config.php');
+require_once('Storage.class.php');
 
 class User extends Storage {
-    protected $id, $login, $password;
-    protected $TALE_NAME = "users";
+    protected $id, $login, $password, $admin;
+    protected $TABLE_NAME = "Users";
     protected $fields = array(
         'id'=>'key',
-        'nom'=>'string',
-        'password'=>'string',
+        'login'=>'string',
+        'password'=>'password',
         'admin'=>'bool'
         );
 
-    private function __construct() {
+    public function __construct() {
         parent::__construct();
     }
 
@@ -22,6 +23,10 @@ class User extends Storage {
     public function getId() {
         return $this->id;
     }
+
+    public function getAdmin() {
+        return $this->admin;
+    }
     
     public function setLogin($login) {
         $this->login = $login;
@@ -29,6 +34,10 @@ class User extends Storage {
 
     public function setPassword($password) {
         $this->password = User::encrypt($password);
+    }
+
+    public function setAdmin($admin) {
+        $this->admin = $admin;
     }
 
     public function encrypt($text) {
