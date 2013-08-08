@@ -57,7 +57,7 @@
                     require_once('inc/User.class.php');
                     $admin = new User();
                     $admin->setLogin($_POST['admin_login']);
-                    $admin->setPassword($_POST['admin_password']);
+                    $admin->setPassword($admin->encrypt($_POST['admin_password']));
                     $admin->setAdmin(true);
                     $admin->save();
                     header('location: index.php');

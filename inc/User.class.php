@@ -27,13 +27,17 @@ class User extends Storage {
     public function getAdmin() {
         return $this->admin;
     }
-    
+
+    public function setId($id) {
+        $this->id = $id;
+    }
+
     public function setLogin($login) {
         $this->login = $login;
     }
 
     public function setPassword($password) {
-        $this->password = User::encrypt($password);
+        $this->password = $password;
     }
 
     public function setAdmin($admin) {
@@ -44,7 +48,33 @@ class User extends Storage {
         return crypt($text, SALT);
     }
 
-    public function check_password($password) {
+    public function checkPassword($password) {
         return User::encrypt($password) == $this->password;
+    }
+
+    public function exists() {
+        $user_data = $this->load(array('login'=>$this->login));
+        if(count($user_data) == 1) {
+            $this->setAdmin($user_data[0]['admin']);
+            $this->setPassword($user_data[0]['password']);
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function sessionStore() {
+        return serialize(array('id'=>$this->id, 'login'=>$this->login, 'password'=>$this->password, 'admin'=>$this->admin));
+    }
+
+    public function sessionRestore($serialized_data) {
+        $user_data = unserialize($serialized_data);
+
+        $this->setId($user_data['id']);
+        $this->setLogin($user_data['login']);
+        $this->setPassword($user_data['password']);
+        $this->setAdmin($user_data['admin']);
     }
 }

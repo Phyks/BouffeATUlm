@@ -7,4 +7,4 @@
     define('MYSQL_PREFIX', 'bouffeatulm_');
     define('INSTANCE_TITLE', 'Bouffe@Ulm');
     define('BASE_URL', 'http://localhost/Bouffe@Ulm/');
-    define('SALT', '$2a$10$AXnaxClN4pYlcXGfafGZCA==');
+    define('SALT', '$2a$10$Cg7T08hTORaxZgfCua1xyQ==');

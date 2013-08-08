@@ -1,2 +1,4 @@
 * i18n
 * Vérification des variables dans les classes + throw exception
+* tokens + ban system
+* TRUNCATE before CREATE TABLE in install.php

@@ -1,8 +1,10 @@
-{include="header"}
+<?php if(!class_exists('raintpl')){exit;}?><?php $tpl = new RainTPL;$tpl_dir_temp = self::$tpl_dir;$tpl->assign( $this->var );$tpl->draw( dirname("header") . ( substr("header",-1,1) != "/" ? "/" : "" ) . basename("header") );?>
 
-<h1>{$instance_title}</h1>
 
-{$notice}
+<h1><?php echo $title;?></h1>
+
+<?php echo $notice;?>
+
 
 <div id="menu">
     <ul>
@@ -10,14 +12,16 @@
         <li><a href="modif_password.php">Modifier le mot de passe</a></li>
         <li><a href="rbmt.php">Consulter les remboursements</a></li>
     </ul>
-    {if condition="$admin"}
+    <?php if( $admin ){ ?>
+
     <ul>
         <li><a href="rbmt_admin.php">Gérer les rembourements</a></li>
         <li><a href="copains.php">Modifier les copains</a></li>
         <li><a href="modif_annonce.php">Modifier l'annonce d'accueil</a></li>
         <li><a href="connexion.php?deco=1">Déconnexion</a></li>
     </ul>
-    {/if}
+    <?php } ?>
+
 </div>
 <div id="quick_summary">
     <h2>Qui doit quoi ?</h2>

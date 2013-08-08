@@ -2,7 +2,6 @@
 require_once('config.php');
 
 class Storage {
-    private $host, $login, $password, $db;
     private $connection = null;
 
     public function __construct() {
@@ -81,19 +80,50 @@ class Storage {
         }
     }
 
+    public function load($fields = NULL) {
+        $query = 'SELECT ';
+        $i = false;
+        foreach($this->fields as $field=>$type) {
+            if($i) { $query .= ','; } else { $i = true; }
+
+            $query .= $field;
+        }
+        $query .= ' FROM '.MYSQL_PREFIX.$this->TABLE_NAME;
+
+        if(!empty($fields) && is_array($fields)) {
+            $i = true;
+            foreach($fields as $field=>$value) {
+                if($i) { $query .= ' WHERE '; $i = false; } else { $query .= ' AND ';  }
+
+                $query .= $field.'=:'.$field;
+            }
+        }
+
+        $query = $this->connection->prepare($query);
+
+        if(!empty($fields) && is_array($fields)) {
+            foreach($fields as $field=>$value) {
+                $query->bindParam(':'.$field, $value);
+            }
+        }
+
+        $query->execute();
+        
+        return $query->fetchAll();
+    }
+
     public function save() {
         if(!empty($this->id)) {
-            $query = 'UPDATE `'.MYSQL_PREFIX.$this->TABLE_NAME.'` SET ';
+            $query = 'UPDATE '.MYSQL_PREFIX.$this->TABLE_NAME.' SET ';
 
             $i = false;
             foreach($this->fields as $field=>$type) {
                 if($i) { $query .= ','; } else { $i = true; }
 
-                $id = $this->$field;
-                $query .= '`'.$field.'` = "'.$this($id).'"';
+                $query .= $field.'=:'.$field;
             }
 
-            $query .= 'WHERE `id`="'.$this->id.'"';
+            $query .= 'WHERE id='.$this->id;
         }
         else {
             $query = 'INSERT INTO '.MYSQL_PREFIX.$this->TABLE_NAME.'(';
@@ -116,6 +146,7 @@ class Storage {
 
             $query .= ')';
         }
+
         $query = $this->connection->prepare($query);
 
         foreach($this->fields as $field=>$type) {
