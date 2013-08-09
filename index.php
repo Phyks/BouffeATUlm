@@ -10,6 +10,7 @@
     $tpl->assign('instance_title', INSTANCE_TITLE);
     $tpl->assign('connection', false);
     $tpl->assign('notice', '');
+    $tpl->assign('error', '');
     
     session_start();
     $current_user = (isset($_SESSION['current_user']) ? unserialize($_SESSION['current_user']) : false);
@@ -52,7 +53,22 @@
             break;
 
         case 'password':
+            if(!empty($_POST['password']) && !empty($_POST['password_confirm'])) {
+                if($_POST['password'] == $_POST['password_confirm']) {
+                    $user = new User();
+                    $user->setLogin($current_user['login']);
+                    $user->setPassword($user->encrypt($_POST['password']));
+                    $user->setAdmin($current_user['admin']);
+                    $user->setId($current_user['id']);
+                    $user->save();
 
+                    header('location: index.php');
+                    exit();
+                }
+                else {
+                    $tpl->assign('error', 'The content of the two password fields doesn\'t match.');
+                }
+            }
             $tpl->draw('edit_users');
             break;
 

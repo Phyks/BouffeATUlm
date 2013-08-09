@@ -94,7 +94,7 @@ input[type=submit] {
     margin: 0;
 }
 
-#install .error {
+.error {
     font-size: 1.5em;
     color: red;
     font-weight: bold;

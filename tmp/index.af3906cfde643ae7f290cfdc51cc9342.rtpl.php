@@ -1,49 +1,52 @@
 <?php if(!class_exists('raintpl')){exit;}?><?php $tpl = new RainTPL;$tpl_dir_temp = self::$tpl_dir;$tpl->assign( $this->var );$tpl->draw( dirname("header") . ( substr("header",-1,1) != "/" ? "/" : "" ) . basename("header") );?>
 
 
-<h1><?php echo $title;?></h1>
-
-<?php echo $notice;?>
-
-
-<div id="menu">
-    <ul>
-        <li><a href="modif.php">Ajouter une dépense</a></li>
-        <li><a href="modif_password.php">Modifier le mot de passe</a></li>
-        <li><a href="rbmt.php">Consulter les remboursements</a></li>
-    </ul>
-    <?php if( $admin ){ ?>
-
-    <ul>
-        <li><a href="rbmt_admin.php">Gérer les rembourements</a></li>
-        <li><a href="copains.php">Modifier les copains</a></li>
-        <li><a href="modif_annonce.php">Modifier l'annonce d'accueil</a></li>
-        <li><a href="connexion.php?deco=1">Déconnexion</a></li>
-    </ul>
-    <?php } ?>
-
-</div>
 <div id="quick_summary">
-    <h2>Qui doit quoi ?</h2>
-    <p>Lire <em>ligne</em> doit <em>case</em>€ à <em>colonne</em>. Les liens permettent de confirmer le paiement des dettes.</p>
-    <table>
+    <h2>Balance</h2>
+    <p class="center">Read <em>line</em> owes <em>case</em>€ to <em>column</em>. You can click on links to confirm the payback.
+    <table> 
         <tr>
-            <th>Doit\À</th>
+            <th>Owes\To</th>
+            <?php $counter1=-1; if( isset($users) && is_array($users) && sizeof($users) ) foreach( $users as $key1 => $value1 ){ $counter1++; ?>
+
+                <th><?php echo $value1["name"];?></th>
+            <?php } ?>
+
         </tr>
+        <?php $counter1=-1; if( isset($users) && is_array($users) && sizeof($users) ) foreach( $users as $key1 => $value1 ){ $counter1++; ?>
+
+            <tr>
+                <th><?php echo $value1["name"];?></th>
+            </tr>
+        <?php } ?>
+
     </table>
 </div>
 <div id="detailed_summary">
-    <h2>Dépenses détaillées du mois actuel</h2>
+    <h2>Detailed list of bills for last month</h2>
 
     <table>
         <tr>
             <th>Date</th>
-            <th>Payé par</th>
-            <th>Participants</th>
-            <th>Montant</th>
-            <th>Menu</th>
-            <th>Modifier</th>
-            <th>Supprimer</th>
+            <th>Paid by</th>
+            <th>Users in</th>
+            <th>Amount</th>
+            <th>What ?</th>
+            <th>Edit</th>
+            <th>Delete</th>
         </tr>
+        <?php $counter1=-1; if( isset($bill) && is_array($bill) && sizeof($bill) ) foreach( $bill as $key1 => $value1 ){ $counter1++; ?>
+
+            <tr>
+                <td><?php echo $value1["date"];?></td>
+                <td><?php echo $value1["buyer"];?></td>
+                <td><?php echo $value1["users_in"];?></td>
+                <td><?php echo $value1["amount"];?></td>
+                <td><?php echo $value1["what"];?></td>
+                <td><a href="index.php?do=edit_bill&id=">Edit</a></td>
+                <td><a href="index.php?do=delete_bill&id=">Delete</a></td>
+            </tr>
+        <?php } ?>
+
     </table>
 </div>

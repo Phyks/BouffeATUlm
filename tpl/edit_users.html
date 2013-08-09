@@ -1,5 +1,9 @@
 {include="header"}
 
+{if condition="$error != ''"}
+    <p class="error">{$error}</p>
+{/if}
+
 <h2>Edit your password</h2>
 <form method="post" action="index.php?do=password" id="edit_password_form">
     <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/></p>

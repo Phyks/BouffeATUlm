@@ -2,3 +2,11 @@
 * Vérification des variables dans les classes + throw exception
 * tokens + ban system
 * TRUNCATE before CREATE TABLE in install.php
+
+install.php :
+=============
+* Link beside password field to toggle visible / not visible
+
+index.php :
+===========
+* Edit password doesn't work
