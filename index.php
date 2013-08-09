@@ -7,7 +7,7 @@
     raintpl::$cache_dir = 'tmp/';
 
     $tpl = new raintpl();
-    $tpl->assign('instance_title', INSTANCE_TITLE);
+    $tpl->assign('instance_title', htmlspecialchars(INSTANCE_TITLE));
     $tpl->assign('connection', false);
     $tpl->assign('notice', '');
     $tpl->assign('error', '');
@@ -42,6 +42,7 @@
                 }
             }
             $tpl->assign('connection', true);
+            $tpl->assign('user_post', (!empty($_POST['login'])) ? htmlspecialchars($_POST['login']) : '');
             $tpl->draw('connexion');
             break;
 
