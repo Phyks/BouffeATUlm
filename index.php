@@ -8,9 +8,14 @@
 
     $tpl = new raintpl();
     $tpl->assign('instance_title', INSTANCE_TITLE);
+    $tpl->assign('connection', false);
+    $tpl->assign('notice', '');
     
     session_start();
     $current_user = (isset($_SESSION['current_user']) ? unserialize($_SESSION['current_user']) : false);
+    $tpl->assign('admin', ($current_user !== false) ? (int) $current_user['admin'] : 0);
+
+    $usersManager = new User();
 
     if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) { //If not connected, go to connection page
         header('location: index.php?do=connect');
@@ -35,6 +40,7 @@
                    $error = "Unknown username/password.";
                 }
             }
+            $tpl->assign('connection', true);
             $tpl->draw('connexion');
             break;
 
@@ -43,8 +49,16 @@
             session_destroy();
             header('location: index.php?do=connect');
             exit();
+            break;
+
+        case 'password':
+
+            $tpl->draw('edit_users');
+            break;
 
         default:
-
+            $tpl->assign('users', array(0=>array("name"=>"truc")));
+            $tpl->assign('bill', array(0=>array()));
+            $tpl->draw('index');
             break;
     }

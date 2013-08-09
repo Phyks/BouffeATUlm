@@ -1,45 +1,45 @@
 {include="header"}
 
-<h1>{$instance_title}</h1>
-
-{$notice}
-
-<div id="menu">
-    <ul>
-        <li><a href="modif.php">Ajouter une dépense</a></li>
-        <li><a href="modif_password.php">Modifier le mot de passe</a></li>
-        <li><a href="rbmt.php">Consulter les remboursements</a></li>
-    </ul>
-    {if condition="$admin"}
-    <ul>
-        <li><a href="rbmt_admin.php">Gérer les rembourements</a></li>
-        <li><a href="copains.php">Modifier les copains</a></li>
-        <li><a href="modif_annonce.php">Modifier l'annonce d'accueil</a></li>
-        <li><a href="connexion.php?deco=1">Déconnexion</a></li>
-    </ul>
-    {/if}
-</div>
 <div id="quick_summary">
-    <h2>Qui doit quoi ?</h2>
-    <p>Lire <em>ligne</em> doit <em>case</em>€ à <em>colonne</em>. Les liens permettent de confirmer le paiement des dettes.</p>
-    <table>
+    <h2>Balance</h2>
+    <p class="center">Read <em>line</em> owes <em>case</em>€ to <em>column</em>. You can click on links to confirm the payback.
+    <table> 
         <tr>
-            <th>Doit\À</th>
+            <th>Owes\To</th>
+            {loop="users"}
+                <th>{$value.name}</th>
+            {/loop}
         </tr>
+        {loop="users"}
+            <tr>
+                <th>{$value.name}</th>
+            </tr>
+        {/loop}
     </table>
 </div>
 <div id="detailed_summary">
-    <h2>Dépenses détaillées du mois actuel</h2>
+    <h2>Detailed list of bills for last month</h2>
 
     <table>
         <tr>
             <th>Date</th>
-            <th>Payé par</th>
-            <th>Participants</th>
-            <th>Montant</th>
-            <th>Menu</th>
-            <th>Modifier</th>
-            <th>Supprimer</th>
+            <th>Paid by</th>
+            <th>Users in</th>
+            <th>Amount</th>
+            <th>What ?</th>
+            <th>Edit</th>
+            <th>Delete</th>
         </tr>
+        {loop="bill"}
+            <tr>
+                <td>{$value.date}</td>
+                <td>{$value.buyer}</td>
+                <td>{$value.users_in}</td>
+                <td>{$value.amount}</td>
+                <td>{$value.what}</td>
+                <td><a href="index.php?do=edit_bill&id=">Edit</a></td>
+                <td><a href="index.php?do=delete_bill&id=">Delete</a></td>
+            </tr>
+        {/loop}
     </table>
 </div>
