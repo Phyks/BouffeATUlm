@@ -116,7 +116,7 @@
                 <p><label for="admin_login">Username of the admin : </label><input type="text" name="admin_login" id="admin_login" <?php echo (!empty($_POST['admin_login'])) ? 'value="'.htmlspecialchars($_POST['admin_login']).'"' : '';?>/></p>
                 <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/></p>
             </fieldset>
-            <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit"></p>
+            <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" value="Install"></p>
         </form>
     </body>
 </html>
