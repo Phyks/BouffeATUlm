@@ -9,14 +9,14 @@
             <th>Owes\To</th>
             <?php $counter1=-1; if( isset($users) && is_array($users) && sizeof($users) ) foreach( $users as $key1 => $value1 ){ $counter1++; ?>
 
-                <th><?php echo $value1["name"];?></th>
+            <th><?php echo $value1->getLogin();?></th>
             <?php } ?>
 
         </tr>
         <?php $counter1=-1; if( isset($users) && is_array($users) && sizeof($users) ) foreach( $users as $key1 => $value1 ){ $counter1++; ?>
 
             <tr>
-                <th><?php echo $value1["name"];?></th>
+                <th><?php echo $value1->getLogin();?></th>
             </tr>
         <?php } ?>
 

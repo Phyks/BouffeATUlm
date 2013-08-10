@@ -70,7 +70,7 @@ class User extends Storage {
         return serialize(array('id'=>$this->id, 'login'=>$this->login, 'password'=>$this->password, 'admin'=>$this->admin));
     }
 
-    public function sessionRestore($data, $serialized) {
+    public function sessionRestore($data, $serialized = false) {
         if($serialized)
             $user_data = unserialize($serialized_data);
         else
@@ -80,5 +80,32 @@ class User extends Storage {
         $this->setLogin($user_data['login']);
         $this->setPassword($user_data['password']);
         $this->setAdmin($user_data['admin']);
+    }
+
+    public function load_users() {
+        $return = array();
+        $users = $this->load();
+
+        foreach($users as $user) {
+            $return[0] = new User();
+            $return[0]->sessionRestore($user);
+        }
+        return $return;
+    }
+
+    public function load_user($fields = NULL) {
+        $fetch = $this->load($fields);
+
+        if(count($fetch) > 0) {
+            $this->setId($fetch[0]['id']);
+            $this->setLogin($fetch[0]['login']);
+            $this->setPassword($fetch[0]['password']);
+            $this->setAdmin($fetch[0]['admin']);
+
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

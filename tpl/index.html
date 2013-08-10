@@ -7,12 +7,12 @@
         <tr>
             <th>Owes\To</th>
             {loop="users"}
-                <th>{$value.name}</th>
+            <th>{$value->getLogin()}</th>
             {/loop}
         </tr>
         {loop="users"}
             <tr>
-                <th>{$value.name}</th>
+                <th>{$value->getLogin()}</th>
             </tr>
         {/loop}
     </table>

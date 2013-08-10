@@ -68,11 +68,42 @@
                     $tpl->assign('error', 'The content of the two password fields doesn\'t match.');
                 }
             }
+            $tpl->assign('view', 'password');
             $tpl->draw('edit_users');
             break;
 
+        case 'edit_users':
+        case 'add_user':
+            if(!$current_user['admin']) {
+                header('location: index.php');
+            }
+ 
+            if(!empty($_GET['user_id']) || $_GET['do'] == 'add_user') {
+                if(!empty($_GET['user_id'])) {
+                    $user_id = (int) $_GET['user_id'];
+                    $user = new User();
+                    $user->load_user(array('id'=>$user_id));
+                    $tpl->assign('user_data', $user);
+                }
+                $tpl->assign('user_id', (!empty($user_id) ? $user_id : -1));
+                $tpl->assign('view', 'edit_user');
+            }
+            else {
+                $users_list = new User();
+                $users_list = $users_list->load_users();
+                $tpl->assign('users', $users_list);
+                $tpl->assign('view', 'list_users');
+            }
+            $tpl->draw('edit_users');
+            break;
+
+        case 'delete_user':
+            break;
+
         default:
-            $tpl->assign('users', array(0=>array("name"=>"truc")));
+            $users_list = new User();
+            $users_list = $users_list->load_users();
+            $tpl->assign('users', $users_list);
             $tpl->assign('bill', array(0=>array()));
             $tpl->draw('index');
             break;

@@ -72,9 +72,13 @@ input[type=submit] {
     text-align: center
 }
 
-#edit_password_form {
+#edit_password_form, #edit_user_form {
     width: 50%;
     margin-left: 15%;
+}
+
+#edit_user_admin_rights {
+    text-align: center;
 }
 
 #install {

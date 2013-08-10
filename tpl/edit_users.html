@@ -4,9 +4,54 @@
     <p class="error">{$error}</p>
 {/if}
 
+{if condition="$view == 'list_users'"}
+<h2>List of users</h2>
+<p>You can also <a href="?do=add_user">add a user</a>.</p>
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Login</th>
+        <th>Is admin ?</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+    {loop="users"}
+    <tr>
+        <td>{$value->getId()}</td>
+        <td>{$value->getLogin()}</td>
+        <td>{$value->getAdmin() ? "Yes" : "No"}</td>
+        <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Edit</a></td>
+        <td><a href="index.php?do=delete_user&user_id={$value->getId()}">Delete</a></td>
+    </tr>
+    {/loop}
+</table>
+{elseif condition="$view == 'edit_user'"}
+<h2>Edit a user</h2>
+<form method="post" action="index.php" id="edit_user_form">
+    <p>
+    <label for="login" class="label-block">Login : </label><input type="text" name="login" id="login" {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''}/>
+    </p>
+    <p>
+        <label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/>
+        {if condition="$user_id != -1"}
+            <br/><em>Note :</em> Leave blank this field if you don't want to edit password.
+        {/if}
+    </p>
+    <p id="edit_user_admin_rights">
+        Give admin rights to this user ?<br/>
+        <input type="radio" id="admin_yes" name="admin" {if condition="$user_id != -1 && $user_data->getAdmin()"}checked{/if}/><label for="admin_yes">Yes</label><br/>
+        <input type="radio" id="admin_no" id="admin" {if condition="$user_id == -1 || !$user_data->getAdmin()"}checked{/if}/><label for="admin_no">No</label>
+    </p>
+    <p class="center">
+        <input type="submit" value="{$user_id != -1 ? 'Edit' : 'Add'}"/>
+    </p>
+</form>
+
+{elseif condition="$view == 'password'"}
 <h2>Edit your password</h2>
 <form method="post" action="index.php?do=password" id="edit_password_form">
     <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/></p>
     <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/></p>
     <p class="center"><input type="submit" value="Update"/></p>
 </form>
+{/if}
