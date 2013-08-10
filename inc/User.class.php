@@ -29,7 +29,7 @@ class User extends Storage {
     }
 
     public function setId($id) {
-        $this->id = $id;
+        $this->id = (int) $id;
     }
 
     public function setLogin($login) {
@@ -41,7 +41,7 @@ class User extends Storage {
     }
 
     public function setAdmin($admin) {
-        $this->admin = $admin;
+        $this->admin = (bool) $admin;
     }
 
     public function encrypt($text) {
@@ -55,6 +55,7 @@ class User extends Storage {
     public function exists() {
         $user_data = $this->load(array('login'=>$this->login));
         if(count($user_data) == 1) {
+            $this->setId($user_data[0]['id']);
             $this->setAdmin($user_data[0]['admin']);
             $this->setPassword($user_data[0]['password']);
 
@@ -69,8 +70,11 @@ class User extends Storage {
         return serialize(array('id'=>$this->id, 'login'=>$this->login, 'password'=>$this->password, 'admin'=>$this->admin));
     }
 
-    public function sessionRestore($serialized_data) {
-        $user_data = unserialize($serialized_data);
+    public function sessionRestore($data, $serialized) {
+        if($serialized)
+            $user_data = unserialize($serialized_data);
+        else
+            $user_data = $data;
 
         $this->setId($user_data['id']);
         $this->setLogin($user_data['login']);

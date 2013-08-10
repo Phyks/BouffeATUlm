@@ -57,10 +57,8 @@
             if(!empty($_POST['password']) && !empty($_POST['password_confirm'])) {
                 if($_POST['password'] == $_POST['password_confirm']) {
                     $user = new User();
-                    $user->setLogin($current_user['login']);
+                    $user->sessionRestore($current_user, false);
                     $user->setPassword($user->encrypt($_POST['password']));
-                    $user->setAdmin($current_user['admin']);
-                    $user->setId($current_user['id']);
                     $user->save();
 
                     header('location: index.php');

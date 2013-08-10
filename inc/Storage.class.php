@@ -123,7 +123,7 @@ class Storage {
                 $query .= $field.'=:'.$field;
             }
 
-            $query .= 'WHERE id='.$this->id;
+            $query .= ' WHERE id='.$this->id;
         }
         else {
             $query = 'INSERT INTO '.MYSQL_PREFIX.$this->TABLE_NAME.'(';
@@ -147,6 +147,7 @@ class Storage {
             $query .= ')';
         }
 
+        $this->connection->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         $query = $this->connection->prepare($query);
 
         foreach($this->fields as $field=>$type) {
