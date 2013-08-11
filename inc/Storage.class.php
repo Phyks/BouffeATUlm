@@ -165,4 +165,27 @@ class Storage {
 
         $this->id = (!isset($this->id) ? $this->connection->lastInsertId() : $this->id);
     }
+
+    public function delete() {
+        $query = 'DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE ';
+
+        $i = false;
+        foreach($this->fields as $field=>$type) {
+            if(!empty($this->$field)) {
+                if($i) { $query .= ' AND '; } else { $i = true; }
+                
+                $query .= $field.'=:'.$field;
+            }
+        }
+
+        $query = $this->connection->prepare($query);
+
+        foreach($this->fields as $field=>$type) {
+            if(!empty($this->$field)) {
+                $query->bindParam(':'.$field, $this->$field);
+            }
+        }
+
+        $query->execute();
+    }
 }

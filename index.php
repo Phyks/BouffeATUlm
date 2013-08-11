@@ -127,9 +127,10 @@
         case 'delete_user':
             if($_GET['user_id'] != $current_user->getId()) {
                 $user = new User();
+                $user->setId($_GET['user_id']);
                 $user->delete();
 
-                header('location: index.php');
+                header('location: index.php?do=edit_users');
                 exit();
             }
             break;
