@@ -1,4 +1,5 @@
 <?php
+    // Include necessary files
     if(!file_exists('inc/config.php')) header('location: install.php');
     require_once('inc/config.php');
     require_once('inc/User.class.php');
@@ -6,32 +7,41 @@
     raintpl::$tpl_dir = 'tpl/';
     raintpl::$cache_dir = 'tmp/';
 
+    // Define raintpl instance
     $tpl = new raintpl();
     $tpl->assign('instance_title', htmlspecialchars(INSTANCE_TITLE));
     $tpl->assign('connection', false);
     $tpl->assign('notice', '');
     $tpl->assign('error', '');
-    
+
+    // Handle current user status
     session_start();
-    $current_user = (isset($_SESSION['current_user']) ? unserialize($_SESSION['current_user']) : false);
-    $tpl->assign('admin', ($current_user !== false) ? (int) $current_user['admin'] : 0);
+    $current_user = new User();
+    if(isset($_SESSION['current_user'])) {
+        $current_user->sessionRestore($_SESSION['current_user'], true);
+    }
+    else {
+        $current_user = false;
+    }
+    $tpl->assign('current_user', $current_user);
 
-    $usersManager = new User();
-
-    if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) { //If not connected, go to connection page
+    // If not connected, redirect to connection page
+    if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) {
         header('location: index.php?do=connect');
     }
     
+    // Initialize empty $_GET['do'] if required to avoid error
     if(empty($_GET['do'])) {
         $_GET['do'] = '';
     }
 
+    // Check what to do
     switch($_GET['do']) {
         case 'connect':
-            if($current_user !== false) header('location: index.php');
+            if($current_user !== false) {
+                header('location: index.php');
+            }
             if(!empty($_POST['login']) && !empty($_POST['password'])) {
-                $current_user = new User();
-                $current_user->setLogin($_POST['login']);
                 if($current_user->exists($_POST['login']) && $current_user->checkPassword($_POST['password'])) {
                     $_SESSION['current_user'] = $current_user->sessionStore();
                     header('location: index.php');
@@ -56,10 +66,8 @@
         case 'password':
             if(!empty($_POST['password']) && !empty($_POST['password_confirm'])) {
                 if($_POST['password'] == $_POST['password_confirm']) {
-                    $user = new User();
-                    $user->sessionRestore($current_user, false);
-                    $user->setPassword($user->encrypt($_POST['password']));
-                    $user->save();
+                    $current_user->setPassword($user->encrypt($_POST['password']));
+                    $current_user->save();
 
                     header('location: index.php');
                     exit();
@@ -74,8 +82,24 @@
 
         case 'edit_users':
         case 'add_user':
-            if(!$current_user['admin']) {
+            if(!$current_user->getAdmin()) {
                 header('location: index.php');
+            }
+
+            if(!empty($_POST['login']) &&  (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
+                $user = new User();
+                if(!empty($_POST['user_id'])) {
+                    $user->setId($_POST['user_id']);
+                }
+                $user->setLogin($_POST['login']);
+                if(!empty($_POST['password'])) {
+                    $user->setPassword($user->encrypt($_POST['password']));
+                }
+                $user->setAdmin($_POST['admin']);
+                $user->save();
+
+                header('location: index.php?do=edit_users');
+                exit();
             }
  
             if(!empty($_GET['user_id']) || $_GET['do'] == 'add_user') {
@@ -91,13 +115,23 @@
             else {
                 $users_list = new User();
                 $users_list = $users_list->load_users();
+
                 $tpl->assign('users', $users_list);
                 $tpl->assign('view', 'list_users');
             }
+            $tpl->assign('login_post', (!empty($_POST['login']) ? htmlspecialchars($_POST['login']) : ''));
+            $tpl->assign('admin_post', (isset($_POST['admin']) ? (int) $_POST['admin'] : -1));
             $tpl->draw('edit_users');
             break;
 
         case 'delete_user':
+            if($_GET['user_id'] != $current_user->getId()) {
+                $user = new User();
+                $user->delete();
+
+                header('location: index.php');
+                exit();
+            }
             break;
 
         default:

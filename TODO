@@ -3,6 +3,7 @@
 * tokens + ban system
 * remember me
 * Display names
+* htmlspecialchars
 
 install.php :
 =============
@@ -12,5 +13,3 @@ install.php :
 index.php :
 ===========
 * Delete user (+ check if not you)
-* Edit user
-* Create user

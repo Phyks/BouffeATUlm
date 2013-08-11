@@ -72,7 +72,7 @@ class User extends Storage {
 
     public function sessionRestore($data, $serialized = false) {
         if($serialized)
-            $user_data = unserialize($serialized_data);
+            $user_data = unserialize($data);
         else
             $user_data = $data;
 
@@ -87,8 +87,8 @@ class User extends Storage {
         $users = $this->load();
 
         foreach($users as $user) {
-            $return[0] = new User();
-            $return[0]->sessionRestore($user);
+            $return[$user['id']] = new User();
+            $return[$user['id']]->sessionRestore($user);
         }
         return $return;
     }

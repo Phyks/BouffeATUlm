@@ -11,7 +11,7 @@
         $block_form = true;
     }
 
-    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password'])) {
+    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency'])) {
         $mysql_host = $_POST['mysql_host'];
         $mysql_login = $_POST['mysql_login'];
         $mysql_db = $_POST['mysql_db'];
@@ -50,7 +50,8 @@
     define('MYSQL_PREFIX', '".$mysql_prefix."');
     define('INSTANCE_TITLE', '".$instance_title."');
     define('BASE_URL', '".$_POST['base_url']."');
-    define('SALT', '".$salt."');";
+    define('SALT', '".$salt."');
+    define('CURRENCY', '".$_POST['currency']."');";
 
             if(file_put_contents("inc/config.php", $config)) {
                 try {
@@ -110,6 +111,7 @@
                     <label for="base_url">Base URL : </label><input type="text" size="30" name="base_url" id="base_url" value="<?php echo (!empty($_POST['base_url'])) ? htmlspecialchars($_POST['base_url']) : 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].str_replace("install.php", "", $_SERVER['REQUEST_URI']); ?>"/><br/>
                     <em>Note :</em> This is the base URL from which you access this page. You must keep the trailing "/" in the above address.
                 </p>
+                <p><label for="currency">Currency : </label><input type="text" name="currency" id="currency" size="3"/></p>
             </fieldset>
             <fieldset>
                 <legend>Administrator</legend>

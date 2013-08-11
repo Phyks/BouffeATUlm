@@ -22,14 +22,14 @@
         <li><a href="index.php?do=new_invoice">Add a bill</a></li>
         <li><a href="index.php?do=password">Change your password</a></li>
         <li><a href="index.php?do=paybacks">See paybacks</a></li>
+        <li><a href="index.php?do=disconnect">Disconnect</a></li>
     </ul>
-    <?php if( $admin == 1 ){ ?>
+    <?php if( $current_user->getAdmin() == 1 ){ ?>
 
     <ul>
         <li><a href="index.php?do=manage_paybacks">Manage paybacks</a></li>
         <li><a href="index.php?do=edit_users">Edit users</a></li>
         <li><a href="index.php?do=edit_notics">Edit notice on homepage</a></li>
-        <li><a href="index.php?do=disconnect">Disconnect</a></li>
     </ul>
     <?php } ?>
 

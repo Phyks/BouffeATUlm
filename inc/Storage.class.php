@@ -118,9 +118,12 @@ class Storage {
 
             $i = false;
             foreach($this->fields as $field=>$type) {
-                if($i) { $query .= ','; } else { $i = true; }
+                if(isset($this->$field))
+                {
+                    if($i) { $query .= ','; } else { $i = true; }
 
-                $query .= $field.'=:'.$field;
+                    $query .= $field.'=:'.$field;
+                }
             }
 
             $query .= ' WHERE id='.$this->id;
@@ -139,9 +142,11 @@ class Storage {
             
             $i = false;
             foreach($this->fields as $field=>$type) {
-                if($i) { $query .= ','; } else { $i = true; }
+                if(isset($this->$field)) {
+                    if($i) { $query .= ','; } else { $i = true; }
                 
-                $query .= ':'.$field;
+                    $query .= ':'.$field;
+                }
             }
 
             $query .= ')';
@@ -151,7 +156,9 @@ class Storage {
         $query = $this->connection->prepare($query);
 
         foreach($this->fields as $field=>$type) {
-            $query->bindParam(':'.$field, $this->$field);
+            if(!empty($this->$field)) {
+                $query->bindParam(':'.$field, $this->$field);
+            }
         }
         
         $query->execute();
