@@ -1,9 +1,15 @@
 <?php if(!class_exists('raintpl')){exit;}?><?php $tpl = new RainTPL;$tpl_dir_temp = self::$tpl_dir;$tpl->assign( $this->var );$tpl->draw( dirname("header") . ( substr("header",-1,1) != "/" ? "/" : "" ) . basename("header") );?>
 
 
+<?php if( $notice != '' ){ ?>
+
+    <div id="notice"><p><?php echo $notice;?></p></div>
+<?php } ?>
+
+
 <div id="quick_summary">
     <h2>Balance</h2>
-    <p class="center">Read <em>line</em> owes <em>case</em>€ to <em>column</em>. You can click on links to confirm the payback.
+    <p class="center">Read <em>line</em> owes <em>case</em><?php echo $currency;?> to <em>column</em>. You can click on links to confirm the payback.
     <table> 
         <tr>
             <th>Owes\To</th>
@@ -50,3 +56,6 @@
 
     </table>
 </div>
+
+<?php $tpl = new RainTPL;$tpl_dir_temp = self::$tpl_dir;$tpl->assign( $this->var );$tpl->draw( dirname("footer") . ( substr("footer",-1,1) != "/" ? "/" : "" ) . basename("footer") );?>
+

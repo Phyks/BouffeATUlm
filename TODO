@@ -3,7 +3,7 @@
 * tokens + ban system
 * remember me
 * Display names
-* htmlspecialchars
+* htmlspecialchars => on users objects
 
 install.php :
 =============

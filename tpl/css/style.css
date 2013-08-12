@@ -47,13 +47,17 @@ input[type=submit] {
     border-radius: 10px;
 }
 
-#title {
+#title, #title a:visited, #install h1 {
     background-color: #333;
     border-bottom: 0.3em solid green;
     color: white;
     padding: 0.5em;
     margin: 0;
     text-align: center;
+}
+
+#title a {
+    text-decoration: none;
 }
 
 #menu ul {
@@ -64,6 +68,13 @@ input[type=submit] {
     display: inline-block;
     margin-left: 1em;
     margin-right: 1em;
+}
+
+#notice {
+    text-align: center;
+    font-size: 1.5em;
+    background-color: green;
+    padding: 0.1em;
 }
 
 #connexion_form {
@@ -81,21 +92,17 @@ input[type=submit] {
     text-align: center;
 }
 
+#textarea_notice {
+    width: 50%;
+}
+
 #install {
     margin: 0;
 }
 
-#install form {
+#install form, #settings_form {
     width: 67%;
     margin: auto;
-}
-
-#install h1 {
-    background-color: #333;
-    border-bottom: 0.3em solid green;
-    color: white;
-    padding: 0.5em;
-    margin: 0;
 }
 
 .error {

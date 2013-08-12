@@ -1,9 +1,10 @@
 <?php
     // Include necessary files
-    if(!file_exists('inc/config.php')) header('location: install.php');
-    require_once('inc/config.php');
+    if(!file_exists('data/config.php')) header('location: install.php');
+    require_once('data/config.php');
     require_once('inc/User.class.php');
     require_once('inc/rain.tpl.class.php');
+    require_once('inc/functions.php');
     raintpl::$tpl_dir = 'tpl/';
     raintpl::$cache_dir = 'tmp/';
 
@@ -11,8 +12,10 @@
     $tpl = new raintpl();
     $tpl->assign('instance_title', htmlspecialchars(INSTANCE_TITLE));
     $tpl->assign('connection', false);
-    $tpl->assign('notice', '');
+    $tpl->assign('notice', nl2br(getNotice()));
     $tpl->assign('error', '');
+    $tpl->assign('base_url', htmlspecialchars(BASE_URL));
+    $tpl->assign('currency', htmlspecialchars(CURRENCY));
 
     // Handle current user status
     session_start();
@@ -42,8 +45,10 @@
                 header('location: index.php');
             }
             if(!empty($_POST['login']) && !empty($_POST['password'])) {
-                if($current_user->exists($_POST['login']) && $current_user->checkPassword($_POST['password'])) {
-                    $_SESSION['current_user'] = $current_user->sessionStore();
+                $user = new User();
+                $user->setLogin($_POST['login']);
+                if($user->exists($_POST['login']) && $user->checkPassword($_POST['password'])) {
+                    $_SESSION['current_user'] = $user->sessionStore();
                     header('location: index.php');
                     exit();
                 }
@@ -109,7 +114,7 @@
                     $user->load_user(array('id'=>$user_id));
                     $tpl->assign('user_data', $user);
                 }
-                $tpl->assign('user_id', (!empty($user_id) ? $user_id : -1));
+                $tpl->assign('user_id', (!empty($user_id) ? (int) $user_id : -1));
                 $tpl->assign('view', 'edit_user');
             }
             else {
@@ -133,6 +138,62 @@
                 header('location: index.php?do=edit_users');
                 exit();
             }
+            break;
+
+        case 'edit_notice':
+            if(isset($_POST['notice'])) {
+                setNotice($_POST['notice']);
+    
+                header('location: index.php');
+                exit();
+            }
+
+            $tpl->assign('notice', getNotice());
+            $tpl->assign('show_settings', false);
+            $tpl->draw('settings');
+            break;
+
+        case 'settings':
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url'])) {
+                if(!is_writable('data/')) {
+                    $tpl>assign('error', 'The script can\'t write in data/ dir, check permissions set on this folder.');
+                }
+                $config = file('data/config.php');
+
+                foreach($config as $line_number=>$line) {
+                    if(strpos($line, "MYSQL_HOST") !== FALSE)
+                        $config[$line_number] = "\tdefine('".$_POST['mysql_host']."');\n";
+                    elseif(strpos($line, "MYSQL_LOGIN") !== FALSE)
+                        $config[$line_number] = "\tdefine('".$_POST['mysql_login']."');\n";
+                    elseif(strpos($line, "MYSQL_PASSWORD") !== FALSE && !empty($_POST['mysql_password']))
+                        $config[$line_number] = "\tdefine('".$_POST['mysql_password']."');\n";
+                    elseif(strpos($line, "MYSQL_DB") !== FALSE)
+                        $config[$line_number] = "\tdefine('".$_POST['mysql_db']."');\n";
+                    elseif(strpos($line, "MYSQL_PREFIX") !== FALSE && !empty($_POST['mysql_prefix']))
+                        $config[$line_number] = "\tdefine('".$_POST['mysql_prefix']."');\n";
+                    elseif(strpos($line, "INSTANCE_TITLE") !== FALSE)
+                        $config[$line_number] = "\tdefine('".$_POST['instance_title']."');\n";
+                    elseif(strpos($line, "BASE_URL") !== FALSE)
+                        $config[$line_number] = "\tdefine('".$_POST['base_url']."');\n";
+                    elseif(strpos($line, "CURRENCY") !== FALSE)
+                        $config[$line_number] = "\tdefine('".$_POST['currency']."');\n";
+                }
+
+                if(file_put_contents("data/config.php", $config)) {
+                    header('location: index.php');
+                    exit();
+                }
+                else {
+                    $tpl->assign('error', 'Unable to write data/config.php file.');
+                }
+            }
+
+            $tpl->assign('mysql_host', MYSQL_HOST);
+            $tpl->assign('mysql_login', MYSQL_LOGIN);
+            $tpl->assign('mysql_db', MYSQL_DB);
+            $tpl->assign('mysql_prefix', MYSQL_PREFIX);
+            $tpl->assign('show_settings', true);
+            $tpl->draw('settings');
             break;
 
         default:

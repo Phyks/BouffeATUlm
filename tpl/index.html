@@ -1,8 +1,12 @@
 {include="header"}
 
+{if condition="$notice != ''"}
+    <div id="notice"><p>{$notice}</p></div>
+{/if}
+
 <div id="quick_summary">
     <h2>Balance</h2>
-    <p class="center">Read <em>line</em> owes <em>case</em>€ to <em>column</em>. You can click on links to confirm the payback.
+    <p class="center">Read <em>line</em> owes <em>case</em>{$currency} to <em>column</em>. You can click on links to confirm the payback.
     <table> 
         <tr>
             <th>Owes\To</th>
@@ -43,3 +47,5 @@
         {/loop}
     </table>
 </div>
+
+{include="footer"}

@@ -8,11 +8,7 @@
 </head>
 <body>
 {if condition="!$connection"}
-<h1 id="title">{$instance_title}</h1>
-
-{if condition="$notice != ''"}
-    <p>{$notice}</p>
-{/if}
+<h1 id="title"><a href="{$base_url}">{$instance_title}</a></h1>
 
 <div id="menu">
     <ul>
@@ -25,7 +21,8 @@
     <ul>
         <li><a href="index.php?do=manage_paybacks">Manage paybacks</a></li>
         <li><a href="index.php?do=edit_users">Edit users</a></li>
-        <li><a href="index.php?do=edit_notics">Edit notice on homepage</a></li>
+        <li><a href="index.php?do=edit_notice">Edit notice on homepage</a></li>
+        <li><a href="index.php?do=settings">Settings</a></li>
     </ul>
     {/if}
 </div>

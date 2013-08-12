@@ -9,13 +9,7 @@
 <body>
 <?php if( !$connection ){ ?>
 
-<h1 id="title"><?php echo $instance_title;?></h1>
-
-<?php if( $notice != '' ){ ?>
-
-    <p><?php echo $notice;?></p>
-<?php } ?>
-
+<h1 id="title"><a href="<?php echo $base_url;?>"><?php echo $instance_title;?></a></h1>
 
 <div id="menu">
     <ul>
@@ -29,7 +23,8 @@
     <ul>
         <li><a href="index.php?do=manage_paybacks">Manage paybacks</a></li>
         <li><a href="index.php?do=edit_users">Edit users</a></li>
-        <li><a href="index.php?do=edit_notics">Edit notice on homepage</a></li>
+        <li><a href="index.php?do=edit_notice">Edit notice on homepage</a></li>
+        <li><a href="index.php?do=settings">Settings</a></li>
     </ul>
     <?php } ?>
 

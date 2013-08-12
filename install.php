@@ -1,17 +1,17 @@
 <?php
-    if(file_exists('inc/config.php')) exit("Your Bouffe@Ulm instance is already configured. You should either delete inc/config.php to access this page or delete the install.php for security reasons if you are ok with the configuration.");
+    if(file_exists('data/config.php')) exit("Your Bouffe@Ulm instance is already configured. You should either delete data/config.php to access this page or delete the install.php for security reasons if you are ok with the configuration.");
 
     if(!function_exists("file_get_contents") && !function_exists("file_put_contents")) {
         $error = "Functions <em>file_get_contents</em> and <em>file_put_contents</em> seems to not be available on your PHP installation. You should enable them first.";
         $block_form = true;
     }
 
-    if(!is_writable('inc/')) {
-        $error = "The script seems to be unable to write to <em>inc/</em> folder (to write the <em>inc/config.php</em> configuration file). You should give write access during install and disable them after (chmod 777 -R inc/ to install and chmod 755 -R inc/ after installation for example).";
+    if(!is_writable('data/')) {
+        $error = "The script seems to be unable to write to <em>data/</em> folder (to write the <em>data/config.php</em> configuration file). You should give write access during install and disable them after (chmod 777 -R data/ to install and chmod 755 -R data/ after installation for example).";
         $block_form = true;
     }
 
-    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency'])) {
+    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url'])) {
         $mysql_host = $_POST['mysql_host'];
         $mysql_login = $_POST['mysql_login'];
         $mysql_db = $_POST['mysql_db'];
@@ -53,7 +53,7 @@
     define('SALT', '".$salt."');
     define('CURRENCY', '".$_POST['currency']."');";
 
-            if(file_put_contents("inc/config.php", $config)) {
+            if(file_put_contents("data/config.php", $config) && file_put_contents("data/notice", '')) {
                 try {
                     require_once('inc/User.class.php');
                     $admin = new User();
@@ -68,7 +68,7 @@
                 }
             }
             else
-                $error = 'Unable to write configuration to config file inc/config.php.';
+                $error = 'Unable to write configuration to config file data/config.php.';
         }
     }
 ?>

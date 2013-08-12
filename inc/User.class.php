@@ -1,5 +1,5 @@
 <?php
-require_once('config.php');
+require_once('data/config.php');
 require_once('Storage.class.php');
 
 class User extends Storage {
