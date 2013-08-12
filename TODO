@@ -4,6 +4,7 @@
 * remember me
 * Display names
 * htmlspecialchars => on users objects
+* Associate a guest with someone
 
 install.php :
 =============

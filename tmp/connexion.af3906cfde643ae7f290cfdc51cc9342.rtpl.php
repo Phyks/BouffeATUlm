@@ -8,3 +8,6 @@
     <p><label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/></p>
     <p><input type="submit" value="Connect"/></p>
 </form>
+
+<?php $tpl = new RainTPL;$tpl_dir_temp = self::$tpl_dir;$tpl->assign( $this->var );$tpl->draw( dirname("footer") . ( substr("footer",-1,1) != "/" ? "/" : "" ) . basename("footer") );?>
+
