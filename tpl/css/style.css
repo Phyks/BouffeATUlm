@@ -11,6 +11,7 @@ fieldset {
 table {
     margin: auto;
     text-align: center;
+    max-width: 100%;
 }
 
 table td, table th {
@@ -28,6 +29,10 @@ h2 {
     padding-left: 3em;
     border: 0.3em solid green;
     border-left: none;
+}
+
+input[type="checkbox"] {
+    margin-left: 2em;
 }
 
 .center {
