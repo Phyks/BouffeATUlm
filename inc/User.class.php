@@ -3,11 +3,12 @@ require_once('data/config.php');
 require_once('Storage.class.php');
 
 class User extends Storage {
-    protected $id, $login, $password, $admin;
+    protected $id, $login, $display_name, $password, $admin;
     protected $TABLE_NAME = "Users";
     protected $fields = array(
         'id'=>'key',
         'login'=>'string',
+        'display_name'=>'string',
         'password'=>'password',
         'admin'=>'bool'
         );
@@ -18,6 +19,10 @@ class User extends Storage {
 
     public function getLogin() {
         return $this->login;
+    }
+
+    public function getDisplayName() {
+        return $this->display_name;
     }
 
     public function getId() {
@@ -34,6 +39,10 @@ class User extends Storage {
 
     public function setLogin($login) {
         $this->login = $login;
+    }
+
+    public function setDisplayName($display_name) {
+        $this->display_name = $display_name;
     }
 
     public function setPassword($password) {
@@ -56,6 +65,7 @@ class User extends Storage {
         $user_data = $this->load(array('login'=>$this->login));
         if(count($user_data) == 1) {
             $this->setId($user_data[0]['id']);
+            $this->setDisplayName($user_data[0]['admin']);
             $this->setAdmin($user_data[0]['admin']);
             $this->setPassword($user_data[0]['password']);
 
@@ -67,7 +77,7 @@ class User extends Storage {
     }
 
     public function sessionStore() {
-        return serialize(array('id'=>$this->id, 'login'=>$this->login, 'password'=>$this->password, 'admin'=>$this->admin));
+        return serialize(array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin));
     }
 
     public function sessionRestore($data, $serialized = false) {
@@ -78,6 +88,7 @@ class User extends Storage {
 
         $this->setId($user_data['id']);
         $this->setLogin($user_data['login']);
+        $this->setDisplayName($user_data['display_name']);
         $this->setPassword($user_data['password']);
         $this->setAdmin($user_data['admin']);
     }
@@ -99,6 +110,7 @@ class User extends Storage {
         if(count($fetch) > 0) {
             $this->setId($fetch[0]['id']);
             $this->setLogin($fetch[0]['login']);
+            $this->setDisplayName($fetch[0]['display_name']);
             $this->setPassword($fetch[0]['password']);
             $this->setAdmin($fetch[0]['admin']);
 

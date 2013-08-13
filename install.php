@@ -23,7 +23,7 @@
             $db = new PDO('mysql:host='.$mysql_host.';dbname='.$mysql_db, $mysql_login, $mysql_password);
 
             //Create table "Users"
-            $dump = $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), password VARCHAR(130), admin TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $dump = $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
  
             //Create table "Invoices" - TODO
             //Create table "Payback" - TODO
@@ -58,6 +58,7 @@
                     require_once('inc/User.class.php');
                     $admin = new User();
                     $admin->setLogin($_POST['admin_login']);
+                    $admin->setDisplayName($_POST['admin_display_name']);
                     $admin->setPassword($admin->encrypt($_POST['admin_password']));
                     $admin->setAdmin(true);
                     $admin->save();
@@ -116,6 +117,7 @@
             <fieldset>
                 <legend>Administrator</legend>
                 <p><label for="admin_login">Username of the admin : </label><input type="text" name="admin_login" id="admin_login" <?php echo (!empty($_POST['admin_login'])) ? 'value="'.htmlspecialchars($_POST['admin_login']).'"' : '';?>/></p>
+                <p><label for="admin_display_name">Displayed name for admin user : </label><input type="text" name="admin_display_name" id="admin_display_name" <?php echo (!empty($_POST['admin_display_name']) ? 'value="'.htmlspecialchars($_POST['admin_display_name']).'"' : '');?>/></p>
                 <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/></p>
             </fieldset>
             <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" value="Install"></p>

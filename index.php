@@ -91,12 +91,13 @@
                 header('location: index.php');
             }
 
-            if(!empty($_POST['login']) &&  (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
+            if(!empty($_POST['login']) && !empty($_POST['display_name']) && (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
                 $user = new User();
                 if(!empty($_POST['user_id'])) {
                     $user->setId($_POST['user_id']);
                 }
                 $user->setLogin($_POST['login']);
+                $user->setDisplayName($_POST['login']);
                 if(!empty($_POST['password'])) {
                     $user->setPassword($user->encrypt($_POST['password']));
                 }
@@ -125,6 +126,7 @@
                 $tpl->assign('view', 'list_users');
             }
             $tpl->assign('login_post', (!empty($_POST['login']) ? htmlspecialchars($_POST['login']) : ''));
+            $tpl->assign('display_name_post', (!empty($_POST['display_name']) ? htmlspecialchars($_POST['display_name']) : ''));
             $tpl->assign('admin_post', (isset($_POST['admin']) ? (int) $_POST['admin'] : -1));
             $tpl->draw('edit_users');
             break;

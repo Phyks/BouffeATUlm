@@ -2,7 +2,6 @@
 * Vérification des variables dans les classes + throw exception
 * tokens + ban system
 * remember me
-* Display names
 * htmlspecialchars => on users objects
 * Associate a guest with someone
 

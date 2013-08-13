@@ -11,12 +11,12 @@
         <tr>
             <th>Owes\To</th>
             {loop="users"}
-            <th>{$value->getLogin()}</th>
+            <th>{$value->getDisplayName()}</th>
             {/loop}
         </tr>
         {loop="users"}
             <tr>
-                <th>{$value->getLogin()}</th>
+                <th>{$value->getDisplayName()}</th>
             </tr>
         {/loop}
     </table>

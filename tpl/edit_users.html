@@ -11,6 +11,7 @@
     <tr>
         <th>Id</th>
         <th>Login</th>
+        <th>Display Name</th>
         <th>Is admin ?</th>
         <th>Edit</th>
         <th>Delete</th>
@@ -19,6 +20,7 @@
     <tr>
         <td>{$value->getId()}</td>
         <td>{$value->getLogin()}</td>
+        <td>{$value->getDisplayName()}</td>
         <td>{$value->getAdmin() ? "Yes" : "No"}</td>
         <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Edit</a></td>
         <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&user_id={$value->getId()}">Delete</a>{/if}</td>
@@ -29,7 +31,10 @@
 <h2>Edit a user</h2>
 <form method="post" action="index.php?do=add_user" id="edit_user_form">
     <p>
-    <label for="login" class="label-block">Login : </label><input type="text" name="login" id="login" {if condition="$login_post != ''"} value="{$login_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''} {/if}/>
+        <label for="login" class="label-block">Login : </label><input type="text" name="login" id="login" {if condition="$login_post != ''"} value="{$login_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''} {/if}/>
+    </p>
+    <p>
+        <label for="display_name" class="label-block">Displayed name : </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {/else} {$user_id != -& ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
     </p>
     <p>
         <label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/>
