@@ -41,16 +41,16 @@
             <th>Edit</th>
             <th>Delete</th>
         </tr>
-        <?php $counter1=-1; if( isset($bill) && is_array($bill) && sizeof($bill) ) foreach( $bill as $key1 => $value1 ){ $counter1++; ?>
+        <?php $counter1=-1; if( isset($invoices) && is_array($invoices) && sizeof($invoices) ) foreach( $invoices as $key1 => $value1 ){ $counter1++; ?>
 
             <tr>
-                <td><?php echo $value1["date"];?></td>
-                <td><?php echo $value1["buyer"];?></td>
-                <td><?php echo $value1["users_in"];?></td>
-                <td><?php echo $value1["amount"];?></td>
-                <td><?php echo $value1["what"];?></td>
-                <td><a href="index.php?do=edit_bill&id=">Edit</a></td>
-                <td><a href="index.php?do=delete_bill&id=">Delete</a></td>
+                <td><?php echo $value1->getDate;?></td>
+                <td><?php echo $value1->getBuyer;?></td>
+                <td><?php echo $value1->getUsersIn;?></td>
+                <td><?php echo $value1->getAmount;?></td>
+                <td><?php echo $value1->getWhat;?></td>
+                <td><a href="index.php?do=edit_bill&id=<?php echo $value1->getId();?>">Edit</a></td>
+                <td><a href="index.php?do=delete_bill&id=<?php echo $value1->getId();?>">Delete</a></td>
             </tr>
         <?php } ?>
 

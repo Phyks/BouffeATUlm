@@ -34,15 +34,15 @@
             <th>Edit</th>
             <th>Delete</th>
         </tr>
-        {loop="bill"}
+        {loop="invoices"}
             <tr>
-                <td>{$value.date}</td>
-                <td>{$value.buyer}</td>
-                <td>{$value.users_in}</td>
-                <td>{$value.amount}</td>
-                <td>{$value.what}</td>
-                <td><a href="index.php?do=edit_bill&id=">Edit</a></td>
-                <td><a href="index.php?do=delete_bill&id=">Delete</a></td>
+                <td>{$value->getDate}</td>
+                <td>{$value->getBuyer}</td>
+                <td>{$value->getUsersIn}</td>
+                <td>{$value->getAmount}</td>
+                <td>{$value->getWhat}</td>
+                <td><a href="index.php?do=edit_bill&id={$value->getId()}">Edit</a></td>
+                <td><a href="index.php?do=delete_bill&id={$value->getId()}">Delete</a></td>
             </tr>
         {/loop}
     </table>

@@ -11,7 +11,7 @@
         $block_form = true;
     }
 
-    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url'])) {
+    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone'])) {
         $mysql_host = $_POST['mysql_host'];
         $mysql_login = $_POST['mysql_login'];
         $mysql_db = $_POST['mysql_db'];
@@ -23,9 +23,10 @@
             $db = new PDO('mysql:host='.$mysql_host.';dbname='.$mysql_db, $mysql_login, $mysql_password);
 
             //Create table "Users"
-            $dump = $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
  
-            //Create table "Invoices" - TODO
+            //Create table "Invoices"
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date INT(11), users_in VARCHAR(255), buyer INT(11), amount FLOAT, what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
             //Create table "Payback" - TODO
         } catch (PDOException $e) {
             $error = 'Unable to connect to database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
@@ -51,7 +52,10 @@
     define('INSTANCE_TITLE', '".$instance_title."');
     define('BASE_URL', '".$_POST['base_url']."');
     define('SALT', '".$salt."');
-    define('CURRENCY', '".$_POST['currency']."');";
+    define('CURRENCY', '".$_POST['currency']."');
+    
+    date_default_timezone_set('".$_POST['timezone']."');
+    ";
 
             if(file_put_contents("data/config.php", $config) && file_put_contents("data/notice", '')) {
                 try {
@@ -113,6 +117,10 @@
                     <em>Note :</em> This is the base URL from which you access this page. You must keep the trailing "/" in the above address.
                 </p>
                 <p><label for="currency">Currency : </label><input type="text" name="currency" id="currency" size="3"/></p>
+                <p>
+                    <label for="timezone">Timezone : </label><input type="text" name="timezone" id="timezone" value="<?php echo @date_default_timezone_get();?>"/><br/>
+                    <em>For example :</em> Europe/Paris. See the doc for more info.
+                </p>
             </fieldset>
             <fieldset>
                 <legend>Administrator</legend>

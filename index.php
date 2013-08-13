@@ -3,6 +3,7 @@
     if(!file_exists('data/config.php')) header('location: install.php');
     require_once('data/config.php');
     require_once('inc/User.class.php');
+    require_once('inc/Invoices.class.php');
     require_once('inc/rain.tpl.class.php');
     require_once('inc/functions.php');
     raintpl::$tpl_dir = 'tpl/';
@@ -156,7 +157,7 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url'])) {
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone'])) {
                 if(!is_writable('data/')) {
                     $tpl>assign('error', 'The script can\'t write in data/ dir, check permissions set on this folder.');
                 }
@@ -179,6 +180,8 @@
                         $config[$line_number] = "\tdefine('".$_POST['base_url']."');\n";
                     elseif(strpos($line, "CURRENCY") !== FALSE)
                         $config[$line_number] = "\tdefine('".$_POST['currency']."');\n";
+                    elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
+                        $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
                 }
 
                 if(file_put_contents("data/config.php", $config)) {
@@ -194,15 +197,53 @@
             $tpl->assign('mysql_login', MYSQL_LOGIN);
             $tpl->assign('mysql_db', MYSQL_DB);
             $tpl->assign('mysql_prefix', MYSQL_PREFIX);
+            $tpl->assign('timezone', '');
             $tpl->assign('show_settings', true);
             $tpl->draw('settings');
+            break;
+
+        case 'new_invoice':
+            if(!empty($_POST['what']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_day']) && !empty($_POT['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
+                $invoice = new Invoice();
+                $invoice->setWhat($_POST['what']);
+                $invoice->setAmount($_POST['amount']);
+                $invoice->setBuyer($current_user->getId());
+                $invoice->setDate();
+
+                //TODO : Handle users_in + guests
+
+                $invoice->save();
+                header('location: index.php');
+                exit();
+            }
+
+            $users_list = new User();
+            $users_list = $users_list->load_users();
+
+            $tpl->assign('days', range(1,31)); // TODO : Improve it
+            $tpl->assign('months', range(1, 12));
+            $tpl->assign('years', range(date('Y') - 1, date('Y') + 1));
+
+            $tpl->assign('day_post', (!empty($_POST['date_day']) ? (int) $_POST['date_day'] : (int) date('d')));
+            $tpl->assign('month_post', (!empty($_POST['date_month']) ? (int) $_POST['date_month'] : (int) date('m')));
+            $tpl->assign('year_post', (!empty($_POST['date_year']) ? (int) $_POST['date_year'] : (int) date('Y')));
+
+            $tpl->assign('amount_post', (!empty($_POST['amount']) ? (float) $_POST['amount'] : 0));
+            $tpl->assign('what_post', (!empty($_POST['what']) ? htmlspecialchars($_POST['what']) : ''));
+            $tpl->assign('users', $users_list);
+            $tpl->draw('new_invoice');
             break;
 
         default:
             $users_list = new User();
             $users_list = $users_list->load_users();
+
+            $invoices_list = new Invoices();
+            $invoices_list = $invoices_list->load_invoices();
+
             $tpl->assign('users', $users_list);
-            $tpl->assign('bill', array(0=>array()));
+            $tpl->assign('invoices', $invoices_list);
+
             $tpl->draw('index');
             break;
     }

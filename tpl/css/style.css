@@ -83,7 +83,7 @@ input[type=submit] {
     text-align: center
 }
 
-#edit_password_form, #edit_user_form {
+#edit_password_form, #edit_user_form, #invoice_form {
     width: 50%;
     margin-left: 15%;
 }
@@ -94,6 +94,10 @@ input[type=submit] {
 
 #textarea_notice {
     width: 50%;
+}
+
+textarea#what {
+    width: 75%;
 }
 
 #install {

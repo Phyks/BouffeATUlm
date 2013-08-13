@@ -93,9 +93,9 @@ class User extends Storage {
         $this->setAdmin($user_data['admin']);
     }
 
-    public function load_users() {
+    public function load_users($fields = NULL) {
         $return = array();
-        $users = $this->load();
+        $users = $this->load($fields);
 
         foreach($users as $user) {
             $return[$user['id']] = new User();

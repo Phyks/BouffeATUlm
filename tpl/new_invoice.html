@@ -1,0 +1,43 @@
+{include="header"}
+
+<h2>Add a bill</h2>
+
+<form method="post" action="index.php?do=new_invoice" id="invoice_form">
+    <p>
+        <label for="what">What ? </label>
+    </p>
+    <textarea name="what" id="what" rows="10">{$what_post}</textarea>
+    <p>
+        <label for="amount">Amount : </label>
+        <input type="text" name="amount" id="amount" {($amount_post != 0) ? 'value="'.$value_post.'"' : ''} size="5"/> {$currency}
+    </p>
+    <p>
+        <label for="date_day">Date : </label>
+        <select name="date_day" id="date_day">
+            {loop="days"}
+            <option value="{$value}" {if condition="$value == $day_post"}selected{/if}>{$value}</option>
+            {/loop}
+        </select> / 
+        <select name="date_month">
+            {loop="months"}
+                <option value="{$value}" {if condition="$value == $month_post"}selected{/if} onchange="set_days_month_year();">{$value}</option>
+            {/loop}
+        </select> / 
+        <select name="date_year">
+            {loop="years"}
+                <option value="{$value}" {if condition="$value == $year_post"}selected{/if} onchange="set_days_month_year();">{$value}</option>
+            {/loop}
+        </select>
+    </p>
+    <p>
+        Users in ?
+        {loop="users"}
+            <br/><input type="checkbox" name="users_in" value="{$value->getId()}" id="users_in_{$value->getId()}"/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> and <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" value="0"/><label for="guest_user_{$value->getId()}"> guest</label>.
+        {/loop}
+    </p>
+    <p>
+        <input type="submit" value="Add"/>
+    </p>
+</form>
+
+{include="footer"}

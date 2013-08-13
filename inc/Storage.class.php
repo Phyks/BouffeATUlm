@@ -59,6 +59,7 @@ class Storage {
         $return = false;
         switch($type) {
             case 'key':
+            case 'int':
                 $return = 'INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY'; 
                 break;
 
@@ -74,6 +75,7 @@ class Storage {
                 $return = 'VARCHAR(130)';
                 break;
 
+            case 'text':
             default:
                 $return = 'TEXT CHARACTER SET utf8 COLLATE utf8_general_ci';
                 break;

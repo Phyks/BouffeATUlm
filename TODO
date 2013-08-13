@@ -9,3 +9,20 @@ install.php :
 =============
 * Link beside password field to toggle visible / not visible
 * TRUNCATE before CREATE TABLE in install.php
+
+inc/Invoices.class.php :
+========================
+* Better way to store date ? (use specific date types)
+* Better way to store users in ?
+* Modify load() method to handle complex queries (such as WHERE date < DATE_1 AND date > DATE_2)
+
+index.php?do=new_invoice :
+==========================
+* Improve date handling for form display
+
+index.php?do=settings :
+=======================
+* Prefill the timezone field
+* Fill the fields with POST
+* Handle checkboxes in PHP ?
+* JavaScript to handle singular / plural + months
