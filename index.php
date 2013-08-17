@@ -203,8 +203,33 @@
             break;
 
         case 'new_invoice':
+        case 'edit_invoice':
+            if(!empty($_GET['id'])) {
+                $invoice = new Invoice();
+                $invoice->load_invoice(array('id'=>(int) $_GET['id']));
+
+                $date_day = '';
+                $date_month = '';
+                $date_year = '';
+                $amount = $invoice->getAmount();
+                $what = $invoice->getWhat();
+                $users_in = explode(',', $invoice->getUsersIn());
+                $guests = array();
+            }
+
+            if(!empty($_POST['what'])) $what = $_POST['what'];
+            if(!empty($_POST['amount'])) $amount = $_POST['amount'];
+            if(!empty($_POST['date_day'])) $date_day = $_POST['date_day'];
+            if(!empty($_POST['date_month'])) $date_month = $_POST['date_month'];
+            if(!empty($_POST['date_year'])) $date_year = $_POST['date_year'];
+            if(!empty($_POST['users_in'])) $users_in = $_POST['users_in'];
+
             if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
                 $invoice = new Invoice();
+
+                if(!empty($_POST['id']))
+                    $invoice->setId($_POST['id']);
+
                 $invoice->setWhat($_POST['what']);
                 $invoice->setAmount($_POST['amount']);
                 $invoice->setBuyer($current_user->getId());
@@ -219,9 +244,9 @@
                 }
                 $invoice->setUsersIn($users_in);
 
-                //$invoice->save();
-//                header('location: index.php');
-  //              exit();
+                $invoice->save();
+                header('location: index.php');
+                exit();
             }
 
             $users_list = new User();
@@ -231,14 +256,15 @@
             $tpl->assign('months', range(1, 12));
             $tpl->assign('years', range(date('Y') - 1, date('Y') + 1));
 
-            $tpl->assign('day_post', (!empty($_POST['date_day']) ? (int) $_POST['date_day'] : (int) date('d')));
-            $tpl->assign('month_post', (!empty($_POST['date_month']) ? (int) $_POST['date_month'] : (int) date('m')));
-            $tpl->assign('year_post', (!empty($_POST['date_year']) ? (int) $_POST['date_year'] : (int) date('Y')));
-            $tpl->assign('amount_post', (!empty($_POST['amount']) ? (float) $_POST['amount'] : 0));
-            $tpl->assign('what_post', (!empty($_POST['what']) ? htmlspecialchars($_POST['what']) : ''));
+            $tpl->assign('day_post', (!empty($date_day) ? (int) $date_day : (int) date('d')));
+            $tpl->assign('month_post', (!empty($date_month) ? (int) $date_month : (int) date('m')));
+            $tpl->assign('year_post', (!empty($date_year) ? (int) $date_year : (int) date('Y')));
+            $tpl->assign('amount_post', (!empty($amount) ? (float) $amount : 0));
+            $tpl->assign('what_post', (!empty($what) ? htmlspecialchars($what) : ''));
             $tpl->assign('users', $users_list);
-            $tpl->assign('users_in', (!empty($_POST['users_in']) ? $_POST['users_in'] : array()));
+            $tpl->assign('users_in', (!empty($users_in) ? $users_in : array()));
             $tpl->assign('guests', (!empty($guests) ? $guests : array()));
+            $tpl->assign('id', (!empty($_GET['id']) ? (int) $_GET['id'] : 0));
             $tpl->draw('new_invoice');
             break;
 
@@ -246,7 +272,7 @@
             $users_list = new User();
             $users_list = $users_list->load_users();
 
-            $invoices_list = new Invoices();
+            $invoices_list = new Invoice();
             $invoices_list = $invoices_list->load_invoices();
 
             $tpl->assign('users', $users_list);

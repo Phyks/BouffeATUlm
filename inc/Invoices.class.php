@@ -3,7 +3,7 @@
     require_once('Storage.class.php');
 
     class Invoice extends Storage {
-        protected $id, $date, $users_in, $buyer, $amount, $what;
+        protected $id = 0, $date, $users_in, $buyer, $amount, $what;
         protected $TABLE_NAME = "Invoices";
         protected $fields = array(
             'id'=>'key',
@@ -79,5 +79,23 @@
             }
 
             return $return;
+        }
+        
+        public function load_invoice($fields = NULL) {
+            $fetch = $this->load($fields);
+
+            if(count($fetch) > 0) {
+                $this->setId($fetch[0]['id']);
+                $this->setWhat($fetch[0]['what']);
+                $this->setAmount($fetch[0]['amount']);
+                $this->setBuyer($fetch[0]['buyer']);
+                $this->setUsersIn($fetch[0]['users_in']);
+                $this->setDate($fetch[0]['date']);
+
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }

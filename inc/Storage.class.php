@@ -158,7 +158,7 @@ class Storage {
         $query = $this->connection->prepare($query);
 
         foreach($this->fields as $field=>$type) {
-            if(!empty($this->$field)) {
+            if(isset($this->$field)) {
                 $query->bindParam(':'.$field, $this->$field);
             }
         }

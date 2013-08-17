@@ -3,7 +3,7 @@ require_once('data/config.php');
 require_once('Storage.class.php');
 
 class User extends Storage {
-    protected $id, $login, $display_name, $password, $admin;
+    protected $id = 0, $login, $display_name, $password, $admin;
     protected $TABLE_NAME = "Users";
     protected $fields = array(
         'id'=>'key',

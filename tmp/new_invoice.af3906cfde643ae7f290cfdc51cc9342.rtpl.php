@@ -47,6 +47,8 @@
     </p>
     <p>
         <input type="submit" value="Add"/>
+        <?php if( $id != 0 ){ ?><input type="hidden" name="id" value="<?php echo $id;?>"/><?php } ?>
+
     </p>
 </form>
 
