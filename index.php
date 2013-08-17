@@ -268,6 +268,17 @@
             $tpl->draw('new_invoice');
             break;
 
+        case 'delete_invoice':
+            if(!empty($_GET['id'])) {
+                $invoice = new Invoice();
+                $invoice->setId($_GET['id']);
+                $invoice->delete();
+
+                header('location: index.php');
+                exit();
+            }
+            break;
+
         default:
             $users_list = new User();
             $users_list = $users_list->load_users();

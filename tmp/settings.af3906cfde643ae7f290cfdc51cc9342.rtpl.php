@@ -25,7 +25,7 @@
 
         <p><label for="mysql_login">MySQL login : </label><input type="text" name="mysql_login" id="mysql_login" value="<?php echo $mysql_login;?>"/></p>
         <p>
-            <label for="mysql_password">MySQL password : </label><input type="password" name="mysql_password" id="mysql_password"/><br/>
+            <label for="mysql_password">MySQL password : </label><input type="password" name="mysql_password" id="mysql_password"/> <a href="" onclick="toggle_password('mysql_password'); return false;"><img src="tpl/tpl/img/toggle_password.jpg" alt="Toggle visible"/></a><br/>
             <em>Note :</em> Leave the above field blank if you don't want to change your password.
         </p>
         <p>
@@ -44,6 +44,10 @@
             <em>Note :</em> This is the base URL from which you access this page. You must keep the trailing "/" in the above address.
         </p>
         <p><label for="currency">Currency : </label><input type="text" name="currency" id="currency" size="3" value="<?php echo $currency;?>"/></p>
+        <p>
+            <label for="timezone">Timezone : </label><input type="text" name="timezone" id="timezone" value="<?php echo $timezone;?>"/><br/>
+            <em>For example :</em> Europe/Paris. See the doc for more info.
+        </p>
     </fieldset>
     <p class="center"><input type="submit" value="Update settings"></p>
 </form>

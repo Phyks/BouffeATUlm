@@ -3,10 +3,11 @@
 * tokens + ban system
 * remember me
 * htmlspecialchars => on users objects
+* handle negative amounts
+* Refactor load method to avoir load_* methods !
 
 install.php :
 =============
-* Link beside password field to toggle visible / not visible
 * TRUNCATE before CREATE TABLE in install.php
 
 inc/Invoices.class.php :
@@ -20,10 +21,11 @@ index.php?do=new_invoice :
 ==========================
 * Improve date handling for form display
 * Onchange not working as wanted
+* Handle date/months
 
 index.php?do=settings :
 =======================
 * Prefill the timezone field
-* Fill the fields with POST
-* Handle checkboxes in PHP ?
-* JavaScript to handle singular / plural + months
+
+Manage paybacks :
+=================
