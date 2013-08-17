@@ -2,7 +2,7 @@
     require_once('data/config.php');
     require_once('Storage.class.php');
 
-    class Invoices extends Storage {
+    class Invoice extends Storage {
         protected $id, $date, $users_in, $buyer, $amount, $what;
         protected $TABLE_NAME = "Invoices";
         protected $fields = array(
@@ -54,7 +54,7 @@
             $this->buyer = (int) $buyer;
         }
 
-        public function setAmount ($admount) {
+        public function setAmount ($amount) {
             $this->amount = (float) $amount;
         }
 

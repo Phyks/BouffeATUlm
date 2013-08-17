@@ -10,7 +10,7 @@
     <textarea name="what" id="what" rows="10"><?php echo $what_post;?></textarea>
     <p>
         <label for="amount">Amount : </label>
-        <input type="text" name="amount" id="amount" {($amount_post != 0) ? 'value="'.$value_post.'"' : ''} size="5"/> <?php echo $currency;?>
+        <input type="text" name="amount" id="amount" <?php if( $amount_post != 0 ){ ?> value="<?php echo $amount_post;?>" <?php } ?> size="5"/> <?php echo $currency;?>
 
     </p>
     <p>
@@ -41,7 +41,7 @@
         Users in ?
         <?php $counter1=-1; if( isset($users) && is_array($users) && sizeof($users) ) foreach( $users as $key1 => $value1 ){ $counter1++; ?>
 
-            <br/><input type="checkbox" name="users_in" value="<?php echo $value1->getId();?>" id="users_in_<?php echo $value1->getId();?>"/> <label for="users_in_<?php echo $value1->getId();?>"><?php echo $value1->getDisplayName();?></label> and <input type="text" name="guest_user_<?php echo $value1->getId();?>" id="guest_user_<?php echo $value1->getId();?>" size="1" value="0"/><label for="guest_user_<?php echo $value1->getId();?>"> guest</label>.
+        <br/><input type="checkbox" name="users_in[]" value="<?php echo $value1->getId();?>" id="users_in_<?php echo $value1->getId();?>" <?php if( $current_user->getId() == $value1->getId() || in_array($value1->getId(), $users_in) ){ ?> checked <?php } ?>/> <label for="users_in_<?php echo $value1->getId();?>"><?php echo $value1->getDisplayName();?></label> and <input type="text" name="guest_user_<?php echo $value1->getId();?>" id="guest_user_<?php echo $value1->getId();?>" size="1" value="<?php if( in_array($value1->getId(), $users_in) ){ ?> <?php echo $guests[$value1->getId()];?> <?php }else{ ?> 0 <?php } ?>" onchange="guest_user_label(<?php echo $value1->getId();?>);"/><label for="guest_user_<?php echo $value1->getId();?>" id="guest_user_<?php echo $value1->getId();?>_label"> guest</label>.
         <?php } ?>
 
     </p>

@@ -9,7 +9,7 @@
 
 <div id="quick_summary">
     <h2>Balance</h2>
-    <p class="center">Read <em>line</em> owes <em>case</em><?php echo $currency;?> to <em>column</em>. You can click on links to confirm the payback.
+    <p class="center">Read <em>line</em> owes <em>case</em> <?php echo $currency;?> to <em>column</em>. You can click on links to confirm the payback.
     <table> 
         <tr>
             <th>Owes\To</th>
@@ -23,6 +23,11 @@
 
             <tr>
                 <th><?php echo $value1->getDisplayName();?></th>
+                <?php $counter2=-1; if( isset($users) && is_array($users) && sizeof($users) ) foreach( $users as $key2 => $value2 ){ $counter2++; ?>
+
+                    <td><a href=""><?php echo $value2->getDisplayName();?></a></td>
+                <?php } ?>
+
             </tr>
         <?php } ?>
 

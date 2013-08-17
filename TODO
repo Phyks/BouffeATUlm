@@ -3,7 +3,6 @@
 * tokens + ban system
 * remember me
 * htmlspecialchars => on users objects
-* Associate a guest with someone
 
 install.php :
 =============
@@ -15,10 +14,12 @@ inc/Invoices.class.php :
 * Better way to store date ? (use specific date types)
 * Better way to store users in ?
 * Modify load() method to handle complex queries (such as WHERE date < DATE_1 AND date > DATE_2)
+* Buyer as user object ?
 
 index.php?do=new_invoice :
 ==========================
 * Improve date handling for form display
+* Onchange not working as wanted
 
 index.php?do=settings :
 =======================
