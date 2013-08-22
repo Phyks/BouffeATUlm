@@ -22,17 +22,17 @@
             <?php } ?>
 
         </select> / 
-        <select name="date_month">
+        <select name="date_month" id="date_month" onchange="set_days_month_year();">
             <?php $counter1=-1; if( isset($months) && is_array($months) && sizeof($months) ) foreach( $months as $key1 => $value1 ){ $counter1++; ?>
 
-                <option value="<?php echo $value1;?>" <?php if( $value1 == $month_post ){ ?>selected<?php } ?> onchange="set_days_month_year();"><?php echo $value1;?></option>
+            <option value="<?php echo $value1;?>" <?php if( $value1 == $month_post ){ ?>selected<?php } ?>><?php echo $value1;?></option>
             <?php } ?>
 
         </select> / 
-        <select name="date_year">
+        <select name="date_year" id="date_year" onchange="set_days_month_year();">
             <?php $counter1=-1; if( isset($years) && is_array($years) && sizeof($years) ) foreach( $years as $key1 => $value1 ){ $counter1++; ?>
 
-                <option value="<?php echo $value1;?>" <?php if( $value1 == $year_post ){ ?>selected<?php } ?> onchange="set_days_month_year();"><?php echo $value1;?></option>
+                <option value="<?php echo $value1;?>" <?php if( $value1 == $year_post ){ ?>selected<?php } ?>><?php echo $value1;?></option>
             <?php } ?>
 
         </select>
@@ -41,7 +41,7 @@
         Users in ?
         <?php $counter1=-1; if( isset($users) && is_array($users) && sizeof($users) ) foreach( $users as $key1 => $value1 ){ $counter1++; ?>
 
-        <br/><input type="checkbox" name="users_in[]" value="<?php echo $value1->getId();?>" id="users_in_<?php echo $value1->getId();?>" <?php if( $current_user->getId() == $value1->getId() || in_array($value1->getId(), $users_in) ){ ?> checked <?php } ?>/> <label for="users_in_<?php echo $value1->getId();?>"><?php echo $value1->getDisplayName();?></label> and <input type="text" name="guest_user_<?php echo $value1->getId();?>" id="guest_user_<?php echo $value1->getId();?>" size="1" value="<?php if( in_array($value1->getId(), $users_in) ){ ?> <?php echo $guests[$value1->getId()];?> <?php }else{ ?> 0 <?php } ?>" onchange="guest_user_label(<?php echo $value1->getId();?>);"/><label for="guest_user_<?php echo $value1->getId();?>" id="guest_user_<?php echo $value1->getId();?>_label"> guest</label>.
+        <br/><input type="checkbox" name="users_in[]" value="<?php echo $value1->getId();?>" id="users_in_<?php echo $value1->getId();?>" <?php if( $current_user->getId() == $value1->getId() || in_array($value1->getId(), $users_in) ){ ?> checked <?php } ?>/> <label for="users_in_<?php echo $value1->getId();?>"><?php echo $value1->getDisplayName();?></label> and <input type="text" name="guest_user_<?php echo $value1->getId();?>" id="guest_user_<?php echo $value1->getId();?>" size="1" <?php if( in_array($value1->getId(), $users_in) ){ ?> value="<?php echo $guests[$value1->getId()];?>" <?php }else{ ?> value="0" <?php } ?> onkeyup="guest_user_label(<?php echo $value1->getId();?>);"/><label for="guest_user_<?php echo $value1->getId();?>" id="guest_user_<?php echo $value1->getId();?>_label"> guest</label>.
         <?php } ?>
 
     </p>

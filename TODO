@@ -12,20 +12,9 @@ install.php :
 
 inc/Invoices.class.php :
 ========================
-* Better way to store date ? (use specific date types)
-* Better way to store users in ?
+* Better way to store users in ? => reprendre cette partie
 * Modify load() method to handle complex queries (such as WHERE date < DATE_1 AND date > DATE_2)
 * Buyer as user object ?
-
-index.php?do=new_invoice :
-==========================
-* Improve date handling for form display
-* Onchange not working as wanted
-* Handle date/months
-
-index.php?do=settings :
-=======================
-* Prefill the timezone field
 
 Manage paybacks :
 =================

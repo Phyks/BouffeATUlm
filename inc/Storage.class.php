@@ -67,6 +67,10 @@ class Storage {
                 $return = 'VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci';
                 break;
 
+            case 'date':
+                $return = 'DATETIME NOT NULL';
+                break;
+
             case 'bool':
                 $return = 'TINYINT(1)';
                 break;

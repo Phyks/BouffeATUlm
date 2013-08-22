@@ -18,21 +18,21 @@
             <option value="{$value}" {if condition="$value == $day_post"}selected{/if}>{$value}</option>
             {/loop}
         </select> / 
-        <select name="date_month">
+        <select name="date_month" id="date_month" onchange="set_days_month_year();">
             {loop="months"}
-                <option value="{$value}" {if condition="$value == $month_post"}selected{/if} onchange="set_days_month_year();">{$value}</option>
+            <option value="{$value}" {if condition="$value == $month_post"}selected{/if}>{$value}</option>
             {/loop}
         </select> / 
-        <select name="date_year">
+        <select name="date_year" id="date_year" onchange="set_days_month_year();">
             {loop="years"}
-                <option value="{$value}" {if condition="$value == $year_post"}selected{/if} onchange="set_days_month_year();">{$value}</option>
+                <option value="{$value}" {if condition="$value == $year_post"}selected{/if}>{$value}</option>
             {/loop}
         </select>
     </p>
     <p>
         Users in ?
         {loop="users"}
-        <br/><input type="checkbox" name="users_in[]" value="{$value->getId()}" id="users_in_{$value->getId()}" {if condition="$current_user->getId() == $value->getId() || in_array($value->getId(), $users_in)"} checked {/if}/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> and <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" value="{if condition="in_array($value->getId(), $users_in)"} {$guests[$value->getId()]} {else} 0 {/if}" onchange="guest_user_label({$value->getId()});"/><label for="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}_label"> guest</label>.
+        <br/><input type="checkbox" name="users_in[]" value="{$value->getId()}" id="users_in_{$value->getId()}" {if condition="$current_user->getId() == $value->getId() || in_array($value->getId(), $users_in)"} checked {/if}/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> and <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" {if condition="in_array($value->getId(), $users_in)"} value="{$guests[$value->getId()]}" {else} value="0" {/if} onkeyup="guest_user_label({$value->getId()});"/><label for="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}_label"> guest</label>.
         {/loop}
     </p>
     <p>

@@ -197,7 +197,7 @@
             $tpl->assign('mysql_login', MYSQL_LOGIN);
             $tpl->assign('mysql_db', MYSQL_DB);
             $tpl->assign('mysql_prefix', MYSQL_PREFIX);
-            $tpl->assign('timezone', '');
+            $tpl->assign('timezone', @date_default_timezone_get());
             $tpl->assign('show_settings', true);
             $tpl->draw('settings');
             break;
@@ -233,7 +233,7 @@
                 $invoice->setWhat($_POST['what']);
                 $invoice->setAmount($_POST['amount']);
                 $invoice->setBuyer($current_user->getId());
-                $invoice->setDate(time());
+                $invoice->setDate($date_day, $date_month, $date_year);
 
                 $users_in = '';
                 $guests = array();

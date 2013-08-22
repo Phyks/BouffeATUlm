@@ -7,7 +7,7 @@
         protected $TABLE_NAME = "Invoices";
         protected $fields = array(
             'id'=>'key',
-            'date'=>'int',
+            'date'=>'date',
             'users_in'=>'string',
             'buyer'=>'int',
             'amount'=>'float',
@@ -42,8 +42,11 @@
             $this->id = (int) $id;
         }
 
-        public function setDate($date) {
-            $this->date = $date;
+        public function setDate($date_day, $date_month, $date_year) {
+            if((int) $date_day < 10) $date_day = "0".(int) $date_day;
+            if((int) $date_month < 10) $date_month = "0".(int) $date_month;
+
+            $this->date = $date_year.$date_month.$date_day;
         }
 
         public function setUsersIn($users_in) {
