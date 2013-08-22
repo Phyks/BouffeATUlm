@@ -61,7 +61,7 @@
     date_default_timezone_set('".$_POST['timezone']."');
     ";
 
-            if(file_put_contents("data/config.php", $config) && file_put_contents("data/notice", '')) {
+            if(file_put_contents("data/config.php", $config) !== false && file_put_contents("data/notice", '') !== false) {
                 try {
                     require_once('inc/User.class.php');
                     $admin = new User();
