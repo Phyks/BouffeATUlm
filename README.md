@@ -5,6 +5,4 @@ An application in PHP with a web front-end to manage your food shopping with you
 
 # Important note
 
-This version is not very usable as is. It was tailored to my needs and is pretty much ugly due to a bad joke with a friend :)
-
-I'm currently working on a complete refactorization (in a separate branch) and will update the repo as soon as it is available. The new version should be easier to maintain and tweak and will be more user-friendly ! :)
+I'm currently working on a complete refactorization and will update the repo during the development. This is a WIP and the repo may not be of great interest for someone not developing it. As soon as I get a stable release, I'll update this README file to provide more infos.
