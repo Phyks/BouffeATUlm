@@ -29,6 +29,7 @@
 </table>
 {elseif condition="$view == 'edit_user'"}
 <h2>Edit a user</h2>
+{if condition="$error"}<p class="error">{$error}</p>{/if}
 <form method="post" action="index.php?do=add_user" id="edit_user_form">
     <p>
         <label for="login" class="label-block">Login : </label><input type="text" name="login" id="login" {if condition="$login_post != ''"} value="{$login_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''} {/if}/>

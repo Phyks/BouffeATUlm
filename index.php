@@ -6,7 +6,7 @@
     require_once('inc/Invoices.class.php');
     require_once('inc/rain.tpl.class.php');
     require_once('inc/functions.php');
-    require_once('inc/Banc.inc.php');
+    require_once('inc/Ban.inc.php');
     require_once('inc/CSRF.inc.php');
     raintpl::$tpl_dir = 'tpl/';
     raintpl::$cache_dir = 'tmp/';
@@ -150,10 +150,15 @@
                         $user->setPassword($user->encrypt($_POST['password']));
                     }
                     $user->setAdmin($_POST['admin']);
-                    $user->save();
 
-                    header('location: index.php?do=edit_users');
-                    exit();
+                    if($user->isUnique()) {
+                        $user->save();
+                        header('location: index.php?do=edit_users');
+                        exit();
+                    }
+                    else {
+                        $tpl->assign('error', 'A user with the same login exists. Choose a different login.');
+                    }
                 }
             }
  

@@ -1,15 +1,15 @@
 <?php
     define('DATA_DIR', 'data'); // Data subdirectory
-    define('IPBANS_FILENAME', DATADIR.'/ipbans.php'); // File storage for failures and bans.
+    define('IPBANS_FILENAME', DATA_DIR.'/ipbans.php'); // File storage for failures and bans.
     define('BAN_AFTER', 5); // Ban IP after this many failures.
     define('BAN_DURATION', 1800); // Ban duration for IP address after login failures (in seconds) (1800 sec. = 30 minutes)
-    if (!is_dir(DATADIR)) { mkdir(DATADIR,0705); chmod(DATADIR,0705); }
-    if (!is_file(DATADIR.'/.htaccess')) { file_put_contents(DATADIR.'/.htaccess',"Allow from none\nDeny from all\n"); } // Protect data files.
+    if (!is_dir(DATA_DIR)) { mkdir(DATA_DIR,0705); chmod(DATA_DIR,0705); }
+    if (!is_file(DATA_DIR.'/.htaccess')) { file_put_contents(DATA_DIR.'/.htaccess',"Allow from none\nDeny from all\n"); } // Protect data files.
 
     function logm($message)
     {
         $t = strval(date('Y/m/d_H:i:s')).' - '.$_SERVER["REMOTE_ADDR"].' - '.strval($message)."\n";
-        file_put_contents(DATADIR.'/log.txt',$t,FILE_APPEND);
+        file_put_contents(DATA_DIR.'/log.txt',$t,FILE_APPEND);
     }
 
 
@@ -63,7 +63,7 @@
     }
 
     // Returns user IP
-    function user_IPs()
+    function user_ip()
     {
         $ip = $_SERVER["REMOTE_ADDR"];
         // Then we use more HTTP headers to prevent session hijacking from users behind the same proxy.

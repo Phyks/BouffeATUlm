@@ -120,4 +120,13 @@ class User extends Storage {
             return false;
         }
     }
+
+    public function isUnique() {
+        if(count($this->load_users(array('login'=>$this->login))) == 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }

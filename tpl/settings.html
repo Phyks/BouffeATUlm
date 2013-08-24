@@ -2,6 +2,7 @@
 
 {if condition="!$show_settings"}
 <h2>Edit homepage notice</h2>
+{if condition="$error"}<p class="error">{$error}</p>{/if}
 <form method="post" id="notice_form" action="index.php?do=edit_notice">
     <p>
         <label for="textarea_notice">Homepage notice :</label><br/>
@@ -15,8 +16,8 @@
 </form>
 
 {else}
-
 <h2>Change settings of your Bouffe@Ulm installation</h2>
+{if condition="$error"}<p class="error">{$error}</p>{/if}
 <form method="post" action="index.php?do=settings" id="settings_form">
     <fieldset>
         <legend>Database</legend>
