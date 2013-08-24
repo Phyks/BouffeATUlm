@@ -6,7 +6,9 @@
 <form method="post" action="index.php?do=connect" id="connexion_form">
     <p><label for="login" class="label-block">Username : </label><input type="text" name="login" id="login" value="<?php echo $user_post;?>"/></p>
     <p><label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/></p>
+    <p><input type="checkbox" name="remember_me" id="remember_me"/><label for="remember_me"> Remember me ?</label></p>
     <p><input type="submit" value="Connect"/></p>
+    <p><a href="mailto:<?php echo $email_webmaster;?>?subject=<?php echo $instance_title;?>%20password">Forgotten password ?</a></p>
 </form>
 
 <?php $tpl = new RainTPL;$tpl_dir_temp = self::$tpl_dir;$tpl->assign( $this->var );$tpl->draw( dirname("footer") . ( substr("footer",-1,1) != "/" ? "/" : "" ) . basename("footer") );?>

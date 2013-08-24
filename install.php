@@ -11,7 +11,7 @@
         $block_form = true;
     }
 
-    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone'])) {
+    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster'])) {
         $mysql_host = $_POST['mysql_host'];
         $mysql_login = $_POST['mysql_login'];
         $mysql_db = $_POST['mysql_db'];
@@ -35,6 +35,10 @@
         } catch (PDOException $e) {
             $error = 'Unable to connect to database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
         }
+
+        if(!filter_var($_POST['email_webmaster'], FILTER_VALIDATE_EMAIL)) {
+            $email = 'Webmaster\'s e-mail address is invalid.';
+        }
         
         if(empty($error)) {
             if(function_exists('mcrypt_create_iv')) {
@@ -57,6 +61,7 @@
     define('BASE_URL', '".$_POST['base_url']."');
     define('SALT', '".$salt."');
     define('CURRENCY', '".$_POST['currency']."');
+    define('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');
     
     date_default_timezone_set('".$_POST['timezone']."');
     ";
@@ -126,6 +131,7 @@
                     <label for="timezone">Timezone : </label><input type="text" name="timezone" id="timezone" value="<?php echo @date_default_timezone_get();?>"/><br/>
                     <em>For example :</em> Europe/Paris. See the doc for more info.
                 </p>
+                <p><label for="email_webmaster">Webmaster's email : </label><input type="text" name="email_webmaster" id="email_webmaster"/></p>
             </fieldset>
             <fieldset>
                 <legend>Administrator</legend>

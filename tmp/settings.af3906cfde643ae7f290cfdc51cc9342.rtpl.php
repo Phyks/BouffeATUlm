@@ -48,6 +48,7 @@
             <label for="timezone">Timezone : </label><input type="text" name="timezone" id="timezone" value="<?php echo $timezone;?>"/><br/>
             <em>For example :</em> Europe/Paris. See the doc for more info.
         </p>
+        <p><label for="email_webmaster">Webmaster's email : </label><input type="text" name="email_webmaster" id="email_webmaster" value="<?php echo $email_webmaster;?>"/></p>
     </fieldset>
     <p class="center"><input type="submit" value="Update settings"></p>
 </form>

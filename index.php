@@ -1,11 +1,12 @@
 <?php
     // Include necessary files
-    if(!file_exists('data/config.php')) header('location: install.php');
+    if(!file_exists('data/config.php')) { header('location: install.php'); exit(); }
     require_once('data/config.php');
     require_once('inc/User.class.php');
     require_once('inc/Invoices.class.php');
     require_once('inc/rain.tpl.class.php');
     require_once('inc/functions.php');
+    require_once('inc/Banc.inc.php');
     raintpl::$tpl_dir = 'tpl/';
     raintpl::$cache_dir = 'tmp/';
 
@@ -17,9 +18,30 @@
     $tpl->assign('error', '');
     $tpl->assign('base_url', htmlspecialchars(BASE_URL));
     $tpl->assign('currency', htmlspecialchars(CURRENCY));
+    $tpl->assign('email_webmaster', htmlspecialchars(EMAIL_WEBMASTER));
+
+    // Set sessions parameters
+    ini_set('session.use_cookies', 1);
+    ini_set('session.use_only_cookies', 1);
+    ini_set('session.use_trans_sid', false);
+    session_name('bouffeatulm');
+
+    // Regenerate session if needed
+    $cookie = session_get_cookie_params();
+    $cookie_dir = ''; if(dirname($_SERVER['SCRIPT_NAME']) != '/') $cookie_dir = dirname($_SERVER['SCRIPT_NAME']);
+    session_set_cookie_params($cookie['lifetime'], $cookie_dir, $_SERVER['HTTP_HOST']);
+    session_regenerate_id(true);
 
     // Handle current user status
-    session_start();
+    if(session_id() == '') session_start();
+
+    // If IP has changed, logout
+    if(user_ip() != $_SESSION['ip']) {
+        session_destroy();
+        header('location: index.php?do=connect');
+        exit();
+    }
+
     $current_user = new User();
     if(isset($_SESSION['current_user'])) {
         $current_user->sessionRestore($_SESSION['current_user'], true);
@@ -32,6 +54,7 @@
     // If not connected, redirect to connection page
     if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) {
         header('location: index.php?do=connect');
+        exit();
     }
     
     // Initialize empty $_GET['do'] if required to avoid error
@@ -44,17 +67,38 @@
         case 'connect':
             if($current_user !== false) {
                 header('location: index.php');
+                exit();
             }
             if(!empty($_POST['login']) && !empty($_POST['password'])) {
                 $user = new User();
                 $user->setLogin($_POST['login']);
-                if($user->exists($_POST['login']) && $user->checkPassword($_POST['password'])) {
-                    $_SESSION['current_user'] = $user->sessionStore();
-                    header('location: index.php');
-                    exit();
+                if(ban_canLogin() == false) {
+                    $error = "Unknown username / password.";
                 }
                 else {
-                   $error = "Unknown username/password.";
+                    if($user->exists($_POST['login']) && $user->checkPassword($_POST['password'])) {
+                        ban_loginOk();
+                        $_SESSION['current_user'] = $user->sessionStore();
+                        $_SESSION['ip'] = user_ip();
+
+                        if(!empty($_POST['remember_me'])) { // Handle remember me cookie
+                            $_SESSION['remember_me'] = 31536000;
+                        }
+                        else {
+                            $_SESSION['remember_me'] = 0;
+                        }
+
+                        $cookie_dir = ''; if(dirname($_SERVER['SCRIPT_NAME']) != '/') $cookie_dir = dirname($_SERVER['SCRIPT_NAME']);
+                        session_set_cookie_params($_SESSION['remember_me'], $cookie_dir, $_SERVER['HTTP_HOST']);
+                        session_regenerate_id(true);
+
+                        header('location: index.php');
+                        exit();
+                    }
+                    else {
+                        ban_loginFailed();
+                        $error = "Unknown username/password.";
+                    }
                 }
             }
             $tpl->assign('connection', true);
@@ -72,7 +116,7 @@
         case 'password':
             if(!empty($_POST['password']) && !empty($_POST['password_confirm'])) {
                 if($_POST['password'] == $_POST['password_confirm']) {
-                    $current_user->setPassword($user->encrypt($_POST['password']));
+                    $current_user->setPassword($current_user->encrypt($_POST['password']));
                     $current_user->save();
 
                     header('location: index.php');
@@ -90,6 +134,7 @@
         case 'add_user':
             if(!$current_user->getAdmin()) {
                 header('location: index.php');
+                exit();
             }
 
             if(!empty($_POST['login']) && !empty($_POST['display_name']) && (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
@@ -98,7 +143,7 @@
                     $user->setId($_POST['user_id']);
                 }
                 $user->setLogin($_POST['login']);
-                $user->setDisplayName($_POST['login']);
+                $user->setDisplayName($_POST['display_name']);
                 if(!empty($_POST['password'])) {
                     $user->setPassword($user->encrypt($_POST['password']));
                 }
@@ -157,7 +202,7 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone'])) {
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster'])) {
                 if(!is_writable('data/')) {
                     $tpl>assign('error', 'The script can\'t write in data/ dir, check permissions set on this folder.');
                 }
@@ -165,21 +210,23 @@
 
                 foreach($config as $line_number=>$line) {
                     if(strpos($line, "MYSQL_HOST") !== FALSE)
-                        $config[$line_number] = "\tdefine('".$_POST['mysql_host']."');\n";
+                        $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
                     elseif(strpos($line, "MYSQL_LOGIN") !== FALSE)
-                        $config[$line_number] = "\tdefine('".$_POST['mysql_login']."');\n";
+                        $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
                     elseif(strpos($line, "MYSQL_PASSWORD") !== FALSE && !empty($_POST['mysql_password']))
-                        $config[$line_number] = "\tdefine('".$_POST['mysql_password']."');\n";
+                        $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
                     elseif(strpos($line, "MYSQL_DB") !== FALSE)
-                        $config[$line_number] = "\tdefine('".$_POST['mysql_db']."');\n";
+                        $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
                     elseif(strpos($line, "MYSQL_PREFIX") !== FALSE && !empty($_POST['mysql_prefix']))
-                        $config[$line_number] = "\tdefine('".$_POST['mysql_prefix']."');\n";
+                        $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
                     elseif(strpos($line, "INSTANCE_TITLE") !== FALSE)
-                        $config[$line_number] = "\tdefine('".$_POST['instance_title']."');\n";
+                        $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
                     elseif(strpos($line, "BASE_URL") !== FALSE)
-                        $config[$line_number] = "\tdefine('".$_POST['base_url']."');\n";
+                        $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
                     elseif(strpos($line, "CURRENCY") !== FALSE)
-                        $config[$line_number] = "\tdefine('".$_POST['currency']."');\n";
+                        $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
+                    elseif(strpos($line, "EMAIL_WEBMASTER") !== FALSE)
+                        $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
                     elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
                         $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
                 }
