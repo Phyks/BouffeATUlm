@@ -8,7 +8,10 @@
         <textarea name="notice" rows="15" id="textarea_notice">{$notice}</textarea>
     </p>
     <p><em>Note :</em> You can use HTML formatting in this form.</p>
-    <input type="submit" value="Submit"/>
+    <p>
+        <input type="submit" value="Submit"/>
+        <input type="hidden" name="token" value="{$token}"/>
+    </p>
 </form>
 
 {else}
@@ -47,7 +50,7 @@
         </p>
         <p><label for="email_webmaster">Webmaster's email : </label><input type="text" name="email_webmaster" id="email_webmaster" value="{$email_webmaster}"/></p>
     </fieldset>
-    <p class="center"><input type="submit" value="Update settings"></p>
+    <p class="center"><input type="submit" value="Update settings"><input type="hidden" name="token" value="{$token}"/></p>
 </form>
 
 {/if}

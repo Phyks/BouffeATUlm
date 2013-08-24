@@ -1,7 +1,5 @@
 * i18n
 * Vérification des variables dans les classes + throw exception
-* tokens + ban system
-* remember me
 * htmlspecialchars => on users objects
 * handle negative amounts
 * Refactor load method to avoir load_* methods !

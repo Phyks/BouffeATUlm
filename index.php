@@ -7,6 +7,7 @@
     require_once('inc/rain.tpl.class.php');
     require_once('inc/functions.php');
     require_once('inc/Banc.inc.php');
+    require_once('inc/CSRF.inc.php');
     raintpl::$tpl_dir = 'tpl/';
     raintpl::$cache_dir = 'tmp/';
 
@@ -56,7 +57,7 @@
         header('location: index.php?do=connect');
         exit();
     }
-    
+
     // Initialize empty $_GET['do'] if required to avoid error
     if(empty($_GET['do'])) {
         $_GET['do'] = '';
@@ -69,7 +70,7 @@
                 header('location: index.php');
                 exit();
             }
-            if(!empty($_POST['login']) && !empty($_POST['password'])) {
+            if(!empty($_POST['login']) && !empty($_POST['password']) && check_token(600, 'connection')) {
                 $user = new User();
                 $user->setLogin($_POST['login']);
                 if(ban_canLogin() == false) {
@@ -101,9 +102,9 @@
                     }
                 }
             }
-            $tpl->assign('connection', true);
             $tpl->assign('user_post', (!empty($_POST['login'])) ? htmlspecialchars($_POST['login']) : '');
-            $tpl->draw('connexion');
+            $tpl->assign('token', generate_token('connection'));
+            $tpl->draw('connection');
             break;
 
         case 'disconnect':
@@ -138,20 +139,22 @@
             }
 
             if(!empty($_POST['login']) && !empty($_POST['display_name']) && (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
-                $user = new User();
-                if(!empty($_POST['user_id'])) {
-                    $user->setId($_POST['user_id']);
-                }
-                $user->setLogin($_POST['login']);
-                $user->setDisplayName($_POST['display_name']);
-                if(!empty($_POST['password'])) {
-                    $user->setPassword($user->encrypt($_POST['password']));
-                }
-                $user->setAdmin($_POST['admin']);
-                $user->save();
+                if(check_token('edit_users')) {
+                    $user = new User();
+                    if(!empty($_POST['user_id'])) {
+                        $user->setId($_POST['user_id']);
+                    }
+                    $user->setLogin($_POST['login']);
+                    $user->setDisplayName($_POST['display_name']);
+                    if(!empty($_POST['password'])) {
+                        $user->setPassword($user->encrypt($_POST['password']));
+                    }
+                    $user->setAdmin($_POST['admin']);
+                    $user->save();
 
-                header('location: index.php?do=edit_users');
-                exit();
+                    header('location: index.php?do=edit_users');
+                    exit();
+                }
             }
  
             if(!empty($_GET['user_id']) || $_GET['do'] == 'add_user') {
@@ -174,6 +177,7 @@
             $tpl->assign('login_post', (!empty($_POST['login']) ? htmlspecialchars($_POST['login']) : ''));
             $tpl->assign('display_name_post', (!empty($_POST['display_name']) ? htmlspecialchars($_POST['display_name']) : ''));
             $tpl->assign('admin_post', (isset($_POST['admin']) ? (int) $_POST['admin'] : -1));
+            $tpl->assign('token', generate_token('edit_users'));
             $tpl->draw('edit_users');
             break;
 
@@ -202,7 +206,7 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster'])) {
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && check_token(600, 'settings')) {
                 if(!is_writable('data/')) {
                     $tpl>assign('error', 'The script can\'t write in data/ dir, check permissions set on this folder.');
                 }
@@ -246,6 +250,7 @@
             $tpl->assign('mysql_prefix', MYSQL_PREFIX);
             $tpl->assign('timezone', @date_default_timezone_get());
             $tpl->assign('show_settings', true);
+            $tpl->assign('token', generate_token('settings'));
             $tpl->draw('settings');
             break;
 
@@ -271,7 +276,7 @@
             if(!empty($_POST['date_year'])) $date_year = $_POST['date_year'];
             if(!empty($_POST['users_in'])) $users_in = $_POST['users_in'];
 
-            if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
+            if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in']) && check_token(600, 'new_invoice')) {
                 $invoice = new Invoice();
 
                 if(!empty($_POST['id']))
@@ -312,6 +317,7 @@
             $tpl->assign('users_in', (!empty($users_in) ? $users_in : array()));
             $tpl->assign('guests', (!empty($guests) ? $guests : array()));
             $tpl->assign('id', (!empty($_GET['id']) ? (int) $_GET['id'] : 0));
+            $tpl->assign('token', generate_token('new_invoice'));
             $tpl->draw('new_invoice');
             break;
 

@@ -1,4 +1,6 @@
 <?php
+    require_once('inc/CSRF.inc.php');
+
     if(file_exists('data/config.php')) exit("Your Bouffe@Ulm instance is already configured. You should either delete data/config.php to access this page or delete the install.php for security reasons if you are ok with the configuration.");
 
     if(!function_exists("file_get_contents") && !function_exists("file_put_contents")) {
@@ -11,7 +13,7 @@
         $block_form = true;
     }
 
-    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster'])) {
+    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && check_token(600, 'install')) {
         $mysql_host = $_POST['mysql_host'];
         $mysql_login = $_POST['mysql_login'];
         $mysql_db = $_POST['mysql_db'];
@@ -139,7 +141,7 @@
                 <p><label for="admin_display_name">Displayed name for admin user : </label><input type="text" name="admin_display_name" id="admin_display_name" <?php echo (!empty($_POST['admin_display_name']) ? 'value="'.htmlspecialchars($_POST['admin_display_name']).'"' : '');?>/></p>
                 <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/> <a href="" onclick="toggle_password('admin_password'); return false;"><img src="img/toggle_password.jpg" alt="Toggle visible"/></a></p>
             </fieldset>
-            <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" value="Install"></p>
+            <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" value="Install"><input type="hidden" name="token" value="<?php echo generate_token('install');?>"/></p>
         </form>
     </body>
 </html>

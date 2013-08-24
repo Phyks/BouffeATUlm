@@ -50,6 +50,7 @@
     <p class="center">
         <input type="submit" value="{$user_id != -1 ? 'Edit' : 'Add'}"/>
         {if condition="$user_id != -1"}<input type="hidden" name="user_id" value="{$user_id}"/>{/if}
+        <input type="hidden" name="token" value="{$token}"/>
     </p>
 </form>
 
@@ -58,6 +59,6 @@
 <form method="post" action="index.php?do=password" id="edit_password_form">
     <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/></p>
     <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/></p>
-    <p class="center"><input type="submit" value="Update"/></p>
+    <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
 {/if}
