@@ -3,6 +3,7 @@
 * htmlspecialchars => on users objects
 * handle negative amounts
 * Refactor load method to avoir load_* methods !
+* Test remember_me
 
 install.php :
 =============

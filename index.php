@@ -36,13 +36,6 @@
     // Handle current user status
     if(session_id() == '') session_start();
 
-    // If IP has changed, logout
-    if(user_ip() != $_SESSION['ip']) {
-        session_destroy();
-        header('location: index.php?do=connect');
-        exit();
-    }
-
     $current_user = new User();
     if(isset($_SESSION['current_user'])) {
         $current_user->sessionRestore($_SESSION['current_user'], true);
@@ -54,6 +47,13 @@
 
     // If not connected, redirect to connection page
     if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) {
+        header('location: index.php?do=connect');
+        exit();
+    }
+    
+    // If IP has changed, logout
+    if($current_user !== false && user_ip() != $_SESSION['ip']) {
+        session_destroy();
         header('location: index.php?do=connect');
         exit();
     }
@@ -102,6 +102,7 @@
                     }
                 }
             }
+            $tpl->assign('connection', true);
             $tpl->assign('user_post', (!empty($_POST['login'])) ? htmlspecialchars($_POST['login']) : '');
             $tpl->assign('token', generate_token('connection'));
             $tpl->draw('connection');
