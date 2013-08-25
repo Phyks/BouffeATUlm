@@ -35,13 +35,13 @@
 </table>
 <?php }elseif( $view == 'edit_user' ){ ?>
 
-<h2>Edit a user</h2>
-<form method="post" action="index.php?do=add_user" id="edit_user_form">
+<h2><?php echo $user_id != -1 ? 'Edit' : 'Add';?> a user</h2>
+<form method="post" action="index.php?do=<?php echo $user_id != -1 ? 'edit_users' : 'add_user';?>" id="edit_user_form">
     <p>
         <label for="login" class="label-block">Login : </label><input type="text" name="login" id="login" <?php if( $login_post != '' ){ ?> value="<?php echo $login_post;?>" <?php }else{ ?> <?php echo $user_id != -1 ? 'value="'.$user_data->getLogin().'"' : '';?> <?php } ?>/>
     </p>
     <p>
-        <label for="display_name" class="label-block">Displayed name : </label><input type="text" name="display_name" id="display_name" <?php if( $display_name_post != '' ){ ?> value="<?php echo $display_name_post;?>" {/else} <?php echo $user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : '';?> <?php } ?>/>
+        <label for="display_name" class="label-block">Displayed name : </label><input type="text" name="display_name" id="display_name" <?php if( $display_name_post != '' ){ ?> value="<?php echo $display_name_post;?>" <?php }else{ ?> <?php echo $user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : '';?> <?php } ?>/>
     </p>
     <p>
         <label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/>
@@ -60,6 +60,7 @@
         <input type="submit" value="<?php echo $user_id != -1 ? 'Edit' : 'Add';?>"/>
         <?php if( $user_id != -1 ){ ?><input type="hidden" name="user_id" value="<?php echo $user_id;?>"/><?php } ?>
 
+        <input type="hidden" name="token" value="<?php echo $token;?>"/>
     </p>
 </form>
 
@@ -69,7 +70,7 @@
 <form method="post" action="index.php?do=password" id="edit_password_form">
     <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/></p>
     <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/></p>
-    <p class="center"><input type="submit" value="Update"/></p>
+    <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="<?php echo $token;?>"</p>
 </form>
 <?php } ?>
 

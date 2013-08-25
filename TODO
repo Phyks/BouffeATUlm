@@ -17,3 +17,18 @@ inc/Invoices.class.php :
 
 Manage paybacks :
 =================
+* TODO : Payback system
+
+Tests :
+=======
+* Remember me ?
+* Add a bill
+* Edit a bill
+* Change settings
+
+Tests passed (quick tests) :
+============================
+* Connection form
+* Edit notice
+* Add / Edit user
+* Change password

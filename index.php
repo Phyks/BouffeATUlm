@@ -118,17 +118,23 @@
         case 'password':
             if(!empty($_POST['password']) && !empty($_POST['password_confirm'])) {
                 if($_POST['password'] == $_POST['password_confirm']) {
-                    $current_user->setPassword($current_user->encrypt($_POST['password']));
-                    $current_user->save();
+                    if(check_token(600, 'password')) {
+                        $current_user->setPassword($current_user->encrypt($_POST['password']));
+                        $current_user->save();
 
-                    header('location: index.php');
-                    exit();
+                        header('location: index.php');
+                        exit();
+                    }
+                    else {
+                        $tpl->assign('error', 'Token error. Please resubmit the form.');
+                    }
                 }
                 else {
                     $tpl->assign('error', 'The content of the two password fields doesn\'t match.');
                 }
             }
             $tpl->assign('view', 'password');
+            $tpl->assign('token', generate_token('password'));
             $tpl->draw('edit_users');
             break;
 
@@ -140,7 +146,7 @@
             }
 
             if(!empty($_POST['login']) && !empty($_POST['display_name']) && (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
-                if(check_token('edit_users')) {
+                if(check_token(600, 'edit_users')) {
                     $user = new User();
                     if(!empty($_POST['user_id'])) {
                         $user->setId($_POST['user_id']);
@@ -152,14 +158,17 @@
                     }
                     $user->setAdmin($_POST['admin']);
 
-                    if($user->isUnique()) {
+                    if(!empty($_POST['user_id']) || $user->isUnique()) {
                         $user->save();
                         header('location: index.php?do=edit_users');
                         exit();
                     }
                     else {
-                        $tpl->assign('error', 'A user with the same login exists. Choose a different login.');
+                        $tpl->assign('error', 'A user with the same login or display name already exists. Choose a different login.');
                     }
+                }
+                else {
+                    $tpl->assign('error', 'Token error. Please resubmit the form.');
                 }
             }
  
@@ -212,41 +221,46 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && check_token(600, 'settings')) {
-                if(!is_writable('data/')) {
-                    $tpl>assign('error', 'The script can\'t write in data/ dir, check permissions set on this folder.');
-                }
-                $config = file('data/config.php');
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster'])) {
+                if(check_token(600, 'settings')) {
+                    if(!is_writable('data/')) {
+                        $tpl>assign('error', 'The script can\'t write in data/ dir, check permissions set on this folder.');
+                    }
+                    $config = file('data/config.php');
 
-                foreach($config as $line_number=>$line) {
-                    if(strpos($line, "MYSQL_HOST") !== FALSE)
-                        $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
-                    elseif(strpos($line, "MYSQL_LOGIN") !== FALSE)
-                        $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
-                    elseif(strpos($line, "MYSQL_PASSWORD") !== FALSE && !empty($_POST['mysql_password']))
-                        $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
-                    elseif(strpos($line, "MYSQL_DB") !== FALSE)
-                        $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
-                    elseif(strpos($line, "MYSQL_PREFIX") !== FALSE && !empty($_POST['mysql_prefix']))
-                        $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
-                    elseif(strpos($line, "INSTANCE_TITLE") !== FALSE)
-                        $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
-                    elseif(strpos($line, "BASE_URL") !== FALSE)
-                        $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
-                    elseif(strpos($line, "CURRENCY") !== FALSE)
-                        $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
-                    elseif(strpos($line, "EMAIL_WEBMASTER") !== FALSE)
-                        $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
-                    elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
-                        $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
-                }
+                    foreach($config as $line_number=>$line) {
+                        if(strpos($line, "MYSQL_HOST") !== FALSE)
+                            $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
+                        elseif(strpos($line, "MYSQL_LOGIN") !== FALSE)
+                            $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
+                        elseif(strpos($line, "MYSQL_PASSWORD") !== FALSE && !empty($_POST['mysql_password']))
+                            $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
+                        elseif(strpos($line, "MYSQL_DB") !== FALSE)
+                            $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
+                        elseif(strpos($line, "MYSQL_PREFIX") !== FALSE && !empty($_POST['mysql_prefix']))
+                            $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
+                        elseif(strpos($line, "INSTANCE_TITLE") !== FALSE)
+                            $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
+                        elseif(strpos($line, "BASE_URL") !== FALSE)
+                            $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
+                        elseif(strpos($line, "CURRENCY") !== FALSE)
+                            $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
+                        elseif(strpos($line, "EMAIL_WEBMASTER") !== FALSE)
+                            $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
+                        elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
+                            $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
+                    }
 
-                if(file_put_contents("data/config.php", $config)) {
-                    header('location: index.php');
-                    exit();
+                    if(file_put_contents("data/config.php", $config)) {
+                        header('location: index.php');
+                        exit();
+                    }
+                    else {
+                        $tpl->assign('error', 'Unable to write data/config.php file.');
+                    }
                 }
                 else {
-                    $tpl->assign('error', 'Unable to write data/config.php file.');
+                    $tpl->assign('error', 'Token error. Please resubmit the form.');
                 }
             }
 
@@ -282,29 +296,34 @@
             if(!empty($_POST['date_year'])) $date_year = $_POST['date_year'];
             if(!empty($_POST['users_in'])) $users_in = $_POST['users_in'];
 
-            if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in']) && check_token(600, 'new_invoice')) {
-                $invoice = new Invoice();
+            if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
+                if(check_token(600, 'new_invoice')) {
+                    $invoice = new Invoice();
 
-                if(!empty($_POST['id']))
-                    $invoice->setId($_POST['id']);
+                    if(!empty($_POST['id']))
+                        $invoice->setId($_POST['id']);
 
-                $invoice->setWhat($_POST['what']);
-                $invoice->setAmount($_POST['amount']);
-                $invoice->setBuyer($current_user->getId());
-                $invoice->setDate($date_day, $date_month, $date_year);
+                    $invoice->setWhat($_POST['what']);
+                    $invoice->setAmount($_POST['amount']);
+                    $invoice->setBuyer($current_user->getId());
+                    $invoice->setDate($date_day, $date_month, $date_year);
 
-                $users_in = '';
-                $guests = array();
-                foreach($_POST['users_in'] as $user) {
-                    $users_in .= ($users_in != '') ? ', ' : '';
-                    $users_in .= $user.'('.(!empty($_POST['guest_user_'.$user]) ? (int) $_POST['guest_user_'.$user] : '0').')';
-                    $guests[$user] = (int) $_POST['guest_user_'.$user];
+                    $users_in = '';
+                    $guests = array();
+                    foreach($_POST['users_in'] as $user) {
+                        $users_in .= ($users_in != '') ? ', ' : '';
+                        $users_in .= $user.'('.(!empty($_POST['guest_user_'.$user]) ? (int) $_POST['guest_user_'.$user] : '0').')';
+                        $guests[$user] = (int) $_POST['guest_user_'.$user];
+                    }
+                    $invoice->setUsersIn($users_in);
+
+                    $invoice->save();
+                    header('location: index.php');
+                    exit();
                 }
-                $invoice->setUsersIn($users_in);
-
-                $invoice->save();
-                header('location: index.php');
-                exit();
+                else {
+                    $tpl->assign('error', 'Token error. Please resubmit the form.');
+                }
             }
 
             $users_list = new User();

@@ -65,7 +65,7 @@ class User extends Storage {
         $user_data = $this->load(array('login'=>$this->login));
         if(count($user_data) == 1) {
             $this->setId($user_data[0]['id']);
-            $this->setDisplayName($user_data[0]['admin']);
+            $this->setDisplayName($user_data[0]['display_name']);
             $this->setAdmin($user_data[0]['admin']);
             $this->setPassword($user_data[0]['password']);
 
@@ -122,7 +122,7 @@ class User extends Storage {
     }
 
     public function isUnique() {
-        if(count($this->load_users(array('login'=>$this->login))) == 0) {
+        if(count($this->load_users(array('login'=>$this->login))) == 0 && count($this->load_users(array('display_name'=>$this->display_name)))) {
             return true;
         }
         else {

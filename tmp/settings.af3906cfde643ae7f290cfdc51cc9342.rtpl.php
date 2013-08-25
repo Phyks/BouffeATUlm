@@ -4,19 +4,25 @@
 <?php if( !$show_settings ){ ?>
 
 <h2>Edit homepage notice</h2>
+<?php if( $error ){ ?><p class="error"><?php echo $error;?></p><?php } ?>
+
 <form method="post" id="notice_form" action="index.php?do=edit_notice">
     <p>
         <label for="textarea_notice">Homepage notice :</label><br/>
         <textarea name="notice" rows="15" id="textarea_notice"><?php echo $notice;?></textarea>
     </p>
     <p><em>Note :</em> You can use HTML formatting in this form.</p>
-    <input type="submit" value="Submit"/>
+    <p>
+        <input type="submit" value="Submit"/>
+        <input type="hidden" name="token" value="<?php echo $token;?>"/>
+    </p>
 </form>
 
 <?php }else{ ?>
 
-
 <h2>Change settings of your Bouffe@Ulm installation</h2>
+<?php if( $error ){ ?><p class="error"><?php echo $error;?></p><?php } ?>
+
 <form method="post" action="index.php?do=settings" id="settings_form">
     <fieldset>
         <legend>Database</legend>
@@ -50,7 +56,7 @@
         </p>
         <p><label for="email_webmaster">Webmaster's email : </label><input type="text" name="email_webmaster" id="email_webmaster" value="<?php echo $email_webmaster;?>"/></p>
     </fieldset>
-    <p class="center"><input type="submit" value="Update settings"></p>
+    <p class="center"><input type="submit" value="Update settings"><input type="hidden" name="token" value="<?php echo $token;?>"/></p>
 </form>
 
 <?php } ?>

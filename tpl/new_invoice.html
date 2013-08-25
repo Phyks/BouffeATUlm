@@ -1,5 +1,9 @@
 {include="header"}
 
+{if condition="$error != ''"}
+    <p class="error">{$error}</p>
+{/if}
+
 <h2>Add a bill</h2>
 
 <form method="post" action="index.php?do=new_invoice" id="invoice_form">
@@ -38,7 +42,7 @@
     <p>
         <input type="submit" value="Add"/>
         {if condition="$id != 0"}<input type="hidden" name="id" value="{$id}"/>{/if}
-        <input type="hidden" name="token" value="{$token"}/>
+        <input type="hidden" name="token" value="{$token}"/>
     </p>
 </form>
 
