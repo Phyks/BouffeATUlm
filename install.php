@@ -26,16 +26,36 @@
 
             //Create table "Users"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+
+            $count_users = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Users');
+            $count_users = $count_users->fetch();
+            if($count_users[0] > 0) {
+                $warning = 'Table '.$mysql_prefix.'Users already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
+            }
+
  
             //Create table "Invoices"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date INT(11), users_in VARCHAR(255), buyer INT(11), amount FLOAT, what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
-            //Create table "Users_in_invoice"
+            $count_invoices = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Invoices');
+            $count_invoices = $count_users->fetch();
+            if($count_invoices[0] > 0) {
+                $warning .= 'Table '.$mysql_prefix.'Users already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
+            }
+
+
+            //Create table "Users_in_invoices"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users_in_invoices (invoice_id INT(11) NOT NULL, KEY invoice_id (invoice_id), user_id INT(11), KEY user_id (user_id), guests INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+
+            $count_users_in_invoices = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Users_in_invoices');
+            $count_users_in_invoices = $count_users_in_invoices->fetch();
+            if($count_users_in_invoices[0] > 0) {
+                $warning .= 'Table '.$mysql_prefix.'Users_in_invoices already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
+            }
             
             //Create table "Payback" - TODO
         } catch (PDOException $e) {
-            $error = 'Unable to connect to database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
+            $error = 'Unable to connect to database and create database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
         }
 
         if(!filter_var($_POST['email_webmaster'], FILTER_VALIDATE_EMAIL)) {
@@ -53,7 +73,7 @@
             $salt = sprintf("$2a$%02d$", 10) . $salt; //prefix for blowfish
 
             $config = "<?php
-    define('VERSION_NUMBER', '2.0');
+    define('VERSION_NUMBER', '0.1beta');
     define('MYSQL_HOST', '".$mysql_host."');
     define('MYSQL_LOGIN', '".$mysql_login."');
     define('MYSQL_PASSWORD', '".$mysql_password."');
@@ -77,8 +97,14 @@
                     $admin->setPassword($admin->encrypt($_POST['admin_password']));
                     $admin->setAdmin(true);
                     $admin->save();
-                    header('location: index.php');
-                    exit();
+
+                    if(empty($warning)) {
+                        header('location: index.php');
+                        exit();
+                    }
+                    else {
+                        echo '<p>'.$warning.'<a href="index.php">Go to your instance.</a></p>';
+                    }
                 } catch (Exception $e) {
                     $erreur = 'An error occurred when inserting user in the database.<br/> Error message : '.$e->getMessage().'.';
                 }

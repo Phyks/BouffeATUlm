@@ -5,10 +5,6 @@
 * Refactor load method to avoir load_* methods !
 * Test remember_me
 
-install.php :
-=============
-* TRUNCATE before CREATE TABLE in install.php
-
 inc/Invoices.class.php :
 ========================
 * Better way to store users in ? => reprendre cette partie
@@ -24,7 +20,6 @@ Tests :
 * Remember me ?
 * Add a bill
 * Edit a bill
-* Change settings
 
 Tests passed (quick tests) :
 ============================
@@ -32,3 +27,4 @@ Tests passed (quick tests) :
 * Edit notice
 * Add / Edit user
 * Change password
+* Change settings
