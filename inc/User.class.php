@@ -17,6 +17,8 @@ class User extends Storage {
         parent::__construct();
     }
 
+    // Getters
+    // =======
     public function getLogin() {
         return $this->login;
     }
@@ -33,6 +35,8 @@ class User extends Storage {
         return $this->admin;
     }
 
+    // Setters
+    // =======
     public function setId($id) {
         $this->id = (int) $id;
     }
@@ -53,6 +57,8 @@ class User extends Storage {
         $this->admin = (bool) $admin;
     }
 
+    // Password functions
+    // ==================
     public function encrypt($text) {
         return crypt($text, SALT);
     }
@@ -61,6 +67,8 @@ class User extends Storage {
         return User::encrypt($password) == $this->password;
     }
 
+    // Check if a user exists by login and load it
+    // ===========================================
     public function exists() {
         $user_data = $this->load(array('login'=>$this->login));
         if(count($user_data) == 1) {
@@ -76,6 +84,8 @@ class User extends Storage {
         }
     }
 
+    // Session storage
+    // ===============
     public function sessionStore() {
         return serialize(array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin));
     }
@@ -93,6 +103,8 @@ class User extends Storage {
         $this->setAdmin($user_data['admin']);
     }
 
+    // Load overload => TODO
+    // =============
     public function load_users($fields = NULL) {
         $return = array();
         $users = $this->load($fields);
@@ -121,6 +133,9 @@ class User extends Storage {
         }
     }
 
+    // Check wether a user already exists or not 
+    // (a user = aunique login and display_name)
+    // =========================================
     public function isUnique() {
         if(count($this->load_users(array('login'=>$this->login))) == 0 && count($this->load_users(array('display_name'=>$this->display_name)))) {
             return true;

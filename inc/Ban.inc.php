@@ -1,11 +1,22 @@
 <?php
+    // Ban system from sebsauvage
+    // Usage :
+    // * Use ban_canLogin() to check wether the user CAN login or not
+    // * If true, test wether password is correct or not
+    // *    If true, call ban_loginOk()
+    // *    Else, call ban_loginFailed()
+    // * Else, reject auth
+
     define('DATA_DIR', 'data'); // Data subdirectory
     define('IPBANS_FILENAME', DATA_DIR.'/ipbans.php'); // File storage for failures and bans.
     define('BAN_AFTER', 5); // Ban IP after this many failures.
     define('BAN_DURATION', 1800); // Ban duration for IP address after login failures (in seconds) (1800 sec. = 30 minutes)
+
     if (!is_dir(DATA_DIR)) { mkdir(DATA_DIR,0705); chmod(DATA_DIR,0705); }
     if (!is_file(DATA_DIR.'/.htaccess')) { file_put_contents(DATA_DIR.'/.htaccess',"Allow from none\nDeny from all\n"); } // Protect data files.
 
+    // Logging function
+    // ================
     function logm($message)
     {
         $t = strval(date('Y/m/d_H:i:s')).' - '.$_SERVER["REMOTE_ADDR"].' - '.strval($message)."\n";
@@ -18,7 +29,9 @@
     // Several consecutive failed logins will ban the IP address for 30 minutes.
     if (!is_file(IPBANS_FILENAME)) file_put_contents(IPBANS_FILENAME, "<?php\n\$GLOBALS['IPBANS']=".var_export(array('FAILURES'=>array(),'BANS'=>array()),true).";\n?>");
     include IPBANS_FILENAME;
+
     // Signal a failed login. Will ban the IP if too many failures:
+    // ============================================================
     function ban_loginFailed()
     {
         $ip=$_SERVER["REMOTE_ADDR"]; $gb=$GLOBALS['IPBANS'];
@@ -34,6 +47,7 @@
     }
 
     // Signals a successful login. Resets failed login counter.
+    // ========================================================
     function ban_loginOk()
     {
         $ip=$_SERVER["REMOTE_ADDR"]; $gb=$GLOBALS['IPBANS'];
@@ -44,6 +58,7 @@
     }
 
     // Checks if the user CAN login. If 'true', the user can try to login.
+    // ===================================================================
     function ban_canLogin()
     {
         $ip=$_SERVER["REMOTE_ADDR"]; $gb=$GLOBALS['IPBANS'];
@@ -63,6 +78,7 @@
     }
 
     // Returns user IP
+    // ===============
     function user_ip()
     {
         $ip = $_SERVER["REMOTE_ADDR"];

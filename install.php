@@ -1,7 +1,7 @@
 <?php
     require_once('inc/CSRF.inc.php');
 
-    if(file_exists('data/config.php')) exit("Your Bouffe@Ulm instance is already configured. You should either delete data/config.php to access this page or delete the install.php for security reasons if you are ok with the configuration.");
+    if(file_exists('data/config.php')) exit('<p>Your Bouffe@Ulm instance is already configured. You should either delete data/config.php to access this page or delete the install.php for security reasons if you are ok with the configuration.<br/><a href="index.php">Go to your instance</a>.</p>');
 
     if(!function_exists("file_get_contents") && !function_exists("file_put_contents")) {
         $error = "Functions <em>file_get_contents</em> and <em>file_put_contents</em> seems to not be available on your PHP installation. You should enable them first.";

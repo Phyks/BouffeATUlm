@@ -12,7 +12,8 @@ class Storage {
         $this->disconnect();
     }
 
-    //Connect / Disconnect functions
+    // Connection functions
+    // ====================
     public function connect() {
         $this->connection = new PDO('mysql:host='.MYSQL_HOST.';dbname='.MYSQL_DB, MYSQL_LOGIN, MYSQL_PASSWORD);
         $this->connection->query('SET NAMES utf8');
@@ -22,7 +23,8 @@ class Storage {
         $this->connection = null;
     }
 
-    //Function to get and set vars
+    // Getters
+    // =======
     public function getHost() {
         return $this->host;
     }
@@ -39,6 +41,8 @@ class Storage {
         return $this->db;
     }
 
+    // Setters
+    // =======
     public function setHost($host) {
         $this->host = host;
     }
@@ -55,6 +59,8 @@ class Storage {
         $this->db = $db;
     }
 
+    // Translates types in class to SQL types
+    // ======================================
     public function typeToSQL($type) {
         $return = false;
         switch($type) {
@@ -86,6 +92,8 @@ class Storage {
         }
     }
 
+    // Load function
+    // =============
     public function load($fields = NULL) {
         $query = 'SELECT ';
         $i = false;
@@ -118,6 +126,8 @@ class Storage {
         return $query->fetchAll();
     }
 
+    // Storing function
+    // ================
     public function save() {
         if(!empty($this->id)) {
             $query = 'UPDATE '.MYSQL_PREFIX.$this->TABLE_NAME.' SET ';
@@ -172,6 +182,8 @@ class Storage {
         $this->id = (!isset($this->id) ? $this->connection->lastInsertId() : $this->id);
     }
 
+    // Delete function
+    // ===============
     public function delete() {
         $query = 'DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE ';
 

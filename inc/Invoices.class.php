@@ -1,4 +1,5 @@
 <?php
+    // TODO : Users in
     require_once('data/config.php');
     require_once('Storage.class.php');
 
@@ -14,6 +15,8 @@
             'what'=>'text'
             );
 
+        // Getters
+        // =======
         public function getId() {
             return $this->id;
         }
@@ -38,6 +41,8 @@
             return $this->what;
         }
 
+        // Setters
+        // =======
         public function setId($id) {
             $this->id = (int) $id;
         }
@@ -65,7 +70,8 @@
             $this->what = $what;
         }
 
-
+        // Load overload => TODO
+        // =============
         public function load_invoices($fields = NULL) {
             $return = array();
             $invoices = $this->load($fields);
