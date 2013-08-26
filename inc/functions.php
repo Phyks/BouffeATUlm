@@ -10,3 +10,30 @@
     function setNotice($notice) {
         return file_put_contents('data/notice', $notice);
     }
+
+    function secureDisplay($unsecured) {
+        $return = NULL;
+        if(is_array($unsecured)) {
+            $return = array();
+            foreach($unsecured as $key=>$unsecured_item) {
+                $return[$key] = secureDisplay($unsecured_item);
+            }
+        }
+        elseif(is_object($unsecured)) {
+            $return = $unsecured->secureDisplay();
+        }
+        elseif(is_numeric($unsecured)) {
+            if(intval($unsecured) == floatval($unsecured))
+                $return = (int) $unsecured;
+            else
+                $return = (float) $unsecured;
+        }
+        elseif(is_bool($unsecured)) {
+            $return = (bool) $unsecured;
+        }
+        else {
+            $return = htmlspecialchars($unsecured);
+        }
+
+        return $return;
+    }

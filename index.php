@@ -43,7 +43,7 @@
     else {
         $current_user = false;
     }
-    $tpl->assign('current_user', $current_user);
+    $tpl->assign('current_user', secureDisplay($current_user));
 
     // If not connected, redirect to connection page
     if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) {
@@ -177,7 +177,7 @@
                     $user_id = (int) $_GET['user_id'];
                     $user = new User();
                     $user->load_user(array('id'=>$user_id));
-                    $tpl->assign('user_data', $user);
+                    $tpl->assign('user_data', $user->secureDisplay());
                 }
                 $tpl->assign('user_id', (!empty($user_id) ? (int) $user_id : -1));
                 $tpl->assign('view', 'edit_user');
@@ -186,7 +186,7 @@
                 $users_list = new User();
                 $users_list = $users_list->load_users();
 
-                $tpl->assign('users', $users_list);
+                $tpl->assign('users', secureDisplay($users_list));
                 $tpl->assign('view', 'list_users');
             }
             $tpl->assign('login_post', (!empty($_POST['login']) ? htmlspecialchars($_POST['login']) : ''));
@@ -215,7 +215,6 @@
                 exit();
             }
 
-            $tpl->assign('notice', getNotice());
             $tpl->assign('show_settings', false);
             $tpl->draw('settings');
             break;
@@ -264,10 +263,10 @@
                 }
             }
 
-            $tpl->assign('mysql_host', MYSQL_HOST);
-            $tpl->assign('mysql_login', MYSQL_LOGIN);
-            $tpl->assign('mysql_db', MYSQL_DB);
-            $tpl->assign('mysql_prefix', MYSQL_PREFIX);
+            $tpl->assign('mysql_host', htmlspecialchars(MYSQL_HOST));
+            $tpl->assign('mysql_login', htmlspecialchars(MYSQL_LOGIN));
+            $tpl->assign('mysql_db', htmlspecialchars(MYSQL_DB));
+            $tpl->assign('mysql_prefix', htmlspecialchars(MYSQL_PREFIX));
             $tpl->assign('timezone', @date_default_timezone_get());
             $tpl->assign('show_settings', true);
             $tpl->assign('token', generate_token('settings'));
@@ -329,7 +328,7 @@
             $users_list = new User();
             $users_list = $users_list->load_users();
 
-            $tpl->assign('days', range(1,31)); // TODO : Improve it
+            $tpl->assign('days', range(1,31));
             $tpl->assign('months', range(1, 12));
             $tpl->assign('years', range(date('Y') - 1, date('Y') + 1));
 
@@ -338,7 +337,7 @@
             $tpl->assign('year_post', (!empty($date_year) ? (int) $date_year : (int) date('Y')));
             $tpl->assign('amount_post', (!empty($amount) ? (float) $amount : 0));
             $tpl->assign('what_post', (!empty($what) ? htmlspecialchars($what) : ''));
-            $tpl->assign('users', $users_list);
+            $tpl->assign('users', secureDisplay($users_list));
             $tpl->assign('users_in', (!empty($users_in) ? $users_in : array()));
             $tpl->assign('guests', (!empty($guests) ? $guests : array()));
             $tpl->assign('id', (!empty($_GET['id']) ? (int) $_GET['id'] : 0));
@@ -364,8 +363,8 @@
             $invoices_list = new Invoice();
             $invoices_list = $invoices_list->load_invoices();
 
-            $tpl->assign('users', $users_list);
-            $tpl->assign('invoices', $invoices_list);
+            $tpl->assign('users', secureDisplay($users_list));
+            $tpl->assign('invoices', secureDisplay($invoices_list));
 
             $tpl->draw('index');
             break;

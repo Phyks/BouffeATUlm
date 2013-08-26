@@ -144,4 +144,15 @@ class User extends Storage {
             return false;
         }
     }
+
+    // Maps htmlspecialchars on the class before display
+    // =================================================
+    public function secureDisplay() {
+        $this->id = (int) $this->id;
+        $this->login = htmlspecialchars($this->login);
+        $this->display_name = htmlspecialchars($this->display_name);
+        $this->admin = (int) $this->admin;
+
+        return $this;
+    }
 }

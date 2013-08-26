@@ -1,5 +1,7 @@
 <?php
     // TODO : Users in
+    // TODO : date format
+
     require_once('data/config.php');
     require_once('Storage.class.php');
 
@@ -106,5 +108,18 @@
             else {
                 return false;
             }
+        }
+
+        // Maps htmlspecialchars on the class before display
+        // =================================================
+        public function secureDisplay() {
+            $this->id = (int) $this->id;
+            $this->what = htmlspecialchars($this->what);
+            $this->amount = (float) $this->amount;
+            $this->buyer = (int) $this->buyer;
+            $this->users_in = htmlspecialchars($this->users_in);
+            $this->date = htmlspecialchars($this->date);
+
+            return $this;
         }
     }
