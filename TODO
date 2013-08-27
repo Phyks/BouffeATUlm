@@ -1,8 +1,5 @@
 * i18n
 * handle negative amounts
-* Refactor load method to avoir load_* methods !
-* Test remember_me
-* TODO in files
 
 inc/Invoices.class.php :
 ========================

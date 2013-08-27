@@ -176,7 +176,7 @@
                 if(!empty($_GET['user_id'])) {
                     $user_id = (int) $_GET['user_id'];
                     $user = new User();
-                    $user->load_user(array('id'=>$user_id));
+                    $user = $user->load(array('id'=>$user_id), true);
                     $tpl->assign('user_data', $user->secureDisplay());
                 }
                 $tpl->assign('user_id', (!empty($user_id) ? (int) $user_id : -1));
@@ -184,7 +184,7 @@
             }
             else {
                 $users_list = new User();
-                $users_list = $users_list->load_users();
+                $users_list = $users_list->load();
 
                 $tpl->assign('users', secureDisplay($users_list));
                 $tpl->assign('view', 'list_users');
@@ -277,7 +277,7 @@
         case 'edit_invoice':
             if(!empty($_GET['id'])) {
                 $invoice = new Invoice();
-                $invoice->load_invoice(array('id'=>(int) $_GET['id']));
+                $invoice->load(array('id'=>(int) $_GET['id']), true);
 
                 $date_day = '';
                 $date_month = '';
@@ -326,7 +326,7 @@
             }
 
             $users_list = new User();
-            $users_list = $users_list->load_users();
+            $users_list = $users_list->load();
 
             $tpl->assign('days', range(1,31));
             $tpl->assign('months', range(1, 12));
@@ -358,10 +358,10 @@
 
         default:
             $users_list = new User();
-            $users_list = $users_list->load_users();
+            $users_list = $users_list->load();
 
             $invoices_list = new Invoice();
-            $invoices_list = $invoices_list->load_invoices();
+            $invoices_list = $invoices_list->load();
 
             $tpl->assign('users', secureDisplay($users_list));
             $tpl->assign('invoices', secureDisplay($invoices_list));

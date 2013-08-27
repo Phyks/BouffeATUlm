@@ -94,7 +94,7 @@ class Storage {
 
     // Load function
     // =============
-    public function load($fields = NULL) {
+    public function load($fields = NULL, $first_only = false) {
         $query = 'SELECT ';
         $i = false;
         foreach($this->fields as $field=>$type) {
@@ -123,7 +123,25 @@ class Storage {
 
         $query->execute();
         
-        return $query->fetchAll();
+        $results = $query->fetchAll();
+
+        if(count($results) > 0) {
+            $return = array();
+            $class = get_class($this);
+
+            foreach($results as $result) {
+                $return[$result['id']] = new $class();
+                $return[$result['id']]->sessionRestore($result);
+            }
+
+            if($first_only)
+                return $return[0];
+            else
+                return $return;
+        }
+        else {
+            return false;
+        }
     }
 
     // Storing function

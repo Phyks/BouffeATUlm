@@ -72,44 +72,6 @@
             $this->what = $what;
         }
 
-        // Load overload => TODO
-        // =============
-        public function load_invoices($fields = NULL) {
-            $return = array();
-            $invoices = $this->load($fields);
-
-            foreach($invoices as $invoice) {
-                $return[$invoice['id']] = new Invoice();
-
-                $return[$invoice['id']]->setId($invoice['id']);
-                $return[$invoice['id']]->setDate($invoice['date']);
-                $return[$invoice['id']]->setUsersIn($invoice['users_in']);
-                $return[$invoice['id']]->setBuyer($invoice['buyer']);
-                $return[$invoice['id']]->setAmount($invoice['amount']);
-                $return[$invoice['id']]->setWhat($invoice['what']);
-            }
-
-            return $return;
-        }
-        
-        public function load_invoice($fields = NULL) {
-            $fetch = $this->load($fields);
-
-            if(count($fetch) > 0) {
-                $this->setId($fetch[0]['id']);
-                $this->setWhat($fetch[0]['what']);
-                $this->setAmount($fetch[0]['amount']);
-                $this->setBuyer($fetch[0]['buyer']);
-                $this->setUsersIn($fetch[0]['users_in']);
-                $this->setDate($fetch[0]['date']);
-
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-
         // Maps htmlspecialchars on the class before display
         // =================================================
         public function secureDisplay() {
@@ -121,5 +83,20 @@
             $this->date = htmlspecialchars($this->date);
 
             return $this;
+        }
+
+        // Restores object from array
+        // ==========================
+        public function sessionRestore($data, $serialized = false) {
+            if($serialized) {
+                $data = unserialize($data);
+            }
+
+            $this->setId($data['id']);
+            $this->setWhat($data['what']);
+            $this->setAmount($data['amount']);
+            $this->setBuyer($data['buyer']);
+            $this->setUsersIn($data['users_in']);
+            $this->setDate($data['date']);
         }
     }
