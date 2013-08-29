@@ -70,14 +70,10 @@ class User extends Storage {
     // Check if a user exists by login and load it
     // ===========================================
     public function exists() {
-        $user_data = $this->load(array('login'=>$this->login));
-        if(count($user_data) == 1) {
-            $this->setId($user_data[0]['id']);
-            $this->setDisplayName($user_data[0]['display_name']);
-            $this->setAdmin($user_data[0]['admin']);
-            $this->setPassword($user_data[0]['password']);
+        $user_data = $this->load(array('login'=>$this->login), true);
 
-            return true;
+        if(count($user_data) == 1) { 
+            return $user_data;
         }
         else {
             return false;

@@ -135,7 +135,7 @@ class Storage {
             }
 
             if($first_only)
-                return $return[0];
+                return $return[$result['id']];
             else
                 return $return;
         }

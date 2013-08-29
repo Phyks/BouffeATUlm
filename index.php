@@ -77,7 +77,8 @@
                     $error = "Unknown username / password.";
                 }
                 else {
-                    if($user->exists($_POST['login']) && $user->checkPassword($_POST['password'])) {
+                    $user = $user->exists($_POST['login']);
+                    if($user !== false && $user->checkPassword($_POST['password'])) {
                         ban_loginOk();
                         $_SESSION['current_user'] = $user->sessionStore();
                         $_SESSION['ip'] = user_ip();
