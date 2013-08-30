@@ -7,7 +7,7 @@
 <div id="quick_summary">
     <h2>Balance</h2>
     <p class="center">Read <em>line</em> owes <em>case</em> {$currency} to <em>column</em>. You can click on links to confirm the payback.
-    <table> 
+    <table id="balance_table"> 
         <tr>
             <th>Owes\To</th>
             {loop="users"}
@@ -27,7 +27,7 @@
 <div id="detailed_summary">
     <h2>Detailed list of bills for last month</h2>
 
-    <table>
+    <table id="list_expenses">
         <tr>
             <th>Date</th>
             <th>Paid by</th>
@@ -40,7 +40,7 @@
         {loop="invoices"}
             <tr>
                 <td>{$value->getDate()}</td>
-                <td>{$value->getBuyer()}</td>
+                <td>{$value->getBuyer()->getDisplayName()}</td>
                 <td>{$value->getUsersIn()}</td>
                 <td>{$value->getAmount()}</td>
                 <td>{$value->getWhat()}</td>

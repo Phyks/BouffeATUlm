@@ -38,3 +38,23 @@ function toggle_password(id) {
     else
         document.getElementById(id).type = 'password';
 }
+
+$(document).ready(function() {
+    $('#balance_table td').hover(function() {
+        $(this).closest('tr').find('td,th').addClass('highlight_td');
+        var col = $(this).index()+1;
+        $(this).closest('table').find('tr :nth-child('+col+')').addClass('highlight_td');
+    }, function() {
+        $(this).closest('tr').find('td,th').removeClass('highlight_td');
+        var col = $(this).index()+1;
+        $(this).closest('table').find('tr :nth-child('+col+')').removeClass('highlight_td');
+    });
+
+    $('#balance_table tr:first-child th:not(:first-child)').hover(function() {
+        var col = $(this).index()+1;
+        $(this).closest('table').find('tr :nth-child('+col+')').addClass('highlight_td');
+    }, function() {
+        var col = $(this).index()+1;
+        $(this).closest('table').find('tr :nth-child('+col+')').removeClass('highlight_td');
+    });
+});

@@ -278,11 +278,12 @@
         case 'edit_invoice':
             if(!empty($_GET['id'])) {
                 $invoice = new Invoice();
-                $invoice->load(array('id'=>(int) $_GET['id']), true);
+                $invoice = $invoice->load(array('id'=>(int) $_GET['id']), true);
 
-                $date_day = '';
-                $date_month = '';
-                $date_year = '';
+                $date_hour = $invoice->getDate('a');
+                $date_day = $invoice->getDate('d');
+                $date_month = $invoice->getDate('m');
+                $date_year = $invoice->getDate('Y');
                 $amount = $invoice->getAmount();
                 $what = $invoice->getWhat();
                 $users_in = explode(',', $invoice->getUsersIn());
@@ -296,30 +297,35 @@
             if(!empty($_POST['date_year'])) $date_year = $_POST['date_year'];
             if(!empty($_POST['users_in'])) $users_in = $_POST['users_in'];
 
-            if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
+            if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_hour']) && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
                 if(check_token(600, 'new_invoice')) {
-                    $invoice = new Invoice();
-
-                    if(!empty($_POST['id']))
-                        $invoice->setId($_POST['id']);
-
-                    $invoice->setWhat($_POST['what']);
-                    $invoice->setAmount($_POST['amount']);
-                    $invoice->setBuyer($current_user->getId());
-                    $invoice->setDate($date_day, $date_month, $date_year);
-
-                    $users_in = '';
-                    $guests = array();
-                    foreach($_POST['users_in'] as $user) {
-                        $users_in .= ($users_in != '') ? ', ' : '';
-                        $users_in .= $user.'('.(!empty($_POST['guest_user_'.$user]) ? (int) $_POST['guest_user_'.$user] : '0').')';
-                        $guests[$user] = (int) $_POST['guest_user_'.$user];
+                    if($_POST['amount'] <= 0) {
+                        $tpl->assign('error', 'Negative amount.');
                     }
-                    $invoice->setUsersIn($users_in);
+                    else {
+                        $invoice = new Invoice();
 
-                    $invoice->save();
-                    header('location: index.php');
-                    exit();
+                        if(!empty($_POST['id']))
+                            $invoice->setId($_POST['id']);
+
+                        $invoice->setWhat($_POST['what']);
+                        $invoice->setAmount($_POST['amount']);
+                        $invoice->setBuyer($current_user);
+                        $invoice->setDate(0, int2ampm($_POST['date_hour']), $_POST['date_day'], $_POST['date_month'], $_POST['date_year']);
+
+                        $users_in = array();
+                        $guests = array();
+                        foreach($_POST['users_in'] as $user) {
+                            $users_in[] = (int) $user;
+                            $guests[] = (int) $_POST['guest_user_'.$user];
+                        }
+                        $invoice->setUsersIn($users_in);
+                        $invoice->setGuests($guests);
+
+                        $invoice->save();
+                        header('location: index.php');
+                        exit();
+                    }
                 }
                 else {
                     $tpl->assign('error', 'Token error. Please resubmit the form.');
@@ -333,6 +339,7 @@
             $tpl->assign('months', range(1, 12));
             $tpl->assign('years', range(date('Y') - 1, date('Y') + 1));
 
+            $tpl->assign('hour_post', (!empty($date_hour) ? (int) ampm2int($date_hour) : (int) ampm2int(date('a'))));
             $tpl->assign('day_post', (!empty($date_day) ? (int) $date_day : (int) date('d')));
             $tpl->assign('month_post', (!empty($date_month) ? (int) $date_month : (int) date('m')));
             $tpl->assign('year_post', (!empty($date_year) ? (int) $date_year : (int) date('Y')));

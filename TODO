@@ -3,9 +3,10 @@
 
 inc/Invoices.class.php :
 ========================
-* Better way to store users in ? => reprendre cette partie
+* Modify store() method to handle storage
+* Modify load() method to handle JOIN
 * Modify load() method to handle complex queries (such as WHERE date < DATE_1 AND date > DATE_2)
-* Buyer as user object ?
+* Cache
 
 Manage paybacks :
 =================
@@ -13,16 +14,14 @@ Manage paybacks :
 
 TODO :
 ======
+* Colgroups + CSS hover
 * Add / Edit a bill
-* Bug in connection form
+* JSON output
 
-Tests :
-=======
-* Remember me ?
-
-Tests passed (quick tests) :
-============================
+To test :
+=========
 * Connection form
+* Remember me ?
 * Edit notice
 * Add / Edit user
 * Change password

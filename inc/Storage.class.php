@@ -64,9 +64,16 @@ class Storage {
     public function typeToSQL($type) {
         $return = false;
         switch($type) {
-            case 'key':
             case 'int':
+                $return = 'INT(11)';
+                break;
+
+            case 'key':
                 $return = 'INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY'; 
+                break;
+
+            case 'float':
+                $return = 'FLOAT';
                 break;
 
             case 'string':
@@ -117,6 +124,9 @@ class Storage {
 
         if(!empty($fields) && is_array($fields)) {
             foreach($fields as $field=>$value) {
+                if($fields[$field] == 'date')
+                    $value = $value->format('Y-m-d H:i:s');
+
                 $query->bindParam(':'.$field, $value);
             }
         }
@@ -191,6 +201,9 @@ class Storage {
 
         foreach($this->fields as $field=>$type) {
             if(isset($this->$field)) {
+                if($fields[$field] == 'date')
+                    $value = $value->format('Y-m-d H:i:s');
+
                 $query->bindParam(':'.$field, $this->$field);
             }
         }
@@ -218,6 +231,9 @@ class Storage {
 
         foreach($this->fields as $field=>$type) {
             if(!empty($this->$field)) {
+                if($fields[$field] == 'date')
+                    $value = $value->format('Y-m-d H:i:s');
+
                 $query->bindParam(':'.$field, $this->$field);
             }
         }

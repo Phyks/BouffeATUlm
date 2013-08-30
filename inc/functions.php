@@ -37,3 +37,17 @@
 
         return $return;
     }
+
+    function ampm2int($date) {
+        if($date == 'am')
+            return 0;
+        else
+            return 1;
+    }
+
+    function int2ampm($hour) {
+        if($hour == 0)
+            return 6;
+        else
+            return 18;
+    }

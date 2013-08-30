@@ -12,10 +12,16 @@ table {
     margin: auto;
     text-align: center;
     max-width: 100%;
+    border-collapse: collapse;
 }
 
 table td, table th {
     padding: 0.5em;
+    border: 1px solid black;
+}
+
+table th {
+    background-color: #DDD;
 }
 
 h2 {
@@ -88,9 +94,13 @@ input[type=submit] {
     text-align: center
 }
 
-#edit_password_form, #edit_user_form, #invoice_form {
-    width: 50%;
-    margin-left: 15%;
+#edit_password_form, #edit_user_form, #invoice_form, #notice_form {
+    width: 67%;
+    margin: auto;
+}
+
+#edit_password_form p, #edit_user_form p, #notice_form p {
+    text-align: center;
 }
 
 #edit_user_admin_rights {
@@ -98,11 +108,23 @@ input[type=submit] {
 }
 
 #textarea_notice {
-    width: 50%;
+    width: 75%;
 }
 
 textarea#what {
     width: 75%;
+}
+
+#list_expenses tr:hover {
+    background-color: #00bd00;
+}
+
+#balance_table tr:not(:first-child):hover * {
+    background-color: #00bd00;
+}
+
+.highlight_td {
+    background-color: #00bd00;
 }
 
 #install {
