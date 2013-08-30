@@ -1,3 +1,6 @@
+    {if condition="!$connection"}
+        <p id="user_connected">Connected as {$current_user->getDisplayName()}.</p>
+    {/if}
     <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
     </body>

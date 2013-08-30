@@ -1,8 +1,7 @@
 <?php
     // Generates a token against CSRF
     // ==============================
-    function generate_token($name = '')
-    {
+    function generate_token($name = '') {
         if(session_id() == '')
             session_start();
 
@@ -16,8 +15,7 @@
 
     // Checks that the anti-CSRF token is correct
     // ==========================================
-    function check_token($time, $name = '')
-    {
+    function check_token($time, $name = '') {
         if(session_id() == '')
             session_start();
 
