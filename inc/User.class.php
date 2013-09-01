@@ -100,10 +100,10 @@ class User extends Storage {
     }
 
     // Check wether a user already exists or not 
-    // (a user = aunique login and display_name)
+    // (a user = a unique login and display_name)
     // =========================================
     public function isUnique() {
-        if(count($this->load(array('login'=>$this->login))) == 0 && count($this->load(array('display_name'=>$this->display_name)))) {
+        if($this->load(array('login'=>$this->login)) === false && $this->load(array('display_name'=>$this->display_name)) === false) {
             return true;
         }
         else {

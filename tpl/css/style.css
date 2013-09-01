@@ -95,6 +95,10 @@ input[type=submit] {
     padding: 0.1em;
 }
 
+#detailed_summary {
+    margin-top: 2.5em;
+}
+
 #connexion_form {
     margin: auto;
     width: 67%;
@@ -122,16 +126,8 @@ textarea#what {
     width: 75%;
 }
 
-#list_expenses tr:hover {
-    background-color: #00bd00;
-}
-
-#balance_table tr:not(:first-child):hover * {
-    background-color: #00bd00;
-}
-
-.highlight_td {
-    background-color: #00bd00;
+#list_expenses tr:hover, #balance_table tr:not(:first-child):hover *, .highlight_td {
+    background-color: green;
 }
 
 #user_connected {

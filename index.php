@@ -365,15 +365,24 @@
             break;
 
         default:
-            $users_list = new User();
-            $users_list = $users_list->load();
+            // Display cached page in priority
+            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = NULL)) {
+                echo $cache;
+            }
+            else {
+                $users_list = new User();
+                $users_list = $users_list->load();
 
-            $invoices_list = new Invoice();
-            $invoices_list = $invoices_list->load();
+                $invoices_list = new Invoice();
+                $invoices_list = $invoices_list->load();
 
-            $tpl->assign('users', secureDisplay($users_list));
-            $tpl->assign('invoices', secureDisplay($invoices_list));
+                $tpl->assign('users', secureDisplay($users_list));
+                $tpl->assign('invoices', secureDisplay($invoices_list));
 
-            $tpl->draw('index');
-            break;
+                // Cache the page (1 month to make it almost permanent and only regenerate it upon new invoice)
+                $tpl->cache('index', 108000, NULL);
+
+                $tpl->draw('index');
+                break;
+            }
     }

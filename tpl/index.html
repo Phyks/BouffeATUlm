@@ -27,27 +27,31 @@
 <div id="detailed_summary">
     <h2>Detailed list of bills for last month</h2>
 
-    <table id="list_expenses">
-        <tr>
-            <th>Date</th>
-            <th>Paid by</th>
-            <th>Users in</th>
-            <th>Amount</th>
-            <th>What ?</th>
-            <th>Edit</th>
-            <th>Delete</th>
-        </tr>
-        {loop="invoices"}
+    {if condition="count($invoices)>1"}
+        <table id="list_expenses">
             <tr>
-                <td>{$value->getDate()}</td>
-                <td>{$value->getBuyer()->getDisplayName()}</td>
-                <td>{$value->getUsersIn()}</td>
-                <td>{$value->getAmount()}</td>
-                <td>{$value->getWhat()}</td>
-                <td><a href="index.php?do=edit_invoice&id={$value->getId()}">Edit</a></td>
-                <td><a href="index.php?do=delete_invoice&id={$value->getId()}">Delete</a></td>
+                <th>Date</th>
+                <th>Paid by</th>
+                <th>Users in</th>
+                <th>Amount</th>
+                <th>What ?</th>
+                <th>Edit</th>
+                <th>Delete</th>
             </tr>
-        {/loop}
-    </table>
+            {loop="invoices"}
+                <tr>
+                    <td>{$value->getDate()}</td>
+                    <td>{$value->getBuyer()->getDisplayName()}</td>
+                    <td>{$value->getUsersIn()}</td>
+                    <td>{$value->getAmount()}</td>
+                    <td>{$value->getWhat()}</td>
+                    <td><a href="index.php?do=edit_invoice&id={$value->getId()}">Edit</a></td>
+                    <td><a href="index.php?do=delete_invoice&id={$value->getId()}">Delete</a></td>
+                </tr>
+            {/loop}
+        </table>
+    {else}
+        <p class="center">No bills added.</p>
+    {/if}
 </div>
 {include="footer"}
