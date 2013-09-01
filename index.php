@@ -161,6 +161,10 @@
 
                     if(!empty($_POST['user_id']) || $user->isUnique()) {
                         $user->save();
+
+                        // Clear the cache
+                        array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+
                         header('location: index.php?do=edit_users');
                         exit();
                     }
@@ -203,6 +207,9 @@
                 $user->setId($_GET['user_id']);
                 $user->delete();
 
+                // Clear the cache
+                array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+
                 header('location: index.php?do=edit_users');
                 exit();
             }
@@ -211,6 +218,9 @@
         case 'edit_notice':
             if(isset($_POST['notice'])) {
                 setNotice($_POST['notice']);
+
+                // Clear the cache
+                array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
     
                 header('location: index.php');
                 exit();
@@ -252,6 +262,9 @@
                     }
 
                     if(file_put_contents("data/config.php", $config)) {
+                        // Clear the cache
+                        array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+
                         header('location: index.php');
                         exit();
                     }
@@ -323,6 +336,10 @@
                         $invoice->setGuests($guests);
 
                         $invoice->save();
+
+                        // Clear the cache
+                        array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+
                         header('location: index.php');
                         exit();
                     }
@@ -359,6 +376,9 @@
                 $invoice->setId($_GET['id']);
                 $invoice->delete();
 
+                // Clear the cache
+                array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+
                 header('location: index.php');
                 exit();
             }
@@ -366,7 +386,7 @@
 
         default:
             // Display cached page in priority
-            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = NULL)) {
+            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
                 echo $cache;
             }
             else {
@@ -380,7 +400,7 @@
                 $tpl->assign('invoices', secureDisplay($invoices_list));
 
                 // Cache the page (1 month to make it almost permanent and only regenerate it upon new invoice)
-                $tpl->cache('index', 108000, NULL);
+                $tpl->cache('index', 108000, $current_user->getLogin());
 
                 $tpl->draw('index');
                 break;

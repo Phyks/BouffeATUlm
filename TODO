@@ -4,7 +4,10 @@ inc/Invoices.class.php :
 ========================
 * Modify store() method to handle storage
 * Modify load() method to handle complex queries (such as WHERE date < DATE_1 AND date > DATE_2)
-* Cache
+
+==========
+* Don't cache the username
+==========
 
 Manage paybacks :
 =================
