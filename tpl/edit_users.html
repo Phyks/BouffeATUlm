@@ -37,7 +37,7 @@
         <label for="display_name" class="label-block">Displayed name : </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
     </p>
     <p>
-        <label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/>
+        <label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/>  <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a>
         {if condition="$user_id != -1"}
             <br/><em>Note :</em> Leave blank this field if you don't want to edit password.
         {/if}
@@ -58,7 +58,7 @@
 <h2>Edit your password</h2>
 <form method="post" action="index.php?do=password" id="edit_password_form">
     <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/></p>
-    <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/></p>
+    <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
     <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
 {/if}

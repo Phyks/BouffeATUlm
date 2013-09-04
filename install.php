@@ -139,7 +139,7 @@
                 <p><label for="mysql_host">MySQL host : </label><input type="text" name="mysql_host" id="mysql_host" value="<?php echo (!empty($_POST['mysql_host'])) ? htmlspecialchars($_POST['mysql_host']) : 'localhost';?>"/></p>
 
                 <p><label for="mysql_login">MySQL login : </label><input type="text" name="mysql_login" id="mysql_login" value="<?php echo (!empty($_POST['mysql_login'])) ? htmlspecialchars($_POST['mysql_login']) : '';?>"/></p>
-                <p><label for="mysql_password">MySQL password : </label><input type="password" name="mysql_password" id="mysql_password"/> <a href="" onclick="toggle_password('mysql_password'); return false;"><img src="img/toggle_password.jpg" alt="Toggle visible"/></a></p>
+                <p><label for="mysql_password">MySQL password : </label><input type="password" name="mysql_password" id="mysql_password"/> <a href="" onclick="toggle_password('mysql_password'); return false;"><img src="tpl/img/toggleVisible.png" alt="Toggle visible"/></a></p>
                 <p>
                 <label for="mysql_db">Name of the MySQL database to use : </label><input type="text" name="mysql_db" id="mysql_db" value="<?php echo (!empty($_POST['mysql_db'])) ? htmlspecialchars($_POST['mysql_db']) : 'Bouffe@Ulm';?>"/><br/>
                     <em>Note :</em> You <em>must</em> create this database first.
@@ -165,7 +165,7 @@
                 <legend>Administrator</legend>
                 <p><label for="admin_login">Username of the admin : </label><input type="text" name="admin_login" id="admin_login" <?php echo (!empty($_POST['admin_login'])) ? 'value="'.htmlspecialchars($_POST['admin_login']).'"' : '';?>/></p>
                 <p><label for="admin_display_name">Displayed name for admin user : </label><input type="text" name="admin_display_name" id="admin_display_name" <?php echo (!empty($_POST['admin_display_name']) ? 'value="'.htmlspecialchars($_POST['admin_display_name']).'"' : '');?>/></p>
-                <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/> <a href="" onclick="toggle_password('admin_password'); return false;"><img src="img/toggle_password.jpg" alt="Toggle visible"/></a></p>
+                <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/> <a href="" onclick="toggle_password('admin_password'); return false;"><img src="tpl/img/toggleVisible.jpg" alt="Toggle visible"/></a></p>
             </fieldset>
             <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" value="Install"><input type="hidden" name="token" value="<?php echo generate_token('install');?>"/></p>
         </form>

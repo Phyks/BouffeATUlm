@@ -15,6 +15,17 @@ fieldset {
     margin-bottom: 1em;
 }
 
+form a {
+    position: relative;
+}
+
+form img {
+    height: 1.5em;
+    vertical-align: middle;
+    position: absolute;
+    left: .5em;
+}
+
 table {
     margin: auto;
     text-align: center;
