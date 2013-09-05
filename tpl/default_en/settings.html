@@ -53,16 +53,9 @@
             <label for="template">Template : </label>
             <select name="template" id="template">
                 {loop="templates"}
-                <option value="{$value}" {if condition="$value == $current_template"} selected="selected" {/if}>{$value}</option>
+                <option value="{$value['value']}" {if condition="$value == $current_template"} selected="selected" {/if}>{$value['option']}</option>
                 {/loop}
             </select
-        </p>
-        <p>
-            <label for="lang">Lang : </label>
-            <select name="lang" id="lang">
-                <option value="en" {if condition="$lang == 'en'"} selected="selected"{/if}>English</option>
-                <option value="fr" {if condition="$lang == 'fr'"} selected="selected"{/if}>French</option>
-            </select>
         </p>
         <p><label for="email_webmaster">Webmaster's email : </label><input type="text" name="email_webmaster" id="email_webmaster" value="{$email_webmaster}"/></p>
     </fieldset>

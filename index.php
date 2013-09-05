@@ -8,7 +8,7 @@
         'write_error_data'=>array('fr'=>'Le script ne peut pas écrire dans le dossier data/, vérifiez les permissions sur ce dossier.', 'en'=>'The script can\'t write in data/ dir, check permissions set on this folder.'),
         'unable_write_config'=>array('fr'=>'Impossible d\'écrire le fichier data/config.php. Vérifiez les permissions.', 'en'=>'Unable to write data/config.php file. Check permissions.'),
         'negative_amount'=>array('fr'=>'Montant négatif non autorisé.', 'en'=>'Negative amount not allowed.'),
-        'template_lang_error'=>array('fr'=>'Template non disponible pour la langue choisie. Modifiez les paramètres de langue ou de template.', 'en'=>'Template not available for the selected lang. Change the lang or the template setting.')
+        'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.')
     );
 
     // Include necessary files
@@ -243,14 +243,14 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && !empty($_POST['template']) && !empty($_POST['lang'])) {
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && !empty($_POST['template'])) {
                 if(check_token(600, 'settings')) {
                     if(!is_writable('data/')) {
                         $tpl>assign('error', $errors['write_error_data'][LANG]);
                     }
                     else {
-                        if(!is_dir('tpl/'.$_POST['template'].'_'.$_POST['lang'])) {
-                            $tpl->assign('error', $errors['template_lang_error'][LANG]);
+                        if(!is_dir('tpl/'.$_POST['template'])) {
+                            $tpl->assign('error', $errors['template_error'][LANG]);
                         }
                         else {
                             $config = file('data/config.php');
@@ -275,9 +275,9 @@
                                 elseif(strpos($line, "EMAIL_WEBMASTER") !== FALSE)
                                     $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
                                 elseif(strpos($line, "TEMPLATE_DIR") !== FALSE)
-                                    $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."_".$_POST['lang']."/');\n";
+                                    $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');\n";
                                 elseif(strpos($line, "LANG") !== FALSE)
-                                    $config[$line_number] = "\tdefine('LANG', '".$_POST['lang']."');\n";
+                                    $config[$line_number] = "\tdefine('LANG', '".substr($_POST['template'], -2)."');\n";
                                 elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
                                     $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
                             }

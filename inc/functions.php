@@ -62,10 +62,7 @@
         if ($handle = opendir($dir)) {
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != ".." && is_dir($dir.$entry)) {
-                    $entry = str_replace(array('_en', '_fr'), array('', ''), $entry);
-                    
-                    if(!in_array($entry, $return))
-                        $return[] = $entry;
+                    $return[] = array('value'=>$entry, 'option'=>str_replace(array('_en', '_fr'), array(' (English)', ' (French)'), $entry));
                 }
             }
             closedir($handle);
