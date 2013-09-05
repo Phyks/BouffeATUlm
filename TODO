@@ -1,22 +1,18 @@
-* i18n
+* i18n : i18n of errors in index.php and use a different template for each translation
+* Don't cache the username
+* JSON output
 
 inc/Invoices.class.php :
 ========================
-* Storage ?
-* Modify load() method to handle complex queries (such as WHERE date < DATE_1 AND date > DATE_2)
-
-==========
-* Don't cache the username
-==========
+* Storage of users in ?!?
 
 Manage paybacks :
 =================
-* TODO : Payback system
+* TODO : Payback system (class should be ok)
 
 TODO :
 ======
 * Add / Edit a bill
-* JSON output
 
 To test :
 =========

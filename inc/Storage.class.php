@@ -116,7 +116,23 @@ class Storage {
             foreach($fields as $field=>$value) {
                 if($i) { $query .= ' WHERE '; $i = false; } else { $query .= ' AND ';  }
 
-                $query .= $field.'=:'.$field;
+                if(!is_array($value)) {
+                    $value = array($value);
+                }
+
+                foreach($value as $value_array) {
+                    if($value_array == 'AND' || $value_array = 'OR') {
+                        $query .= ' '.$value_array.' ';
+                        continue;
+                    }
+
+                    if(substr($value_array, 0, 1) == "<")
+                        $query .= $field.'<:'.$field;
+                    elseif(substr($value_array, 0, 1) == ">")
+                        $query .= $field.'>:'.$field;
+                    else
+                        $query .= $field.'=:'.$field;
+                }
             }
         }
 
@@ -124,10 +140,21 @@ class Storage {
 
         if(!empty($fields) && is_array($fields)) {
             foreach($fields as $field=>$value) {
+                if(!is_array($value))
+                    $value = array($value);
+
                 if($fields[$field] == 'date')
                     $value = $value->format('Y-m-d H:i:s');
 
-                $query->bindParam(':'.$field, $value);
+                foreach($value as $value_array) {
+                    if($value_array == 'AND' || $value_array == 'OR')
+                        continue;
+
+                    if(substr($value, 0, 1) == ">" || substr($value, 0, 1) == "<")
+                        $query->bindParam(':'.$field, substr($value, 0, 1);
+                    else
+                        $query->bindParam(':'.$field, $value);
+                }
             }
         }
 
