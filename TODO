@@ -2,7 +2,7 @@
 
 inc/Invoices.class.php :
 ========================
-* Modify store() method to handle storage
+* Storage ?
 * Modify load() method to handle complex queries (such as WHERE date < DATE_1 AND date > DATE_2)
 
 ==========
@@ -17,8 +17,6 @@ TODO :
 ======
 * Add / Edit a bill
 * JSON output
-* Arrow to toggle visible password
-* Change tpl easily
 
 To test :
 =========

@@ -84,6 +84,7 @@
     define('SALT', '".$salt."');
     define('CURRENCY', '".$_POST['currency']."');
     define('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');
+    define('TEMPLATE_DIR', 'tpl/default/');
     
     date_default_timezone_set('".$_POST['timezone']."');
     ";

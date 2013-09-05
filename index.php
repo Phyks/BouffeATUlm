@@ -8,7 +8,7 @@
     require_once('inc/functions.php');
     require_once('inc/Ban.inc.php');
     require_once('inc/CSRF.inc.php');
-    raintpl::$tpl_dir = 'tpl/';
+    raintpl::$tpl_dir = TEMPLATE_DIR;
     raintpl::$cache_dir = 'tmp/';
 
     // Define raintpl instance
@@ -231,7 +231,7 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster'])) {
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && !empty($_POST['template'])) {
                 if(check_token(600, 'settings')) {
                     if(!is_writable('data/')) {
                         $tpl>assign('error', 'The script can\'t write in data/ dir, check permissions set on this folder.');
@@ -257,6 +257,8 @@
                             $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
                         elseif(strpos($line, "EMAIL_WEBMASTER") !== FALSE)
                             $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
+                        elseif(strpos($line, "TEMPLATE_DIR") !== FALSE)
+                            $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');\n";
                         elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
                             $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
                     }
@@ -284,6 +286,8 @@
             $tpl->assign('timezone', @date_default_timezone_get());
             $tpl->assign('show_settings', true);
             $tpl->assign('token', generate_token('settings'));
+            $tpl->assign('templates', listDirs('tpl/'));
+            $tpl->assign('current_template', trim(substr(TEMPLATE_DIR, 4), '/'));
             $tpl->draw('settings');
             break;
 

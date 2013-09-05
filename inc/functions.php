@@ -51,3 +51,21 @@
         else
             return 18;
     }
+
+    function listDirs($dir) {
+        if(strrpos($dir, '/') !== strlen($dir) - 1) {
+            $dir .= '/';
+        }
+
+        $return = array();
+
+        if ($handle = opendir($dir)) {
+            while (false !== ($entry = readdir($handle))) {
+                if ($entry != "." && $entry != ".." && is_dir($dir.$entry)) {
+                    $return[] = $entry;
+                }
+            }
+            closedir($handle);
+        }
+        return $return;
+    }
