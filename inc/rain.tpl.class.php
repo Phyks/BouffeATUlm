@@ -140,7 +140,7 @@ class RainTPL{
 
 	function assign( $variable, $value = null ){
 		if( is_array( $variable ) )
-			$this->var += $variable;
+			$this->var = $variable + $this->var;
 		else
 			$this->var[ $variable ] = $value;
 	}
@@ -221,8 +221,10 @@ class RainTPL{
         // set the cache_id
         $this->cache_id = $cache_id;
 
-		if( !$this->check_template( $tpl_name ) && file_exists( $this->tpl['cache_filename'] ) && ( time() - filemtime( $this->tpl['cache_filename'] ) < $expire_time ) )
+		if( !$this->check_template( $tpl_name ) && file_exists( $this->tpl['cache_filename'] ) && ( time() - filemtime( $this->tpl['cache_filename'] ) < $expire_time ) ){
+			// return the cached file as HTML. It remove the first 43 character, which are a PHP code to secure the file <?php if(!class_exists('raintpl')){exit;}? >
 			return substr( file_get_contents( $this->tpl['cache_filename'] ), 43 );
+		}
 		else{
 			//delete the cache of the selected template
             if (file_exists($this->tpl['cache_filename']))
@@ -257,24 +259,30 @@ class RainTPL{
 
 			$tpl_basename                       = basename( $tpl_name );														// template basename
 			$tpl_basedir                        = strpos($tpl_name,"/") ? dirname($tpl_name) . '/' : null;						// template basedirectory
-			$tpl_dir                            = self::$tpl_dir . $tpl_basedir;								// template directory
-			$this->tpl['tpl_filename']          = $tpl_dir . $tpl_basename . '.' . self::$tpl_ext;	// template filename
-			$temp_compiled_filename             = self::$cache_dir . $tpl_basename . "." . md5( $tpl_dir . serialize(self::$config_name_sum));
+			$this->tpl['template_directory']    = self::$tpl_dir . $tpl_basedir;								// template directory
+			$this->tpl['tpl_filename']          = $this->tpl['template_directory'] . $tpl_basename . '.' . self::$tpl_ext;	// template filename
+			$temp_compiled_filename             = self::$cache_dir . $tpl_basename . "." . md5( $this->tpl['template_directory'] . serialize(self::$config_name_sum));
 			$this->tpl['compiled_filename']     = $temp_compiled_filename . '.rtpl.php';	// cache filename
 			$this->tpl['cache_filename']        = $temp_compiled_filename . '.s_' . $this->cache_id . '.rtpl.php';	// static cache filename
-
-			// if the template doesn't exsist throw an error
-			if( self::$check_template_update && !file_exists( $this->tpl['tpl_filename'] ) ){
+                        $this->tpl['checked']               = true;
+                        
+			// if the template doesn't exist and is not an external source throw an error
+			if( self::$check_template_update && !file_exists( $this->tpl['tpl_filename'] ) && !preg_match('/http/', $tpl_name) ){
 				$e = new RainTpl_NotFoundException( 'Template '. $tpl_basename .' not found!' );
 				throw $e->setTemplateFile($this->tpl['tpl_filename']);
 			}
 
-			// file doesn't exsist, or the template was updated, Rain will compile the template
-			if( !file_exists( $this->tpl['compiled_filename'] ) || ( self::$check_template_update && filemtime($this->tpl['compiled_filename']) < filemtime( $this->tpl['tpl_filename'] ) ) ){
+			// We check if the template is not an external source
+			if(preg_match('/http/', $tpl_name)){
+				$this->compileFile('', '', $tpl_name, self::$cache_dir, $this->tpl['compiled_filename'] );
+				return true;
+			}
+			// file doesn't exist, or the template was updated, Rain will compile the template
+			elseif( !file_exists( $this->tpl['compiled_filename'] ) || ( self::$check_template_update && filemtime($this->tpl['compiled_filename']) < filemtime( $this->tpl['tpl_filename'] ) ) ){
 				$this->compileFile( $tpl_basename, $tpl_basedir, $this->tpl['tpl_filename'], self::$cache_dir, $this->tpl['compiled_filename'] );
 				return true;
 			}
-			$this->tpl['checked'] = true;
+			
 		}
 	}
 
@@ -372,13 +380,18 @@ class RainTPL{
 	 * @access protected
 	 */
 	protected function compileCode( $parsed_code ){
+            
+                // if parsed code is empty return null string
+                if( !$parsed_code )
+                    return "";
 
 		//variables initialization
 		$compiled_code = $open_if = $comment_is_open = $ignore_is_open = null;
-        $loop_level = 0;
+                $loop_level = 0;
 
+                
 	 	//read all parsed code
-	 	while( $html = array_shift( $parsed_code ) ){
+	 	foreach( $parsed_code as $html ){
 
 	 		//close ignore tag
 			if( !$comment_is_open && ( strpos( $html, '{/ignore}' ) !== FALSE || strpos( $html, '*}' ) !== FALSE ) )
@@ -407,37 +420,47 @@ class RainTPL{
 
 			//include tag
 			elseif( preg_match( '/\{include="([^"]*)"(?: cache="([^"]*)"){0,1}\}/', $html, $code ) ){
+				if (preg_match("/http/", $code[1])) {
+					$content = file_get_contents($code[1]);
+					$compiled_code .= $content;
+				} else {
+					//variables substitution
+					$include_var = $this->var_replace( $code[ 1 ], $left_delimiter = null, $right_delimiter = null, $php_left_delimiter = '".' , $php_right_delimiter = '."', $loop_level );
 
-				//variables substitution
-				$include_var = $this->var_replace( $code[ 1 ], $left_delimiter = null, $right_delimiter = null, $php_left_delimiter = '".' , $php_right_delimiter = '."', $loop_level );
+                                        //get the folder of the actual template
+                                        $actual_folder = substr( $this->tpl['template_directory'], strlen(self::$tpl_dir) );
 
-				// if the cache is active
-				if( isset($code[ 2 ]) ){
-					
-					//dynamic include
-					$compiled_code .= '<?php $tpl = new '.get_class($this).';' .
-								 'if( $cache = $tpl->cache( $template = basename("'.$include_var.'") ) )' .
-								 '	echo $cache;' .
-								 'else{' .
-								 '	$tpl_dir_temp = self::$tpl_dir;' .
-								 '	$tpl->assign( $this->var );' .
-									( !$loop_level ? null : '$tpl->assign( "key", $key'.$loop_level.' ); $tpl->assign( "value", $value'.$loop_level.' );' ).
-								 '	$tpl->draw( dirname("'.$include_var.'") . ( substr("'.$include_var.'",-1,1) != "/" ? "/" : "" ) . basename("'.$include_var.'") );'.
-								 '} ?>';
+                                        //get the included template
+                                        $include_template = $actual_folder . $include_var;
+
+                                        // reduce the path
+                                        $include_template = $this->reduce_path( $include_template );
+
+					// if the cache is active
+					if( isset($code[ 2 ]) ){
+
+                                                //include
+                                                $compiled_code .= '<?php $tpl = new '.get_called_class().';' .
+                                                                  'if( $cache = $tpl->cache( "'.$include_template.'" ) )' .
+								  '	echo $cache;' .
+								  'else{' .
+                                                                  '$tpl->assign( $this->var );' .
+                                                                  ( !$loop_level ? null : '$tpl->assign( "key", $key'.$loop_level.' ); $tpl->assign( "value", $value'.$loop_level.' );' ).
+                                                                  '$tpl->draw( "'.$include_template.'" );'.
+                                                                  '}' .
+                                                                  '?>';
+
+					}
+					else{
+                                                //include
+                                                $compiled_code .= '<?php $tpl = new '.get_called_class().';' .
+                                                                  '$tpl->assign( $this->var );' .
+                                                                  ( !$loop_level ? null : '$tpl->assign( "key", $key'.$loop_level.' ); $tpl->assign( "value", $value'.$loop_level.' );' ).
+                                                                  '$tpl->draw( "'.$include_template.'" );'.
+                                                                  '?>';
+
+					}
 				}
-				else{
-	
-					//dynamic include
-					$compiled_code .= '<?php $tpl = new '.get_class($this).';' .
-									  '$tpl_dir_temp = self::$tpl_dir;' .
-									  '$tpl->assign( $this->var );' .
-									  ( !$loop_level ? null : '$tpl->assign( "key", $key'.$loop_level.' ); $tpl->assign( "value", $value'.$loop_level.' );' ).
-									  '$tpl->draw( dirname("'.$include_var.'") . ( substr("'.$include_var.'",-1,1) != "/" ? "/" : "" ) . basename("'.$include_var.'") );'.
-									  '?>';
-					
-					
-				}
-
 			}
 
 	 		//loop
@@ -590,10 +613,15 @@ class RainTPL{
 	 * @return type
 	 */
 	protected function reduce_path( $path ){
-		$path = str_replace( "://", "@not_replace@", $path );
-		$path = str_replace( "//", "/", $path );
-		$path = str_replace( "@not_replace@", "://", $path );
-		return preg_replace('/\w+\/\.\.\//', '', $path );
+            $path = str_replace( "://", "@not_replace@", $path );
+            $path = preg_replace( "#(/+)#", "/", $path );
+            $path = preg_replace( "#(/\./+)#", "/", $path );
+            $path = str_replace( "@not_replace@", "://", $path );
+            
+            while( preg_match( '#\.\./#', $path ) ){
+                $path = preg_replace('#\w+/\.\./#', '', $path );
+            }
+            return $path;
 	}
 
 
@@ -619,27 +647,27 @@ class RainTPL{
 			$exp = $sub = array();
 
 			if( in_array( "img", self::$path_replace_list ) ){
-				$exp = array( '/<img(.*?)src=(?:")(http|https)\:\/\/([^"]+?)(?:")/i', '/<img(.*?)src=(?:")([^"]+?)#(?:")/i', '/<img(.*?)src="(.*?)"/', '/<img(.*?)src=(?:\@)([^"]+?)(?:\@)/i' );
+				$exp = array( '/<img(.[^<]*?)src=(?:")(http|https)\:\/\/([^"]+?)(?:")/iU', '/<img(.[^<]*?)src=(?:")([^"]+?)#(?:")/iU', '/<img(.[^<]*?)src="(.*?)"/iU', '/<img(.[^<]*?)src=(?:\@)([^"]+?)(?:\@)/iU' );
 				$sub = array( '<img$1src=@$2://$3@', '<img$1src=@$2@', '<img$1src="' . $path . '$2"', '<img$1src="$2"' );
 			}
 
 			if( in_array( "script", self::$path_replace_list ) ){
-				$exp = array_merge( $exp , array( '/<script(.*?)src=(?:")(http|https)\:\/\/([^"]+?)(?:")/i', '/<script(.*?)src=(?:")([^"]+?)#(?:")/i', '/<script(.*?)src="(.*?)"/', '/<script(.*?)src=(?:\@)([^"]+?)(?:\@)/i' ) );
+				$exp = array_merge( $exp , array( '/<script(.[^<]*?)src=(?:")(http|https)\:\/\/([^"]+?)(?:")/iU', '/<script(.[^<]*?)src=(?:")([^"]+?)#(?:")/iU', '/<script(.[^<]*?)src="(.*?)"/iU', '/<script(.[^<]*?)src=(?:\@)([^"]+?)(?:\@)/iU' ) );
 				$sub = array_merge( $sub , array( '<script$1src=@$2://$3@', '<script$1src=@$2@', '<script$1src="' . $path . '$2"', '<script$1src="$2"' ) );
 			}
 
 			if( in_array( "link", self::$path_replace_list ) ){
-				$exp = array_merge( $exp , array( '/<link(.*?)href=(?:")(http|https)\:\/\/([^"]+?)(?:")/i', '/<link(.*?)href=(?:")([^"]+?)#(?:")/i', '/<link(.*?)href="(.*?)"/', '/<link(.*?)href=(?:\@)([^"]+?)(?:\@)/i' ) );
+				$exp = array_merge( $exp , array( '/<link(.[^<]*?)href=(?:")(http|https)\:\/\/([^"]+?)(?:")/iU', '/<link(.[^<]*?)href=(?:")([^"]+?)#(?:")/iU', '/<link(.[^<]*?)href="(.*?)"/iU', '/<link(.[^<]*?)href=(?:\@)([^"]+?)(?:\@)/iU' ) );
 				$sub = array_merge( $sub , array( '<link$1href=@$2://$3@', '<link$1href=@$2@' , '<link$1href="' . $path . '$2"', '<link$1href="$2"' ) );
 			}
 
 			if( in_array( "a", self::$path_replace_list ) ){
-				$exp = array_merge( $exp , array( '/<a(.*?)href=(?:")(http\:\/\/|https\:\/\/|javascript:)([^"]+?)(?:")/i', '/<a(.*?)href="(.*?)"/', '/<a(.*?)href=(?:\@)([^"]+?)(?:\@)/i'  ) );
+				$exp = array_merge( $exp , array( '/<a(.[^<]*?)href=(?:")(http\:\/\/|https\:\/\/|javascript:|mailto:)([^"]+?)(?:")/iU', '/<a(.[^<]*?)href="(.*?)"/iU', '/<a(.[^<]*?)href=(?:\@)([^"]+?)(?:\@)/iU'  ) );
 				$sub = array_merge( $sub , array( '<a$1href=@$2$3@', '<a$1href="' . self::$base_url . '$2"', '<a$1href="$2"' ) );
 			}
 
 			if( in_array( "input", self::$path_replace_list ) ){
-				$exp = array_merge( $exp , array( '/<input(.*?)src=(?:")(http|https)\:\/\/([^"]+?)(?:")/i', '/<input(.*?)src=(?:")([^"]+?)#(?:")/i', '/<input(.*?)src="(.*?)"/', '/<input(.*?)src=(?:\@)([^"]+?)(?:\@)/i' ) );
+				$exp = array_merge( $exp , array( '/<input(.[^<]*?)src=(?:")(http|https)\:\/\/([^"]+?)(?:")/iU', '/<input(.[^<]*?)src=(?:")([^"]+?)#(?:")/iU', '/<input(.[^<]*?)src="(.*?)"/iU', '/<input(.[^<]*?)src=(?:\@)([^"]+?)(?:\@)/iU' ) );
 				$sub = array_merge( $sub , array( '<input$1src=@$2://$3@', '<input$1src=@$2@', '<input$1src="' . $path . '$2"', '<input$1src="$2"' ) );
 			}
 

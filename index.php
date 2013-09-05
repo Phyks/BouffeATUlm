@@ -10,7 +10,6 @@
     require_once('inc/CSRF.inc.php');
     raintpl::$tpl_dir = 'tpl/';
     raintpl::$cache_dir = 'tmp/';
-    raintpl::configure('base_url', htmlspecialchars(BASE_URL));
 
     // Define raintpl instance
     $tpl = new raintpl();
@@ -22,9 +21,6 @@
     $tpl->assign('currency', htmlspecialchars(CURRENCY));
     $tpl->assign('email_webmaster', htmlspecialchars(EMAIL_WEBMASTER));
     
-    // TODO : Avoid a bug in rainTPL with img near input
-    $tpl->configure('path_replace_list', array('a', 'img', 'link', 'script'));
-
     // Set sessions parameters
     ini_set('session.use_cookies', 1);
     ini_set('session.use_only_cookies', 1);
