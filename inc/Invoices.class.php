@@ -2,7 +2,6 @@
     // TODO : Handle users_in
     require_once('data/config.php');
     require_once('Storage.class.php');
-    require_once('UsersIn.class.php');
 
     class Invoice extends Storage {
         protected $id = 0, $date, $users_in, $guests, $buyer, $amount, $what;
@@ -19,7 +18,6 @@
             );
 
         public function __construct() {
-            $users_in = new UsersIn();
             parent::__construct();
         }
 

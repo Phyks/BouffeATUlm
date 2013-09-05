@@ -1,18 +1,14 @@
-* i18n : i18n of errors in index.php and use a different template for each translation
 * Don't cache the username
 * JSON output
 
 inc/Invoices.class.php :
 ========================
 * Storage of users in ?!?
+* Add / Edit a bill
 
 Manage paybacks :
 =================
 * TODO : Payback system (class should be ok)
-
-TODO :
-======
-* Add / Edit a bill
 
 To test :
 =========

@@ -1,4 +1,16 @@
 <?php
+    // Error translation
+    $errors = array(
+        'unknown_username_password'=>array('fr'=>'Nom d\'utilisateur ou mot de passe inconnu.', 'en'=>'Unknown username or password.'),
+        'token_error'=>array('fr'=>'Erreur de token. Veuillez réessayer.', 'en'=>'Token error. Please resubmit the form.'),
+        'password_mismatch'=>array('fr'=>'Les deux mots de passe ne correspondent pas.', 'en'=>'The content of the two passwords fields doesn\'t match.'),
+        'user_already_exists'=>array('fr'=>'Un utilisateur avec le même login ou nom d\'affichage existe déjà. Choisissez un login ou un nom d\'affichage différent.', 'en'=>'A user with the same login or display name already exists. Choose a different login or display name.'),
+        'write_error_data'=>array('fr'=>'Le script ne peut pas écrire dans le dossier data/, vérifiez les permissions sur ce dossier.', 'en'=>'The script can\'t write in data/ dir, check permissions set on this folder.'),
+        'unable_write_config'=>array('fr'=>'Impossible d\'écrire le fichier data/config.php. Vérifiez les permissions.', 'en'=>'Unable to write data/config.php file. Check permissions.'),
+        'negative_amount'=>array('fr'=>'Montant négatif non autorisé.', 'en'=>'Negative amount not allowed.'),
+        'template_lang_error'=>array('fr'=>'Template non disponible pour la langue choisie. Modifiez les paramètres de langue ou de template.', 'en'=>'Template not available for the selected lang. Change the lang or the template setting.')
+    );
+
     // Include necessary files
     if(!file_exists('data/config.php')) { header('location: install.php'); exit(); }
     require_once('data/config.php');
@@ -74,7 +86,7 @@
                 $user = new User();
                 $user->setLogin($_POST['login']);
                 if(ban_canLogin() == false) {
-                    $error = "Unknown username / password.";
+                    $error = $errors['unknown_username_password'][LANG];
                 }
                 else {
                     $user = $user->exists($_POST['login']);
@@ -99,7 +111,7 @@
                     }
                     else {
                         ban_loginFailed();
-                        $error = "Unknown username/password.";
+                        $error = $errors['unknown_username_password'][LANG];
                     }
                 }
             }
@@ -127,11 +139,11 @@
                         exit();
                     }
                     else {
-                        $tpl->assign('error', 'Token error. Please resubmit the form.');
+                        $tpl->assign('error', $errors['token_error'][LANG]);
                     }
                 }
                 else {
-                    $tpl->assign('error', 'The content of the two password fields doesn\'t match.');
+                    $tpl->assign('error', $errors['password_mismatch'][LANG]);
                 }
             }
             $tpl->assign('view', 'password');
@@ -169,11 +181,11 @@
                         exit();
                     }
                     else {
-                        $tpl->assign('error', 'A user with the same login or display name already exists. Choose a different login.');
+                        $tpl->assign('error', $errors['user_already_exists'][LANG]);
                     }
                 }
                 else {
-                    $tpl->assign('error', 'Token error. Please resubmit the form.');
+                    $tpl->assign('error', $errors['token_error'][LANG]);
                 }
             }
  
@@ -231,51 +243,60 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && !empty($_POST['template'])) {
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && !empty($_POST['template']) && !empty($_POST['lang'])) {
                 if(check_token(600, 'settings')) {
                     if(!is_writable('data/')) {
-                        $tpl>assign('error', 'The script can\'t write in data/ dir, check permissions set on this folder.');
-                    }
-                    $config = file('data/config.php');
-
-                    foreach($config as $line_number=>$line) {
-                        if(strpos($line, "MYSQL_HOST") !== FALSE)
-                            $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
-                        elseif(strpos($line, "MYSQL_LOGIN") !== FALSE)
-                            $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
-                        elseif(strpos($line, "MYSQL_PASSWORD") !== FALSE && !empty($_POST['mysql_password']))
-                            $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
-                        elseif(strpos($line, "MYSQL_DB") !== FALSE)
-                            $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
-                        elseif(strpos($line, "MYSQL_PREFIX") !== FALSE && !empty($_POST['mysql_prefix']))
-                            $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
-                        elseif(strpos($line, "INSTANCE_TITLE") !== FALSE)
-                            $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
-                        elseif(strpos($line, "BASE_URL") !== FALSE)
-                            $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
-                        elseif(strpos($line, "CURRENCY") !== FALSE)
-                            $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
-                        elseif(strpos($line, "EMAIL_WEBMASTER") !== FALSE)
-                            $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
-                        elseif(strpos($line, "TEMPLATE_DIR") !== FALSE)
-                            $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');\n";
-                        elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
-                            $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
-                    }
-
-                    if(file_put_contents("data/config.php", $config)) {
-                        // Clear the cache
-                        array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
-
-                        header('location: index.php');
-                        exit();
+                        $tpl>assign('error', $errors['write_error_data'][LANG]);
                     }
                     else {
-                        $tpl->assign('error', 'Unable to write data/config.php file.');
+                        if(!is_dir('tpl/'.$_POST['template'].'_'.$_POST['lang'])) {
+                            $tpl->assign('error', $errors['template_lang_error'][LANG]);
+                        }
+                        else {
+                            $config = file('data/config.php');
+
+                            foreach($config as $line_number=>$line) {
+                                if(strpos($line, "MYSQL_HOST") !== FALSE)
+                                    $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
+                                elseif(strpos($line, "MYSQL_LOGIN") !== FALSE)
+                                    $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
+                                elseif(strpos($line, "MYSQL_PASSWORD") !== FALSE && !empty($_POST['mysql_password']))
+                                    $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
+                                elseif(strpos($line, "MYSQL_DB") !== FALSE)
+                                    $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
+                                elseif(strpos($line, "MYSQL_PREFIX") !== FALSE && !empty($_POST['mysql_prefix']))
+                                    $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
+                                elseif(strpos($line, "INSTANCE_TITLE") !== FALSE)
+                                    $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
+                                elseif(strpos($line, "BASE_URL") !== FALSE)
+                                    $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
+                                elseif(strpos($line, "CURRENCY") !== FALSE)
+                                    $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
+                                elseif(strpos($line, "EMAIL_WEBMASTER") !== FALSE)
+                                    $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
+                                elseif(strpos($line, "TEMPLATE_DIR") !== FALSE)
+                                    $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."_".$_POST['lang']."/');\n";
+                                elseif(strpos($line, "LANG") !== FALSE)
+                                    $config[$line_number] = "\tdefine('LANG', '".$_POST['lang']."');\n";
+                                elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
+                                    $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
+                            }
+
+                            if(file_put_contents("data/config.php", $config)) {
+                                // Clear the cache
+                                array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+
+                                header('location: index.php');
+                                exit();
+                            }
+                            else {
+                                $tpl->assign('error', $errors['unable_write_config'][LANG]);
+                            }
+                        }
                     }
                 }
                 else {
-                    $tpl->assign('error', 'Token error. Please resubmit the form.');
+                    $tpl->assign('error', $errors['token_error'][LANG]);
                 }
             }
 
@@ -286,8 +307,9 @@
             $tpl->assign('timezone', @date_default_timezone_get());
             $tpl->assign('show_settings', true);
             $tpl->assign('token', generate_token('settings'));
-            $tpl->assign('templates', listDirs('tpl/'));
+            $tpl->assign('templates', listTemplates('tpl/'));
             $tpl->assign('current_template', trim(substr(TEMPLATE_DIR, 4), '/'));
+            $tpl->assign('lang', LANG);
             $tpl->draw('settings');
             break;
 
@@ -317,7 +339,7 @@
             if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_hour']) && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
                 if(check_token(600, 'new_invoice')) {
                     if($_POST['amount'] <= 0) {
-                        $tpl->assign('error', 'Negative amount.');
+                        $tpl->assign('error', $errors['negative_amount'][LANG]);
                     }
                     else {
                         $invoice = new Invoice();
@@ -349,7 +371,7 @@
                     }
                 }
                 else {
-                    $tpl->assign('error', 'Token error. Please resubmit the form.');
+                    $tpl->assign('error', $errors['token_error'][LANG]);
                 }
             }
 

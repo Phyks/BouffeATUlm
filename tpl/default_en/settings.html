@@ -57,6 +57,13 @@
                 {/loop}
             </select
         </p>
+        <p>
+            <label for="lang">Lang : </label>
+            <select name="lang" id="lang">
+                <option value="en" {if condition="$lang == 'en'"} selected="selected"{/if}>English</option>
+                <option value="fr" {if condition="$lang == 'fr'"} selected="selected"{/if}>French</option>
+            </select>
+        </p>
         <p><label for="email_webmaster">Webmaster's email : </label><input type="text" name="email_webmaster" id="email_webmaster" value="{$email_webmaster}"/></p>
     </fieldset>
     <p class="center"><input type="submit" value="Update settings"><input type="hidden" name="token" value="{$token}"/></p>

@@ -151,7 +151,7 @@ class Storage {
                         continue;
 
                     if(substr($value, 0, 1) == ">" || substr($value, 0, 1) == "<")
-                        $query->bindParam(':'.$field, substr($value, 0, 1);
+                        $query->bindParam(':'.$field, substr($value, 0, 1));
                     else
                         $query->bindParam(':'.$field, $value);
                 }

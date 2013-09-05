@@ -52,7 +52,7 @@
             return 18;
     }
 
-    function listDirs($dir) {
+    function listTemplates($dir) {
         if(strrpos($dir, '/') !== strlen($dir) - 1) {
             $dir .= '/';
         }
@@ -62,7 +62,10 @@
         if ($handle = opendir($dir)) {
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != ".." && is_dir($dir.$entry)) {
-                    $return[] = $entry;
+                    $entry = str_replace(array('_en', '_fr'), array('', ''), $entry);
+                    
+                    if(!in_array($entry, $return))
+                        $return[] = $entry;
                 }
             }
             closedir($handle);

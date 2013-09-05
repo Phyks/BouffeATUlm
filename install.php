@@ -13,7 +13,7 @@
         $block_form = true;
     }
 
-    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && check_token(600, 'install')) {
+    if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && check_token(600, 'install') && !empty($_POST['lang'])) {
         $mysql_host = $_POST['mysql_host'];
         $mysql_login = $_POST['mysql_login'];
         $mysql_db = $_POST['mysql_db'];
@@ -84,7 +84,8 @@
     define('SALT', '".$salt."');
     define('CURRENCY', '".$_POST['currency']."');
     define('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');
-    define('TEMPLATE_DIR', 'tpl/default/');
+    define('TEMPLATE_DIR', 'tpl/default_".$_POST['lang']."/');
+    define('LANG', '".$_POST['lang']."');
     
     date_default_timezone_set('".$_POST['timezone']."');
     ";
@@ -161,6 +162,7 @@
                     <em>For example :</em> Europe/Paris. See the doc for more info.
                 </p>
                 <p><label for="email_webmaster">Webmaster's email : </label><input type="text" name="email_webmaster" id="email_webmaster"/></p>
+                <p><label for="lang">Lang : </label><select name="lang" id="lang"><option value="en">English</option><option value="fr">French</option></select></p>
             </fieldset>
             <fieldset>
                 <legend>Administrator</legend>
