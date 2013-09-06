@@ -69,3 +69,13 @@
         }
         return $return;
     }
+
+    function TwoDArrayToOneD($array, $key) {
+        $return = array();
+
+        foreach($array as $value) {
+            $return[] = $value[$key];
+        }
+
+        return $return;
+    }
