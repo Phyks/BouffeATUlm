@@ -3,29 +3,7 @@
 {/if}
 
 {if condition="$view == 'list_users'"}
-TODO ***
-<h2>List of users</h2>
-<p class="center">You can also <a href="?do=add_user">add a user</a>.</p>
-<table id="edit_users">
-    <tr>
-        <th>Id</th>
-        <th>Login</th>
-        <th>Display Name</th>
-        <th>Is admin ?</th>
-        <th>Edit</th>
-        <th>Delete</th>
-    </tr>
-    {loop="users"}
-    <tr>
-        <td>{$value->getId()}</td>
-        <td>{$value->getLogin()}</td>
-        <td>{$value->getDisplayName()}</td>
-        <td>{$value->getAdmin() ? "Yes" : "No"}</td>
-        <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Edit</a></td>
-        <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&user_id={$value->getId()}">Delete</a>{/if}</td>
-    </tr>
-    {/loop}
-</table>
+    {function="json_encode(array_map(function($obj) { return $obj->sessionStore(false);}, $users))"}
 {else}
-    {if condition="LANG == 'en'}Nothing to show.{else}Il n'y a rien à afficher.{/if}
-{/else}
+    {if condition="LANG == 'en'"}Nothing to show.{else}Il n'y a rien à afficher.{/if}
+{/if}

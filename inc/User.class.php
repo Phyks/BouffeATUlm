@@ -97,8 +97,13 @@ class User extends Storage {
 
     // Session storage
     // ===============
-    public function sessionStore() {
-        return serialize(array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token));
+    public function sessionStore($serialize = true) {
+        if($serialize) {
+            return serialize(array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token));
+        }
+        else {
+            return array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token);
+        }
     }
 
     public function sessionRestore($data, $serialized = false) {

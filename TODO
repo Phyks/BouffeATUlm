@@ -1,5 +1,5 @@
 * Don't cache the username
-* JSON output => finish the template
+* JSON output => do index view
 * API
 
 inc/Invoices.class.php :
