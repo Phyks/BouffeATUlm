@@ -20,7 +20,14 @@
     require_once('inc/functions.php');
     require_once('inc/Ban.inc.php');
     require_once('inc/CSRF.inc.php');
-    raintpl::$tpl_dir = TEMPLATE_DIR;
+    if(!empty($_GET['json'])) {
+        raintpl::$tpl_dir = 'tpl/json/';
+        $get_redir = 'json=1';
+    }
+    else {
+        raintpl::$tpl_dir = TEMPLATE_DIR;
+        $get_redir = '';
+    }
     raintpl::$cache_dir = 'tmp/';
 
     // Define raintpl instance
@@ -57,17 +64,35 @@
     }
     $tpl->assign('current_user', secureDisplay($current_user));
 
-    // If not connected, redirect to connection page
-    if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) {
-        header('location: index.php?do=connect');
-        exit();
+    if(!empty($_GET['json_token'])) {
+        $current_user = new User();
+
+        if($current_user->load(array('json_token'=>$_GET['json_token'], true)) === false) {
+            header('location: index.php?do=connect'.$get_redir);
+            exit();
+        }
+        else {
+            if(!empty($get_redir))
+                $get_redir .= '&';
+
+            $get_redir .= 'json_token='.$_GET['json_token'];
+        }
     }
-    
-    // If IP has changed, logout
-    if($current_user !== false && user_ip() != $_SESSION['ip']) {
-        session_destroy();
-        header('location: index.php?do=connect');
-        exit();
+    else {
+        //If json token not available
+        
+        // If not connected, redirect to connection page
+        if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) {
+            header('location: index.php?do=connect&'.$get_redir);
+            exit();
+        }
+        
+        // If IP has changed, logout
+        if($current_user !== false && user_ip() != $_SESSION['ip']) {
+            session_destroy();
+            header('location: index.php?do=connect&'.$get_redir);
+            exit();
+        }
     }
 
     // Initialize empty $_GET['do'] if required to avoid error
@@ -79,7 +104,7 @@
     switch($_GET['do']) {
         case 'connect':
             if($current_user !== false) {
-                header('location: index.php');
+                header('location: index.php?'.$get_redir);
                 exit();
             }
             if(!empty($_POST['login']) && !empty($_POST['password']) && check_token(600, 'connection')) {
@@ -106,7 +131,7 @@
                         session_set_cookie_params($_SESSION['remember_me'], $cookie_dir, $_SERVER['HTTP_HOST']);
                         session_regenerate_id(true);
 
-                        header('location: index.php');
+                        header('location: index.php?'.$get_redir);
                         exit();
                     }
                     else {
@@ -124,7 +149,7 @@
         case 'disconnect':
             $current_user = false;
             session_destroy();
-            header('location: index.php?do=connect');
+            header('location: index.php?do=connect&'.$get_redir);
             exit();
             break;
 
@@ -135,7 +160,7 @@
                         $current_user->setPassword($current_user->encrypt($_POST['password']));
                         $current_user->save();
 
-                        header('location: index.php');
+                        header('location: index.php?'.$get_redir);
                         exit();
                     }
                     else {
@@ -147,6 +172,7 @@
                 }
             }
             $tpl->assign('view', 'password');
+            $tpl->assign('json_token', htmlspecialchars($current_user->getJsonToken()));
             $tpl->assign('token', generate_token('password'));
             $tpl->draw('edit_users');
             break;
@@ -154,7 +180,7 @@
         case 'edit_users':
         case 'add_user':
             if(!$current_user->getAdmin()) {
-                header('location: index.php');
+                header('location: index.php?'.$get_redir);
                 exit();
             }
 
@@ -163,6 +189,9 @@
                     $user = new User();
                     if(!empty($_POST['user_id'])) {
                         $user->setId($_POST['user_id']);
+                    }
+                    else {
+                        $user->newJsonToken();
                     }
                     $user->setLogin($_POST['login']);
                     $user->setDisplayName($_POST['display_name']);
@@ -177,7 +206,7 @@
                         // Clear the cache
                         array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
 
-                        header('location: index.php?do=edit_users');
+                        header('location: index.php?do=edit_users&'.$get_redir);
                         exit();
                     }
                     else {
@@ -213,6 +242,24 @@
             $tpl->draw('edit_users');
             break;
 
+        case 'new_token':
+            if(!empty($_GET['user_id']) && $current_user->getAdmin()) {
+                $user_id = (int) $_GET['user_id'];
+            }
+            else {
+                $user_id = $current_user->getId();
+            }
+
+            $user = new User();
+            $user = $user->load(array('id'=>$user_id), true);
+            $user->newJsonToken();
+            $user->save();
+            $_SESSION['current_user'] = $user->sessionStore();
+
+            header('location: index.php'.$get_redir);
+            exit();
+            break;
+
         case 'delete_user':
             if($_GET['user_id'] != $current_user->getId()) {
                 $user = new User();
@@ -222,7 +269,7 @@
                 // Clear the cache
                 array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
 
-                header('location: index.php?do=edit_users');
+                header('location: index.php?do=edit_users&'.$get_redir);
                 exit();
             }
             break;
@@ -234,7 +281,7 @@
                 // Clear the cache
                 array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
     
-                header('location: index.php');
+                header('location: index.php?'.$get_redir);
                 exit();
             }
 
@@ -286,7 +333,7 @@
                                 // Clear the cache
                                 array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
 
-                                header('location: index.php');
+                                header('location: index.php?'.$get_redir);
                                 exit();
                             }
                             else {
@@ -366,7 +413,7 @@
                         // Clear the cache
                         array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
 
-                        header('location: index.php');
+                        header('location: index.php?'.$get_redir);
                         exit();
                     }
                 }
@@ -405,7 +452,7 @@
                 // Clear the cache
                 array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
 
-                header('location: index.php');
+                header('location: index.php?'.$get_redir);
                 exit();
             }
             break;

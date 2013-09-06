@@ -61,7 +61,7 @@
 
         if ($handle = opendir($dir)) {
             while (false !== ($entry = readdir($handle))) {
-                if ($entry != "." && $entry != ".." && is_dir($dir.$entry)) {
+                if ($entry != "." && $entry != ".." && $entry != 'json' && is_dir($dir.$entry)) {
                     $return[] = array('value'=>$entry, 'option'=>str_replace(array('_en', '_fr'), array(' (English)', ' (French)'), $entry));
                 }
             }

@@ -3,14 +3,15 @@ require_once('data/config.php');
 require_once('Storage.class.php');
 
 class User extends Storage {
-    protected $id = 0, $login, $display_name, $password, $admin;
+    protected $id = 0, $login, $display_name, $password, $admin, $json_token;
     protected $TABLE_NAME = "Users";
     protected $fields = array(
         'id'=>'key',
         'login'=>'string',
         'display_name'=>'string',
         'password'=>'password',
-        'admin'=>'bool'
+        'admin'=>'bool',
+        'json_token'=>'string',
         );
 
     public function __construct() {
@@ -35,6 +36,10 @@ class User extends Storage {
         return $this->admin;
     }
 
+    public function getJsonToken() {
+        return $this->json_token;
+    }
+
     // Setters
     // =======
     public function setId($id) {
@@ -57,6 +62,10 @@ class User extends Storage {
         $this->admin = (bool) $admin;
     }
 
+    public function setJsonToken($token) {
+        $this->json_token = $token;
+    }
+
     // Password functions
     // ==================
     public function encrypt($text) {
@@ -65,6 +74,12 @@ class User extends Storage {
 
     public function checkPassword($password) {
         return User::encrypt($password) == $this->password;
+    }
+
+    // JSON token functions
+    // ====================
+    public function newJsonToken() {
+        $this->json_token = md5(uniqid(mt_rand(), true));
     }
 
     // Check if a user exists by login and load it
@@ -83,7 +98,7 @@ class User extends Storage {
     // Session storage
     // ===============
     public function sessionStore() {
-        return serialize(array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin));
+        return serialize(array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token));
     }
 
     public function sessionRestore($data, $serialized = false) {
@@ -97,6 +112,7 @@ class User extends Storage {
         $this->setDisplayName($user_data['display_name']);
         $this->setPassword($user_data['password']);
         $this->setAdmin($user_data['admin']);
+        $this->setJsonToken($user_data['json_token']);
     }
 
     // Check wether a user already exists or not 
@@ -118,6 +134,7 @@ class User extends Storage {
         $this->login = htmlspecialchars($this->login);
         $this->display_name = htmlspecialchars($this->display_name);
         $this->admin = (int) $this->admin;
+        $this->json_token = htmlspecialchars($this->json_token);
 
         return $this;
     }

@@ -1,5 +1,3 @@
-{include="header"}
-
 {if condition="$error != ''"}
     <p class="error">{$error}</p>
 {/if}
@@ -54,11 +52,6 @@
     </p>
 </form>
 
-{if condition="$user_id != -1"}
-    <h2>Personal token for this user</h2>
-    <p>The personal token for this user to be used with the API is : {$user_data->getJsonToken()}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&user_id={$user_data->getId()}">generate a new one</a>.</p>
-{/if}
-
 {elseif condition="$view == 'password'"}
 <h2>Edit your password</h2>
 <form method="post" action="index.php?do=password" id="edit_password_form">
@@ -66,8 +59,4 @@
     <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
     <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
-
-<h2>Your personal token to use the API</h2>
-<p>Your personal token to use the API is : {$json_token}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token">generate a new one</a>.</p>
 {/if}
-{include="footer"}

@@ -1,5 +1,5 @@
 * Don't cache the username
-* JSON output
+* JSON output => do the template
 
 inc/Invoices.class.php :
 ========================
@@ -9,6 +9,7 @@ inc/Invoices.class.php :
 Manage paybacks :
 =================
 * TODO : Payback system (class should be ok)
+* TODO : Global payback
 
 To test :
 =========
