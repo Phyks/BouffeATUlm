@@ -3,6 +3,7 @@
 {/if}
 
 {if condition="$view == 'list_users'"}
+TODO ***
 <h2>List of users</h2>
 <p class="center">You can also <a href="?do=add_user">add a user</a>.</p>
 <table id="edit_users">
@@ -25,38 +26,6 @@
     </tr>
     {/loop}
 </table>
-{elseif condition="$view == 'edit_user'"}
-<h2>{$user_id != -1 ? 'Edit' : 'Add'} a user</h2>
-<form method="post" action="index.php?do={$user_id != -1 ? 'edit_users' : 'add_user'}" id="edit_user_form">
-    <p>
-        <label for="login" class="label-block">Login : </label><input type="text" name="login" id="login" {if condition="$login_post != ''"} value="{$login_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''} {/if}/>
-    </p>
-    <p>
-        <label for="display_name" class="label-block">Displayed name : </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
-    </p>
-    <p>
-        <label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/>  <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a>
-        {if condition="$user_id != -1"}
-            <br/><em>Note :</em> Leave blank this field if you don't want to edit password.
-        {/if}
-    </p>
-    <p id="edit_user_admin_rights">
-        Give admin rights to this user ?<br/>
-    <input type="radio" id="admin_yes" value="1" name="admin" {if condition="$admin_post == 1 || ($admin_post == -1 && $user_id != -1 && $user_data->getAdmin())"} checked{/if}/><label for="admin_yes">Yes</label><br/>
-    <input type="radio" id="admin_no" value="0" name="admin" {if condition="$admin_post == 0 || ($admin_post == -1 && ($user_id == -1 || !$user_data->getAdmin()))"} checked{/if}/><label for="admin_no">No</label>
-    </p>
-    <p class="center">
-        <input type="submit" value="{$user_id != -1 ? 'Edit' : 'Add'}"/>
-        {if condition="$user_id != -1"}<input type="hidden" name="user_id" value="{$user_id}"/>{/if}
-        <input type="hidden" name="token" value="{$token}"/>
-    </p>
-</form>
-
-{elseif condition="$view == 'password'"}
-<h2>Edit your password</h2>
-<form method="post" action="index.php?do=password" id="edit_password_form">
-    <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/></p>
-    <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
-    <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
-</form>
-{/if}
+{else}
+    {if condition="LANG == 'en'}Nothing to show.{else}Il n'y a rien à afficher.{/if}
+{/else}

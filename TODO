@@ -1,5 +1,6 @@
 * Don't cache the username
-* JSON output => do the template
+* JSON output => finish the template
+* API
 
 inc/Invoices.class.php :
 ========================
