@@ -121,7 +121,7 @@ class Storage {
                 }
 
                 foreach($value as $value_array) {
-                    if($value_array == 'AND' || $value_array = 'OR') {
+                    if($value_array == 'AND' || $value_array == 'OR') {
                         $query .= ' '.$value_array.' ';
                         continue;
                     }
@@ -150,10 +150,10 @@ class Storage {
                     if($value_array == 'AND' || $value_array == 'OR')
                         continue;
 
-                    if(substr($value, 0, 1) == ">" || substr($value, 0, 1) == "<")
-                        $query->bindParam(':'.$field, substr($value, 0, 1));
+                    if(substr($value_array, 0, 1) == ">" || substr($value_array, 0, 1) == "<")
+                        $query->bindParam(':'.$field, substr($value_array, 0, 1));
                     else
-                        $query->bindParam(':'.$field, $value);
+                        $query->bindParam(':'.$field, $value_array);
                 }
             }
         }
