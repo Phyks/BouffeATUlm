@@ -51,13 +51,4 @@
 
             return $this;
         }
-
-        // Restores object from array
-        // ==========================
-        public function sessionRestore($data, $serialized = false) { 
-            // TODO ***
-            if($serialized) {
-                $data = unserialize($data);
-            }
-        }
     }

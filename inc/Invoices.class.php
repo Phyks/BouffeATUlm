@@ -32,10 +32,6 @@
             return $this->date->format($format);
         }
 
-        public function getGuests() {
-            return $this->guests;
-        }
-
         public function getBuyer() {
             return $this->buyer;
         }
@@ -55,7 +51,7 @@
         // Setters
         // =======
         public function setId($id) {
-            $this->users_in->setId($id);
+            $this->users_in->setInvoiceId($id);
             $this->id = (int) $id;
         }
 
@@ -110,5 +106,27 @@
             $this->setAmount($data['amount']);
             $this->setBuyer($data['buyer']);
             $this->setDate($data['date']);
+        }
+        
+        // Override parent load() method
+        // =============================
+        public function load($fields = NULL, $first_only = false) {
+            $return = parent::load($fields, $first_only); // Execute parent load
+
+            if($return !== false) {
+                foreach(array_keys($return) as $key) {
+                    $return[$key]->users_in->load(); // Load users in for each invoice
+                }
+            }
+
+            return $return; // Return the loaded elements
+        }
+
+        // Overrid parent save() method
+        // ============================
+        public function save() {
+            parent::save(); // Save invoice element
+
+            $this->users_in->save(); // Save users in
         }
     }
