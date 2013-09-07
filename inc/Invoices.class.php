@@ -1,13 +1,13 @@
 <?php
-    // TODO : Handle users_in
     require_once('data/config.php');
     require_once('Storage.class.php');
+    require_once('UsersIn.class.php');
 
     class Invoice extends Storage {
-        protected $id = 0, $date, $users_in, $guests, $buyer, $amount, $what;
+        protected $id = 0, $date, $users_in, $buyer, $amount, $what;
         // date is a DateTime object
         // buyer is a User object
-        // guests is an array with same keys as users_in
+        // users_in is a UsersIn objects
         protected $TABLE_NAME = "Invoices";
         protected $fields = array(
             'id'=>'key',
@@ -19,6 +19,7 @@
 
         public function __construct() {
             parent::__construct();
+            $users_in = new UsersIn();
         }
 
         // Getters
@@ -39,6 +40,10 @@
             return $this->buyer;
         }
 
+        public function getUsersIn() {
+            return $this->users_in;
+        }
+
         public function getAmount() {
             return $this->amount;
         }
@@ -50,6 +55,7 @@
         // Setters
         // =======
         public function setId($id) {
+            $this->users_in->setId($id);
             $this->id = (int) $id;
         }
 
@@ -73,6 +79,11 @@
 
         public function setWhat($what) {
             $this->what = $what;
+        }
+
+        public function setUsersIn($users_in) {
+            // Note : users_in in param is an array with users in listed and guests for each user
+            $this->users_in->set($users_in);
         }
 
         // Maps htmlspecialchars on the class before display
