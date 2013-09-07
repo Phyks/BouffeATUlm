@@ -4,7 +4,6 @@
 
 inc/Invoices.class.php :
 ========================
-* Storage of users in ?!?
 * Add / Edit a bill
 
 Manage paybacks :

@@ -1,5 +1,4 @@
 <?php
-    //TODO : load() and save() overload
     require_once('data/config.php');
     require_once('Storage.class.php');
 
@@ -50,5 +49,70 @@
             $this->users_in = $temp_array;
 
             return $this;
+        }
+
+        // Override load() method
+        // ======================
+        public function load() {
+            $query = 'SELECT ';
+
+            $i = false;
+            foreach($this->fields as $field->$type) {
+                if($i) { $query .= ','; } else { $i = true; }
+
+                $query .= $field;
+            }
+
+            $query .= ' FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE invoice_id=:invoice_id';
+
+            $query = $this->getConnection()->prepare($query);
+            $query->bindParam(':invoice_id', $this->invoice_id);
+            $query->execute();
+
+            $results = $query->fetchAll();
+            $this->users_list = array();
+            foreach($results as $result) {
+                $this->users_list[(int) $result['user_id']] = (int) $result['guests'];
+            }
+        }
+
+        // Override save() method
+        // ======================
+        public function save() {
+            // TODO : Optimize ?
+
+            $query = 'SELECT COUNT(invoice_id) FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE invoice_id=:invoice_id';
+            $query = $this->getConnection()->prepare($query);
+            $query->bindParam(':invoice_id', $this->invoice_id);
+            $query->execute();
+
+            $count = $query->fetchColumn(0);
+
+            if($count != 0) {
+                // If there are already some records, delete them first
+                $query = $this->getConnection()->prepare('DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE invoice_id=:invoice_id');
+                $query->bindParam(':invoice_id', $this->invoice_id);
+                $query->execute();
+            }
+
+            $query = 'INSERT INTO '.MYSQL_PREFIX.$this->TABLE_NAME.'(';
+            $i = false;
+            foreach($this->fields as $field=>$type) {
+                if($i) { $query .= ','; } else { $i = true;}
+                $query .= $field;
+            }
+
+            $query .= ') VALUES(:invoice_id, :user_id, :guests)';
+
+            $query = $this->getConnection()->prepare($query);
+
+            $user = -1;
+            $guests = -1;
+            $query->bindParam(':user_id', (int) $user);
+            $query->bindParam(':guests', (int) $guests);
+
+            foreach($this->users_list as $user=>$guests) {
+                $query->execute();
+            }
         }
     }

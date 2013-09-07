@@ -41,6 +41,10 @@ class Storage {
         return $this->db;
     }
 
+    public function getConnection() {
+        return $this->connection;
+    }
+
     // Setters
     // =======
     public function setHost($host) {
