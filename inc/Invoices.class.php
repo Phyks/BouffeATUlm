@@ -20,7 +20,6 @@
         public function __construct() {
             parent::__construct();
             $this->users_in = new UsersIn();
-            $this->date = new DateTime();
         }
 
         // Getters
@@ -30,7 +29,10 @@
         }
 
         public function getDate($format = "d-m-Y H:i") {
-            return $this->date->format($format);
+            if(!empty($this->date))
+                return $this->date->format($format);
+            else
+                return false;
         }
 
         public function getBuyer() {
@@ -90,7 +92,6 @@
             $this->what = htmlspecialchars($this->what);
             $this->amount = (float) $this->amount;
             $this->buyer = (int) $this->buyer;
-            // TODO : $this->date = htmlspecialchars($this->date);
 
             return $this;
         }
@@ -106,7 +107,8 @@
             $this->setWhat($data['what']);
             $this->setAmount($data['amount']);
             $this->setBuyer($data['buyer']);
-            //TODO : $this->setDate($data['date']);
+
+            $this->date = DateTime::createFromFormat('Y-m-d H:i:s', $data['date']);
         }
         
         // Override parent load() method
@@ -114,20 +116,31 @@
         public function load($fields = NULL, $first_only = false) {
             $return = parent::load($fields, $first_only); // Execute parent load
 
-            if($return !== false) {
+            if(is_array($return)) {
                 foreach(array_keys($return) as $key) {
                     $return[$key]->users_in->load(); // Load users in for each invoice
                 }
+            }
+            elseif(is_a($return, 'Invoice')) {
+                $return->users_in->load();
             }
 
             return $return; // Return the loaded elements
         }
 
-        // Overrid parent save() method
+        // Override parent save() method
         // ============================
         public function save() {
             parent::save(); // Save invoice element
 
             $this->users_in->save(); // Save users in
+        }
+
+        // Override parent delete() method
+        // ===============================
+        public function delete() {
+            parent::delete(); // Delete invoice element
+
+            $this->users_in->delete(); // Also delete users in
         }
     }

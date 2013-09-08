@@ -114,4 +114,12 @@
                 $query->execute();
             }
         }
+
+        // Override delete() method
+        // ========================
+        public function delete() {
+            $query = $this->getConnection()->prepare('DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE invoice_id=:invoice_id');
+            $query->bindParam(':invoice_id', $this->invoice_id);
+            $query->execute();
+        }
     }

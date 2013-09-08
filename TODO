@@ -5,11 +5,6 @@
 * User groups
 * cf TODO in files
 
-inc/Invoices.class.php :
-========================
-* Edit a bill
-* Error in guest input on token error
-
 Manage paybacks :
 =================
 * TODO : Payback system (class should be ok)

@@ -8,7 +8,8 @@
         'write_error_data'=>array('fr'=>'Le script ne peut pas écrire dans le dossier data/, vérifiez les permissions sur ce dossier.', 'en'=>'The script can\'t write in data/ dir, check permissions set on this folder.'),
         'unable_write_config'=>array('fr'=>'Impossible d\'écrire le fichier data/config.php. Vérifiez les permissions.', 'en'=>'Unable to write data/config.php file. Check permissions.'),
         'negative_amount'=>array('fr'=>'Montant négatif non autorisé.', 'en'=>'Negative amount not allowed.'),
-        'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.')
+        'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.'),
+        'unauthorized'=>array('fr'=>'Vous n\'avez pas le droit de faire cette action.', 'en'=>'You are not authorized to do that.')
     );
 
     $localized = array(
@@ -448,15 +449,25 @@
             break;
 
         case 'delete_invoice':
-            // TODO : Check user has right to do it
             if(!empty($_GET['id'])) {
                 $invoice = new Invoice();
-                $invoice->setId($_GET['id']);
-                $invoice->delete();
+                $invoice = $invoice->load(array('id'=>(int) $_GET['id']), true);
 
-                // Clear the cache
-                array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+                if($current_user->getAdmin() || $invoice->getBuyer() == $current_user->getId()) {
+                    $invoice->delete();
 
+                    // Clear the cache
+                    array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+
+                    header('location: index.php?'.$get_redir);
+                    exit();
+                }
+                else {
+                    $tpl->assign('error', $errors['unauthorized']);
+                    $tpl->draw('index');
+                }
+            }
+            else {
                 header('location: index.php?'.$get_redir);
                 exit();
             }
@@ -464,10 +475,10 @@
 
         default:
             // Display cached page in priority
-            /* TODO if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
+            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
                 echo $cache;
             }
-            else { */
+            else {
                 $users_list = new User();
                 $users_list = $users_list->load();
 
@@ -482,5 +493,5 @@
 
                 $tpl->draw('index');
                 break;
-            //}
+            }
     }

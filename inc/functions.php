@@ -81,6 +81,7 @@
     }
 
     function formatUsersIn($users_in, $all_users) {
+        global $localized;
         // TODO : Move this function to somewhere else ?
         $return = '';
         $users_in = $users_in->get();
@@ -91,10 +92,10 @@
 
             $return .= $all_users[$user_in]->getDisplayName();
             if($guests != 0) {
-                if($guest > 1)
-                    $return .= ' ('.$guests.' '.$localized['guest'].'s)';
+                if($guests > 1)
+                    $return .= ' ('.$guests.' '.$localized['guest'][LANG].'s)';
                 else 
-                    $return .= ' ('.$guests.' '.$localized['guest'].')';
+                    $return .= ' ('.$guests.' '.$localized['guest'][LANG].')';
             }
         }
 
