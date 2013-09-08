@@ -2,10 +2,13 @@
 * JSON output => do index view
 * API
 * Reattribute all invoices / paybacks to unknown user when deleting a user
+* User groups
+* cf TODO in files
 
 inc/Invoices.class.php :
 ========================
-* Add / Edit a bill
+* Edit a bill
+* Error in guest input on token error
 
 Manage paybacks :
 =================

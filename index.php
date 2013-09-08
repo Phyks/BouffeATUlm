@@ -408,7 +408,10 @@
                         $invoice->save();
 
                         // Clear the cache
-                        array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+                        $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
+                        if(is_array($tmp_files)) {
+                            array_map("unlink", $tmp_files);
+                        }
 
                         header('location: index.php?'.$get_redir);
                         exit();
@@ -456,10 +459,10 @@
 
         default:
             // Display cached page in priority
-            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
+            /* TODO if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
                 echo $cache;
             }
-            else {
+            else { */
                 $users_list = new User();
                 $users_list = $users_list->load();
 
@@ -474,5 +477,5 @@
 
                 $tpl->draw('index');
                 break;
-            }
+            //}
     }

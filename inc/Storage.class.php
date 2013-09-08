@@ -237,13 +237,13 @@ class Storage {
                 else
                     $value = $this->$field;
 
-                $query->bindParam(':'.$field, $value);
+                $query->bindValue(':'.$field, $value);
             }
         }
         
         $query->execute();
 
-        $this->id = (!isset($this->id) ? $this->connection->lastInsertId() : $this->id);
+        (empty($this->id) ? $this->setId($this->connection->lastInsertId()) : $this->setId($this->id));
     }
 
     // Delete function

@@ -5,7 +5,7 @@
     class UsersIn extends Storage {
         protected $invoice_id = 0, $users_list;
         //users_list is an array of users_id and number of guest per user
-        protected $TABLE_NAME = "Users_in";
+        protected $TABLE_NAME = "Users_in_invoices";
         protected $fields = array(
             'invoice_id'=>'int',
             'user_id'=>'int',
@@ -106,12 +106,11 @@
 
             $query = $this->getConnection()->prepare($query);
 
-            $user = -1;
-            $guests = -1;
-            $query->bindParam(':user_id', intval($user));
-            $query->bindParam(':guests', intval($guests));
+            $query->bindParam(':invoice_id', $this->invoice_id);
 
             foreach($this->users_list as $user=>$guests) {
+                $query->bindParam(':user_id', intval($user));
+                $query->bindParam(':guests', intval($guests));
                 $query->execute();
             }
         }
