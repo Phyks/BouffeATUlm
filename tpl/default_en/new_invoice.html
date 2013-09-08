@@ -43,7 +43,7 @@
     <fieldset>
         <legend>Users in ?</legend>
         {loop="users"}
-        <br/><input type="checkbox" name="users_in[]" value="{$value->getId()}" id="users_in_{$value->getId()}" {if condition="$current_user->getId() == $value->getId() || in_array($value->getId(), $users_in)"} checked {/if}/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> and <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" {if condition="in_array($value->getId(), $users_in)"} value="{$guests[$value->getId()]}" {else} value="0" {/if} onkeyup="guest_user_label({$value->getId()});"/><label for="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}_label"> guest</label>.
+        <input type="checkbox" name="users_in[]" value="{$value->getId()}" id="users_in_{$value->getId()}" {if condition="($current_user->getId() == $value->getId() && empty($users_in)) || in_array($value->getId(), array_keys($users_in))"} checked {/if}/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> and <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" {if condition="in_array($value->getId(), array_keys($users_in))"} value="{$users_in[$value->getId()]}" {else} value="0" {/if} onkeyup="guest_user_label({$value->getId()});"/><label for="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}_label"> guest</label>.<br/>
         {/loop}
     </fieldset>
     <p class="center">

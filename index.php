@@ -376,8 +376,7 @@
                 $date_year = $invoice->getDate('Y');
                 $amount = $invoice->getAmount();
                 $what = $invoice->getWhat();
-                $users_in = explode(',', $invoice->getUsersIn());
-                $guests = array();
+                $users_in = $invoice->getUsersIn()->get();
             }
 
             if(!empty($_POST['what'])) $what = $_POST['what'];
@@ -385,7 +384,12 @@
             if(!empty($_POST['date_day'])) $date_day = $_POST['date_day'];
             if(!empty($_POST['date_month'])) $date_month = $_POST['date_month'];
             if(!empty($_POST['date_year'])) $date_year = $_POST['date_year'];
-            if(!empty($_POST['users_in'])) $users_in = $_POST['users_in'];
+            if(!empty($_POST['users_in'])) {
+                $users_in = array();
+                foreach($_POST['users_in'] as $user) {
+                    $users_in[(int) $user] = (int) $_POST['guest_user_'.$user];
+                }
+            }
 
             if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && !empty($_POST['date_hour']) && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
                 if(check_token(600, 'new_invoice')) {
@@ -403,10 +407,7 @@
                         $invoice->setBuyer($current_user->getId());
                         $invoice->setDate(0, int2ampm($_POST['date_hour']), $_POST['date_day'], $_POST['date_month'], $_POST['date_year']);
 
-                        $users_in = array();
-                        foreach($_POST['users_in'] as $user) {
-                            $users_in[(int) $user] = (int) $_POST['guest_user_'.$user];
-                        }
+                        
                         $invoice->setUsersIn($users_in);
 
                         $invoice->save();
@@ -441,7 +442,6 @@
             $tpl->assign('what_post', (!empty($what) ? htmlspecialchars($what) : ''));
             $tpl->assign('users', secureDisplay($users_list));
             $tpl->assign('users_in', (!empty($users_in) ? $users_in : array()));
-            $tpl->assign('guests', (!empty($guests) ? $guests : array()));
             $tpl->assign('id', (!empty($_GET['id']) ? (int) $_GET['id'] : 0));
             $tpl->assign('token', generate_token('new_invoice'));
             $tpl->draw('new_invoice');

@@ -57,4 +57,11 @@ $(document).ready(function() {
         var col = $(this).index()+1;
         $(this).closest('table').find('tr :nth-child('+col+')').removeClass('highlight_td');
     });
+
+    if($('#invoice_form').length) {
+        $('#invoice_form input[id^=users_in]').each(function () {
+            var id = $(this).attr('id').replace('users_in_', '');
+            guest_user_label(id);
+        });
+    }
 });
