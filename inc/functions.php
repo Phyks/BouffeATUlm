@@ -79,3 +79,24 @@
 
         return $return;
     }
+
+    function formatUsersIn($users_in, $all_users) {
+        // TODO : Move this function to somewhere else ?
+        $return = '';
+        $users_in = $users_in->get();
+
+        $i = false;
+        foreach($users_in as $user_in=>$guests) {
+            if($i) { $return .= '<br/>'; } else { $i = true; }
+
+            $return .= $all_users[$user_in]->getDisplayName();
+            if($guests != 0) {
+                if($guest > 1)
+                    $return .= ' ('.$guests.' '.$localized['guest'].'s)';
+                else 
+                    $return .= ' ('.$guests.' '.$localized['guest'].')';
+            }
+        }
+
+        return $return;
+    }

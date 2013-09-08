@@ -11,6 +11,10 @@
         'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.')
     );
 
+    $localized = array(
+        'guest'=>array('fr'=>'invité', 'en'=>'guest')
+    );
+
     // Include necessary files
     if(!file_exists('data/config.php')) { header('location: install.php'); exit(); }
     require_once('data/config.php');
@@ -444,6 +448,7 @@
             break;
 
         case 'delete_invoice':
+            // TODO : Check user has right to do it
             if(!empty($_GET['id'])) {
                 $invoice = new Invoice();
                 $invoice->setId($_GET['id']);

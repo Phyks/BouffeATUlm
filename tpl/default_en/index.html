@@ -27,7 +27,7 @@
 <div id="detailed_summary">
     <h2>Detailed list of bills for last month</h2>
 
-    {if condition="count($invoices)>1"}
+    {if condition="count($invoices)>=1"}
         <table id="list_expenses">
             <tr>
                 <th>Date</th>
@@ -42,7 +42,7 @@
                 <tr>
                     <td>{$value->getDate()}</td>
                     <td>{$users[$value->getBuyer()]->getDisplayName()}</td>
-                    <td>{$value->getUsersIn()}</td>
+                    <td>{function="formatUsersIn($value->getUsersIn(), $users)"}</td>
                     <td>{$value->getAmount()}</td>
                     <td>{$value->getWhat()}</td>
                     <td><a href="index.php?do=edit_invoice&id={$value->getId()}">Edit</a></td>
