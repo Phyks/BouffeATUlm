@@ -41,7 +41,7 @@
             {loop="invoices"}
                 <tr>
                     <td>{$value->getDate()}</td>
-                    <td>{$value->getBuyer()->getDisplayName()}</td>
+                    <td>{$users[$value->getBuyer()]->getDisplayName()}</td>
                     <td>{$value->getUsersIn()}</td>
                     <td>{$value->getAmount()}</td>
                     <td>{$value->getWhat()}</td>

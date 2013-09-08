@@ -57,7 +57,7 @@
             $query = 'SELECT ';
 
             $i = false;
-            foreach($this->fields as $field->$type) {
+            foreach($this->fields as $field=>$type) {
                 if($i) { $query .= ','; } else { $i = true; }
 
                 $query .= $field;
@@ -108,8 +108,8 @@
 
             $user = -1;
             $guests = -1;
-            $query->bindParam(':user_id', (int) $user);
-            $query->bindParam(':guests', (int) $guests);
+            $query->bindParam(':user_id', intval($user));
+            $query->bindParam(':guests', intval($guests));
 
             foreach($this->users_list as $user=>$guests) {
                 $query->execute();

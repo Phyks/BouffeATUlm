@@ -396,17 +396,14 @@
 
                         $invoice->setWhat($_POST['what']);
                         $invoice->setAmount($_POST['amount']);
-                        $invoice->setBuyer($current_user);
+                        $invoice->setBuyer($current_user->getId());
                         $invoice->setDate(0, int2ampm($_POST['date_hour']), $_POST['date_day'], $_POST['date_month'], $_POST['date_year']);
 
                         $users_in = array();
-                        $guests = array();
                         foreach($_POST['users_in'] as $user) {
-                            $users_in[] = (int) $user;
-                            $guests[] = (int) $_POST['guest_user_'.$user];
+                            $users_in[(int) $user] = (int) $_POST['guest_user_'.$user];
                         }
                         $invoice->setUsersIn($users_in);
-                        $invoice->setGuests($guests);
 
                         $invoice->save();
 

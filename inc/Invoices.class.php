@@ -19,7 +19,8 @@
 
         public function __construct() {
             parent::__construct();
-            $users_in = new UsersIn();
+            $this->users_in = new UsersIn();
+            $this->date = new DateTime();
         }
 
         // Getters
@@ -89,7 +90,7 @@
             $this->what = htmlspecialchars($this->what);
             $this->amount = (float) $this->amount;
             $this->buyer = (int) $this->buyer;
-            $this->date = htmlspecialchars($this->date);
+            // TODO : $this->date = htmlspecialchars($this->date);
 
             return $this;
         }
@@ -105,7 +106,7 @@
             $this->setWhat($data['what']);
             $this->setAmount($data['amount']);
             $this->setBuyer($data['buyer']);
-            $this->setDate($data['date']);
+            //TODO : $this->setDate($data['date']);
         }
         
         // Override parent load() method

@@ -233,9 +233,11 @@ class Storage {
         foreach($this->fields as $field=>$type) {
             if(isset($this->$field)) {
                 if($type == 'date')
-                    $value = $value->format('Y-m-d H:i:s');
+                    $value = $this->$field->format('Y-m-d H:i:s');
+                else
+                    $value = $this->$field;
 
-                $query->bindParam(':'.$field, $this->$field);
+                $query->bindParam(':'.$field, $value);
             }
         }
         
