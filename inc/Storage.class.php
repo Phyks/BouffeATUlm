@@ -105,7 +105,7 @@ class Storage {
 
     // Load function
     // =============
-    public function load($fields = NULL, $first_only = false) {
+    public function load($fields = NULL, $first_only = false, $key_array = 'id') {
         $query = 'SELECT ';
         $i = false;
         foreach($this->fields as $field=>$type) {
@@ -155,9 +155,9 @@ class Storage {
                         continue;
 
                     if(substr($value_array, 0, 1) == ">" || substr($value_array, 0, 1) == "<")
-                        $query->bindParam(':'.$field, substr($value_array, 0, 1));
+                        $query->bindValue(':'.$field, substr($value_array, 0, 1));
                     else
-                        $query->bindParam(':'.$field, $value_array);
+                        $query->bindValue(':'.$field, $value_array);
                 }
             }
         }
@@ -171,12 +171,12 @@ class Storage {
             $class = get_class($this);
 
             foreach($results as $result) {
-                $return[$result['id']] = new $class();
-                $return[$result['id']]->sessionRestore($result);
+                $return[$result[$key_array]] = new $class();
+                $return[$result[$key_array]]->sessionRestore($result);
             }
 
             if($first_only)
-                return $return[$result['id']];
+                return $return[$result[$key_array]];
             else
                 return $return;
         }
@@ -193,12 +193,9 @@ class Storage {
 
             $i = false;
             foreach($this->fields as $field=>$type) {
-                if(isset($this->$field))
-                {
-                    if($i) { $query .= ','; } else { $i = true; }
+                if($i) { $query .= ','; } else { $i = true; }
 
-                    $query .= $field.'=:'.$field;
-                }
+                $query .= $field.'=:'.$field;
             }
 
             $query .= ' WHERE id='.$this->id;
@@ -217,11 +214,9 @@ class Storage {
             
             $i = false;
             foreach($this->fields as $field=>$type) {
-                if(isset($this->$field)) {
-                    if($i) { $query .= ','; } else { $i = true; }
+                if($i) { $query .= ','; } else { $i = true; }
                 
-                    $query .= ':'.$field;
-                }
+                $query .= ':'.$field;
             }
 
             $query .= ')';
@@ -231,14 +226,12 @@ class Storage {
         $query = $this->connection->prepare($query);
 
         foreach($this->fields as $field=>$type) {
-            if(isset($this->$field)) {
-                if($type == 'date')
-                    $value = $this->$field->format('Y-m-d H:i:s');
-                else
-                    $value = $this->$field;
+            if($type == 'date')
+                $value = $this->$field->format('Y-m-d H:i:s');
+            else
+                $value = $this->$field;
 
-                $query->bindValue(':'.$field, $value);
-            }
+            $query->bindValue(':'.$field, $value);
         }
         
         $query->execute();
