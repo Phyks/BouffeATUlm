@@ -474,10 +474,84 @@
             }
             break;
 
+        case 'confirm_payback':
+            if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['invoice_id'])) {
+                if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
+                    $invoice = new Invoice();
+                    $invoice = $invoice->load(array('id'=>(int) $_GET['invoice_id']), true);
+
+                    $payback = new Payback();
+
+                    if(!empty($_GET['payback_id'])) {
+                        $payback = $payback->load(array('id'=>(int) $_GET['payback_id']), true);
+
+                        if($payback->getFrom() != $_GET['from'] || $payback->getTo() != $_GET['to']) {
+                            $payback = new Payback();
+                        }
+                    }
+
+                    $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                    $payback->setInvoice($_GET['invoice_id']);
+                    $payback->setAmount($invoice->getAmount());
+                    $payback->setFrom($_GET['from']);
+                    $payback->setTo($_GET['to']);
+
+                    $payback->save();
+                    
+                    // Clear the cache
+                    $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
+                    if(is_array($tmp_files)) {
+                        array_map("unlink", $tmp_files);
+                    }
+
+                    header('location: index.php');
+                    exit();
+
+                }
+                else {
+                    $tpl->assign('error', $errors['unauthorized']);
+                    $tpl->draw('index');
+                }
+            }
+            else {
+                header('location: index.php?'.$get_redir);
+            }
+            break;
+
+        case 'delete_payback':
+            if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['invoice_id'])) {
+                if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
+                    $paybacks = new Payback();
+
+                    $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['to'], 'from_user'=> (int) $_GET['from'], 'invoice_id'=> (int) $_GET['invoice_id']));
+
+                    foreach($paybacks as $payback) {
+                        $payback->delete();
+                    }
+
+                    // Clear the cache
+                    $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
+                    if(is_array($tmp_files)) {
+                        array_map("unlink", $tmp_files);
+                    }
+
+                    header('location: index.php');
+                    exit();
+                }
+                else {
+                    $tpl->assign('error', $errors['unauthorized']);
+                    $tpl->draw('index');
+                }
+            }
+            else {
+                header('location: index.php');
+                exit();
+            }
+
+
         default:
-            $use_cache = false;
             // Display cached page in priority
-            if($use_cache && $cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
+            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
                 echo $cache;
             }
             else {
@@ -492,7 +566,7 @@
                 $paybacks = array();
                 foreach($invoices_list as $invoice) {
                     $paybacks[$invoice->getId()] = new Payback();
-                    $paybacks[$invoice->getId()] = $paybacks[$invoice->getId()]->load(array('invoice_id'=>$invoice->getId()));
+                    $paybacks[$invoice->getId()] = $paybacks[$invoice->getId()]->load(array('invoice_id'=>$invoice->getId()), false, 'from_user');
                 }
 
                 $tpl->assign('users', secureDisplay($users_list));

@@ -34,6 +34,12 @@
         }
 
         public function set($users_in) {
+            foreach($users_in as $user=>$guest) {
+                if($guest < 0)
+                    $users_in[$user] = 0;
+                else
+                    $users_in[$user] = (int) $guest;
+            }
             $this->users_list = $users_in;
         }
 

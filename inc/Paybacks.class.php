@@ -3,7 +3,7 @@
     require_once('Storage.class.php');
 
     class Payback extends Storage {
-        protected $id = 0, $date, $invoice_id, $amount, $from, $to;
+        protected $id = 0, $date, $invoice_id, $amount, $from_user, $to_user;
         protected $TABLE_NAME = "Paybacks";
         protected $fields = array(
             'id'=>'key',
@@ -41,11 +41,11 @@
         }
 
         public function getFrom() {
-            return (int) $this->from;
+            return (int) $this->from_user;
         }
 
         public function getTo() {
-            return (int) $this->to;
+            return (int) $this->to_user;
         }
 
         // Setters
@@ -70,11 +70,11 @@
         }
 
         public function setFrom($from) {
-            $this->from = (int) $from;
+            $this->from_user = (int) $from;
         }
 
         public function setTo($to) {
-            $this->to = (int) $to;
+            $this->to_user = (int) $to;
         }
 
         // Restores object from array
@@ -87,8 +87,8 @@
             $this->setId($data['id']);
             $this->setInvoice($data['invoice_id']);
             $this->setAmount($data['amount']);
-            $this->setFrom($data['from']);
-            $this->setTo($data['to']);
+            $this->setFrom($data['from_user']);
+            $this->setTo($data['to_user']);
 
             $this->date = DateTime::createFromFormat('Y-m-d H:i:s', $data['date']);
         }
@@ -100,7 +100,9 @@
             $this->id = (int) $this->id;
             $this->invoice_id = (int) $this->invoice_id;
             $this->amount = (float) $this->amount;
-            $this->from = (int) $this->from;
-            $this->to = (int) $this->to;
+            $this->from = (int) $this->from_user;
+            $this->to = (int) $this->to_user;
+
+            return $this;
         }
     }
