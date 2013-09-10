@@ -35,7 +35,7 @@
 
  
             //Create table "Invoices"
-            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date INT(11), users_in VARCHAR(255), buyer INT(11), amount FLOAT, what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, users_in VARCHAR(255), buyer INT(11), amount FLOAT, what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             $count_invoices = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Invoices');
             $count_invoices = $count_users->fetch();
@@ -53,7 +53,14 @@
                 $warning .= 'Table '.$mysql_prefix.'Users_in_invoices already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
             }
             
-            //Create table "Payback" - TODO
+            //Create table "Paybacks"
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Paybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, invoice_id INT(11), KEY invoice_id (invoice_id), amount FLOAT, from_user INT(11), to_user INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+
+            $count_paybacks = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Paybacks');
+            $count_paybacks = $count_paybacks->fetch();
+            if($count_paybacks[0] > 0) {
+                $warning .= 'Table '.$mysql_prefix.'Paybacks already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
+            }
         } catch (PDOException $e) {
             $error = 'Unable to connect to database and create database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
         }

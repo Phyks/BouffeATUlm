@@ -21,6 +21,7 @@
     require_once('data/config.php');
     require_once('inc/User.class.php');
     require_once('inc/Invoices.class.php');
+    require_once('inc/Paybacks.class.php');
     require_once('inc/rain.tpl.class.php');
     require_once('inc/functions.php');
     require_once('inc/Ban.inc.php');
@@ -474,8 +475,9 @@
             break;
 
         default:
+            $use_cache = false;
             // Display cached page in priority
-            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
+            if($use_cache && $cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
                 echo $cache;
             }
             else {
@@ -485,8 +487,17 @@
                 $invoices_list = new Invoice();
                 $invoices_list = $invoices_list->load();
 
+                if($invoices_list === false) $invoices_list = array();
+
+                $paybacks = array();
+                foreach($invoices_list as $invoice) {
+                    $paybacks[$invoice->getId()] = new Payback();
+                    $paybacks[$invoice->getId()] = $paybacks[$invoice->getId()]->load(array('invoice_id'=>$invoice->getId()));
+                }
+
                 $tpl->assign('users', secureDisplay($users_list));
                 $tpl->assign('invoices', secureDisplay($invoices_list));
+                $tpl->assign('paybacks', secureDisplay($paybacks));
 
                 // Cache the page (1 month to make it almost permanent and only regenerate it upon new invoice)
                 $tpl->cache('index', 108000, $current_user->getLogin());
