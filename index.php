@@ -569,9 +569,23 @@
                     $paybacks[$invoice->getId()] = $paybacks[$invoice->getId()]->load(array('invoice_id'=>$invoice->getId()), false, 'from_user');
                 }
 
+                $balances = array();
+                foreach($users_list as $user1) {
+                    foreach($users_list as $user2) {
+                        if($user1->getId() == $user2->getId()) {
+                            $balances[$user1->getId()][$user2->getId()] = 'X';
+                        }
+                        else {
+                            // TODO : Balances between users
+                            $balances[$user1->getId()][$user2->getId()] = '';
+                        }
+                    }
+                }
+
                 $tpl->assign('users', secureDisplay($users_list));
                 $tpl->assign('invoices', secureDisplay($invoices_list));
                 $tpl->assign('paybacks', secureDisplay($paybacks));
+                $tpl->assign('balances', secureDisplay($balances));
 
                 // Cache the page (1 month to make it almost permanent and only regenerate it upon new invoice)
                 $tpl->cache('index', 108000, $current_user->getLogin());

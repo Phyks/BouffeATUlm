@@ -85,6 +85,12 @@
             $this->users_in->set($users_in);
         }
 
+        // Get the amount to pay by person
+        // ===============================
+        public function getAmountPerPerson() {
+            return round($this->amount / count($this->users_in->get()), 2);
+        }
+
         // Maps htmlspecialchars on the class before display
         // =================================================
         public function secureDisplay() {

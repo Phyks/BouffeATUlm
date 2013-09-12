@@ -18,7 +18,7 @@
             <tr>
                 <th>{$value->getDisplayName()}</th>
                 {loop="users"}
-                    <td><a href="">{$value->getDisplayName()}</a></td>
+                    <td>{$balances[$value1->getId()][$value2->getId()]}</td>
                 {/loop}
             </tr>
         {/loop}
@@ -55,13 +55,12 @@
                                 {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                     <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Confirm payback">
                                 {/if}
-                                    Remains {$value1->getAmount()} {$currency}
+                                    Remains {$value1->getAmountPerPerson()} {$currency}
                                 {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                     </a>
                                 {/if}
                             {else}
-                                {* TODO : partial payback *}
-                                {if condition="$paybacks[$value1->getId()][$key2]->getAmount() == $value1->getAmount()"}
+                                {if condition="$paybacks[$value1->getId()][$key2]->getAmount() == $value1->getAmountPerPerson()"}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                         <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Delete payback">
                                     {/if}
@@ -73,7 +72,7 @@
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                         <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}" title="Confirm payback">
                                     {/if}
-                                        Remains {$value1->getAmount() - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
+                                        Remains {$value1->getAmountPerPerson() - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                         </a>
                                     {/if}

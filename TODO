@@ -2,12 +2,10 @@
 * JSON output => do index view
 * API
 * Reattribute all invoices / paybacks to unknown user when deleting a user ?
-* Check that all is ok when deleting an invoice
-* Use PHP constant in tpl instead of variables
 * User groups
 * cf TODO in files
 
 Manage paybacks :
 =================
-* TODO : Payback system (class should be ok)
+* TODO : Index balance table
 * TODO : Global payback
