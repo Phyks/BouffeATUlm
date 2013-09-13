@@ -27,40 +27,14 @@
             //Create table "Users"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
-            $count_users = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Users');
-            $count_users = $count_users->fetch();
-            if($count_users[0] > 0) {
-                $warning = 'Table '.$mysql_prefix.'Users already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
-            }
-
- 
             //Create table "Invoices"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, users_in VARCHAR(255), buyer INT(11), amount FLOAT, what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
-
-            $count_invoices = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Invoices');
-            $count_invoices = $count_users->fetch();
-            if($count_invoices[0] > 0) {
-                $warning .= 'Table '.$mysql_prefix.'Users already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
-            }
-
 
             //Create table "Users_in_invoices"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users_in_invoices (invoice_id INT(11) NOT NULL, KEY invoice_id (invoice_id), user_id INT(11), KEY user_id (user_id), guests INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
-            $count_users_in_invoices = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Users_in_invoices');
-            $count_users_in_invoices = $count_users_in_invoices->fetch();
-            if($count_users_in_invoices[0] > 0) {
-                $warning .= 'Table '.$mysql_prefix.'Users_in_invoices already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
-            }
-            
             //Create table "Paybacks"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Paybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, invoice_id INT(11), KEY invoice_id (invoice_id), amount FLOAT, from_user INT(11), to_user INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
-
-            $count_paybacks = $db->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = "'.$mysql_db.'" AND table_name = "'.$mysql_prefix.'"Paybacks');
-            $count_paybacks = $count_paybacks->fetch();
-            if($count_paybacks[0] > 0) {
-                $warning .= 'Table '.$mysql_prefix.'Paybacks already exists. Not doing anything on this table. Please check manually that this table is correct.<br/>';
-            }
         } catch (PDOException $e) {
             $error = 'Unable to connect to database and create database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
         }
@@ -107,13 +81,8 @@
                     $admin->setAdmin(true);
                     $admin->save();
 
-                    if(empty($warning)) {
-                        header('location: index.php');
-                        exit();
-                    }
-                    else {
-                        echo '<p>'.$warning.'<a href="index.php">Go to your instance.</a></p>';
-                    }
+                    header('location: index.php');
+                    exit();
                 } catch (Exception $e) {
                     $erreur = 'An error occurred when inserting user in the database.<br/> Error message : '.$e->getMessage().'.';
                 }
@@ -128,8 +97,8 @@
     <head>
         <meta charset="utf-8">
         <title>Bouffe@Ulm - Installation</title>
-        <link rel="stylesheet" media="screen" type="text/css" href="tpl/css/style.css" />
-        <script type="text/javascript" src="tpl/js/main.js"></script>
+        <link rel="stylesheet" media="screen" type="text/css" href="tpl/default_en/css/style.css" />
+        <script type="text/javascript" src="tpl/default_en/js/main.js"></script>
     </head>
     <body id="install">
         <h1 class="center">Bouffe@Ulm - Installation</h1>
@@ -148,7 +117,7 @@
                 <p><label for="mysql_host">MySQL host : </label><input type="text" name="mysql_host" id="mysql_host" value="<?php echo (!empty($_POST['mysql_host'])) ? htmlspecialchars($_POST['mysql_host']) : 'localhost';?>"/></p>
 
                 <p><label for="mysql_login">MySQL login : </label><input type="text" name="mysql_login" id="mysql_login" value="<?php echo (!empty($_POST['mysql_login'])) ? htmlspecialchars($_POST['mysql_login']) : '';?>"/></p>
-                <p><label for="mysql_password">MySQL password : </label><input type="password" name="mysql_password" id="mysql_password"/> <a href="" onclick="toggle_password('mysql_password'); return false;"><img src="tpl/img/toggleVisible.png" alt="Toggle visible"/></a></p>
+                <p><label for="mysql_password">MySQL password : </label><input type="password" name="mysql_password" id="mysql_password"/> <a href="" onclick="toggle_password('mysql_password'); return false;"><img src="tpl/default_en/img/toggleVisible.png" alt="Toggle visible"/></a></p>
                 <p>
                 <label for="mysql_db">Name of the MySQL database to use : </label><input type="text" name="mysql_db" id="mysql_db" value="<?php echo (!empty($_POST['mysql_db'])) ? htmlspecialchars($_POST['mysql_db']) : 'Bouffe@Ulm';?>"/><br/>
                     <em>Note :</em> You <em>must</em> create this database first.
@@ -175,7 +144,7 @@
                 <legend>Administrator</legend>
                 <p><label for="admin_login">Username of the admin : </label><input type="text" name="admin_login" id="admin_login" <?php echo (!empty($_POST['admin_login'])) ? 'value="'.htmlspecialchars($_POST['admin_login']).'"' : '';?>/></p>
                 <p><label for="admin_display_name">Displayed name for admin user : </label><input type="text" name="admin_display_name" id="admin_display_name" <?php echo (!empty($_POST['admin_display_name']) ? 'value="'.htmlspecialchars($_POST['admin_display_name']).'"' : '');?>/></p>
-                <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/> <a href="" onclick="toggle_password('admin_password'); return false;"><img src="tpl/img/toggleVisible.jpg" alt="Toggle visible"/></a></p>
+                <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/> <a href="" onclick="toggle_password('admin_password'); return false;"><img src="tpl/default_en/img/toggleVisible.png" alt="Toggle visible"/></a></p>
             </fieldset>
             <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" value="Install"><input type="hidden" name="token" value="<?php echo generate_token('install');?>"/></p>
         </form>
