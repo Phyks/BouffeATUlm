@@ -25,10 +25,10 @@
             $db = new PDO('mysql:host='.$mysql_host.';dbname='.$mysql_db, $mysql_login, $mysql_password);
 
             //Create table "Users"
-            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1), json_token VARCHAR(32)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             //Create table "Invoices"
-            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, users_in VARCHAR(255), buyer INT(11), amount FLOAT, what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, buyer INT(11), amount FLOAT, what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             //Create table "Users_in_invoices"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users_in_invoices (invoice_id INT(11) NOT NULL, KEY invoice_id (invoice_id), user_id INT(11), KEY user_id (user_id), guests INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
@@ -79,6 +79,7 @@
                     $admin->setDisplayName($_POST['admin_display_name']);
                     $admin->setPassword($admin->encrypt($_POST['admin_password']));
                     $admin->setAdmin(true);
+                    $admin->newJsonToken();
                     $admin->save();
 
                     header('location: index.php');
