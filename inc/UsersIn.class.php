@@ -43,6 +43,12 @@
             $this->users_list = $users_in;
         }
 
+        // Check if a user is in a specified invoice
+        // =========================================
+        public function inUsersIn($id) {
+            return in_array($id, array_keys($this->users_list));
+        }
+
         // Maps htmlspecialchars on the class before display
         // =================================================
         public function secureDisplay() {

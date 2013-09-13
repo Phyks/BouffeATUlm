@@ -575,9 +575,43 @@
                         if($user1->getId() == $user2->getId()) {
                             $balances[$user1->getId()][$user2->getId()] = 'X';
                         }
+                        if(!empty($balances[$user2->getId()][$user1->getId()])) {
+                            // If the opposed element in the matrix exists
+                            if(is_float($balances[$user2->getId()][$user1->getId()])) {
+                                if($balances[$user2->getId()][$user1->getId()] >= 0) {
+                                    $balances[$user1->getId()][$user2->getId()] = '-';
+                                }
+                                else {
+                                    $balances[$user1->getId()][$user2->getId()] = -$balances[$user2->getId()][$user1->getId()];
+                                    $balances[$user2->getId()][$user1->getId()] = '-';
+                                }
+                            }
+                        }
                         else {
-                            // TODO : Balances between users
-                            $balances[$user1->getId()][$user2->getId()] = '';
+                            // TODO : Optimize ?
+                            $balances[$user1->getId()][$user2->getId()] = 0;
+
+                            // First, get a list of all invoices paid by user2 and check if user1 was in
+                            $invoices_list_balances = new Invoice();
+                            $invoices_list_balances = $invoices_list_balances->load(array('buyer'=>$user2->getId()));
+                            if($invoices_list_balances !== false) {
+                                foreach($invoices_list_balances as $invoice) {
+                                    if($invoice->getUsersIn()->inUsersIn($user1->getId())) {
+                                        $balances[$user1->getId()][$user2->getId()] += $invoice->getAmountPerPerson();
+                                    }
+                                }
+                            }
+
+                            // Then search for all invoices paid by 1 and check if user2 was in 
+                            $invoices_list_balances = new Invoice();
+                            $invoices_list_balances = $invoices_list_balances->load(array('buyer'=>$user1->getId()));
+                            if($invoices_list_balances !== false) {
+                                foreach($invoices_list_balances as $invoice) {
+                                    if($invoice->getUsersIn()->inUsersIn($user2->getId())) {
+                                        $balances[$user1->getId()][$user2->getId()] -= $invoice->getAmountPerPerson();
+                                    }
+                                }
+                            }
                         }
                     }
                 }

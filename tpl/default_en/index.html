@@ -18,7 +18,12 @@
             <tr>
                 <th>{$value->getDisplayName()}</th>
                 {loop="users"}
-                    <td>{$balances[$value1->getId()][$value2->getId()]}</td>
+                    {if condition="$balances[$value1->getId()][$value2->getId()] == 'X'"}
+                        <td class="cell-disabled"></td>
+                    {else}
+
+                        <td>{$balances[$value1->getId()][$value2->getId()]}</td>
+                    {/if}
                 {/loop}
             </tr>
         {/loop}

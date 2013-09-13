@@ -163,7 +163,7 @@ class Storage {
         }
 
         $query->execute();
-        
+
         $results = $query->fetchAll();
 
         if(count($results) > 0) {
