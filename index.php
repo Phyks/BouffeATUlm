@@ -262,7 +262,7 @@
             $user->save();
             $_SESSION['current_user'] = $user->sessionStore();
 
-            header('location: index.php'.$get_redir);
+            header('location: index.php?do=password&'.$get_redir);
             exit();
             break;
 
@@ -271,6 +271,44 @@
                 $user = new User();
                 $user->setId($_GET['user_id']);
                 $user->delete();
+
+                // Update concerned invoices
+                $invoices = new Invoice();
+                $invoices = $invoices->load();
+                if($invoices !== FALSE) {
+                    foreach($invoices as $invoice) {
+                        if($invoice->getBuyer() == $_GET['user_id']) {
+                            $invoice->setBuyer(0);
+                            $invoice->save();
+                        }
+                        if($invoice->getUsersIn()->inUsersIn($_GET['user_id'])) {
+                            $users_in = $invoice->getUsersIn()->get();
+                            $users_in[0] = $users_in[$_GET['user_id']];
+                            unset($users_in[$_GET['user_id']]);
+
+                            $invoice->setUsersIn($users_in);
+                            $invoice->save();
+                        }
+                    }
+                }
+
+                // Update paybacks
+                $paybacks = new Payback();
+                $paybacks = $paybacks->load(array('from_user'=>(int) $_GET['user_id']));
+                if($paybacks !== FALSE) {
+                    foreach($paybacks as $payback) {
+                        $payback->setFrom(0);
+                        $payback->save();
+                    }
+                }
+                $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['user_id']));
+                if($paybacks !== FALSE) {
+                    foreach($paybacks as $payback) {
+                        $payback->setTo(0);
+                        $payback->save();
+                    }
+                }
+
 
                 // Clear the cache
                 array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
@@ -489,10 +527,16 @@
                             $payback = new Payback();
                         }
                     }
+                    else {
+                        $payback = $payback->load(array('invoice_id'=>(int) $_GET['invoice_id'], 'to_user'=>(int) $_GET['to'], 'from_user'=>(int) $_GET['from']), true);
+
+                        if($payback == false)
+                            $payback = new Payback();
+                    }
 
                     $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
                     $payback->setInvoice($_GET['invoice_id']);
-                    $payback->setAmount($invoice->getAmount());
+                    $payback->setAmount($invoice->getAmountPerPerson($_GET['from']));
                     $payback->setFrom($_GET['from']);
                     $payback->setTo($_GET['to']);
 
@@ -525,8 +569,10 @@
 
                     $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['to'], 'from_user'=> (int) $_GET['from'], 'invoice_id'=> (int) $_GET['invoice_id']));
 
-                    foreach($paybacks as $payback) {
-                        $payback->delete();
+                    if($paybacks == false) {
+                        foreach($paybacks as $payback) {
+                            $payback->delete();
+                        }
                     }
 
                     // Clear the cache
@@ -535,6 +581,7 @@
                         array_map("unlink", $tmp_files);
                     }
 
+                    exit();
                     header('location: index.php');
                     exit();
                 }
@@ -597,7 +644,7 @@
                             if($invoices_list_balances !== false) {
                                 foreach($invoices_list_balances as $invoice) {
                                     if($invoice->getUsersIn()->inUsersIn($user1->getId())) {
-                                        $balances[$user1->getId()][$user2->getId()] += $invoice->getAmountPerPerson();
+                                        $balances[$user1->getId()][$user2->getId()] += $invoice->getAmountPerPerson($user1->getId());
                                     }
                                 }
                             }
@@ -608,7 +655,7 @@
                             if($invoices_list_balances !== false) {
                                 foreach($invoices_list_balances as $invoice) {
                                     if($invoice->getUsersIn()->inUsersIn($user2->getId())) {
-                                        $balances[$user1->getId()][$user2->getId()] -= $invoice->getAmountPerPerson();
+                                        $balances[$user1->getId()][$user2->getId()] -= $invoice->getAmountPerPerson($user2->getId());
                                     }
                                 }
                             }

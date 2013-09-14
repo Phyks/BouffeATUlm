@@ -28,13 +28,13 @@
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1), json_token VARCHAR(32)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             //Create table "Invoices"
-            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, buyer INT(11), amount FLOAT, what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, buyer INT(11), amount INT(11), what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             //Create table "Users_in_invoices"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users_in_invoices (invoice_id INT(11) NOT NULL, KEY invoice_id (invoice_id), user_id INT(11), KEY user_id (user_id), guests INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             //Create table "Paybacks"
-            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Paybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, invoice_id INT(11), KEY invoice_id (invoice_id), amount FLOAT, from_user INT(11), to_user INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Paybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, invoice_id INT(11), KEY invoice_id (invoice_id), amount INT(11), from_user INT(11), to_user INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
         } catch (PDOException $e) {
             $error = 'Unable to connect to database and create database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
         }

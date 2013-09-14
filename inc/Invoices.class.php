@@ -13,7 +13,7 @@
             'id'=>'key',
             'date'=>'date',
             'buyer'=>'int',
-            'amount'=>'float',
+            'amount'=>'int',
             'what'=>'text'
             );
 
@@ -44,7 +44,7 @@
         }
 
         public function getAmount() {
-            return $this->amount;
+            return (float) $this->amount / 100; // Amount is stored in cents
         }
 
         public function getWhat() {
@@ -73,7 +73,7 @@
         }
 
         public function setAmount ($amount) {
-            $this->amount = (float) $amount;
+            $this->amount = (int) ($amount * 100); // Amount is stored in cents
         }
 
         public function setWhat($what) {
@@ -87,8 +87,12 @@
 
         // Get the amount to pay by person
         // ===============================
-        public function getAmountPerPerson() {
-            return round($this->amount / count($this->users_in->get()), 2);
+        public function getAmountPerPerson($id) {
+            $guests = $this->users_in->get();
+            $guests = $guests[(int) $id];
+
+            // Amount is stored in cents
+            return round($this->amount / 100 / (count($this->users_in->get()) + $guests), 2);
         }
 
         // Maps htmlspecialchars on the class before display
@@ -111,7 +115,7 @@
 
             $this->setId($data['id']);
             $this->setWhat($data['what']);
-            $this->setAmount($data['amount']);
+            $this->amount = (int) $data['amount'];
             $this->setBuyer($data['buyer']);
 
             $this->date = DateTime::createFromFormat('Y-m-d H:i:s', $data['date']);

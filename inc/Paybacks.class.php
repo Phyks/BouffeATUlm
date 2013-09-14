@@ -9,7 +9,7 @@
             'id'=>'key',
             'date'=>'date',
             'invoice_id'=>'int',
-            'amount'=>'float',
+            'amount'=>'int',
             'from_user'=>'int',
             'to_user'=>'int'
         );
@@ -37,7 +37,7 @@
         }
 
         public function getAmount() {
-            return (float) $this->amount;
+            return (float) $this->amount / 100; // Amount is stored in cents
         }
 
         public function getFrom() {
@@ -66,7 +66,7 @@
         }
 
         public function setAmount($amount) {
-            $this->amount = (float) $amount;
+            $this->amount = (int) ($amount * 100); // Amount is stored in cents
         }
 
         public function setFrom($from) {
@@ -86,7 +86,7 @@
 
             $this->setId($data['id']);
             $this->setInvoice($data['invoice_id']);
-            $this->setAmount($data['amount']);
+            $this->amount = (int) $data['amount'];
             $this->setFrom($data['from_user']);
             $this->setTo($data['to_user']);
 

@@ -58,7 +58,7 @@
 {elseif condition="$view == 'password'"}
 <h2>Edit your password</h2>
 <form method="post" action="index.php?do=password" id="edit_password_form">
-    <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/></p>
+    <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/> <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
     <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
     <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
