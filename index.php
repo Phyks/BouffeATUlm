@@ -495,6 +495,16 @@
                 if($current_user->getAdmin() || $invoice->getBuyer() == $current_user->getId()) {
                     $invoice->delete();
 
+                    // Delete related paybacks
+                    $paybacks = new Payback();
+                    $paybacks = $paybacks->load(array('invoice_id'=>(int) $_GET['id']));
+
+                    if($paybacks !== false) {
+                        foreach($paybacks as $payback) {
+                            $payback->delete();
+                        }
+                    }
+
                     // Clear the cache
                     array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
 
