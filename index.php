@@ -309,29 +309,29 @@
                             $config = file('data/config.php');
 
                             foreach($config as $line_number=>$line) {
-                                if(strpos($line, "MYSQL_HOST") !== FALSE)
+                                if(strpos(trim($line), "MYSQL_HOST") === 0)
                                     $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
-                                elseif(strpos($line, "MYSQL_LOGIN") !== FALSE)
+                                elseif(strpos(trim($line), "MYSQL_LOGIN") === 0)
                                     $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
-                                elseif(strpos($line, "MYSQL_PASSWORD") !== FALSE && !empty($_POST['mysql_password']))
+                                elseif(strpos(trim($line), "MYSQL_PASSWORD") === 0 && !empty($_POST['mysql_password']))
                                     $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
-                                elseif(strpos($line, "MYSQL_DB") !== FALSE)
+                                elseif(strpos(trim($line), "MYSQL_DB") === 0)
                                     $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
-                                elseif(strpos($line, "MYSQL_PREFIX") !== FALSE && !empty($_POST['mysql_prefix']))
+                                elseif(strpos(trim($line), "MYSQL_PREFIX") === 0 && !empty($_POST['mysql_prefix']))
                                     $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
-                                elseif(strpos($line, "INSTANCE_TITLE") !== FALSE)
+                                elseif(strpos(trim($line), "INSTANCE_TITLE") === 0)
                                     $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
-                                elseif(strpos($line, "BASE_URL") !== FALSE)
+                                elseif(strpos(trim($line), "BASE_URL") === 0)
                                     $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
-                                elseif(strpos($line, "CURRENCY") !== FALSE)
+                                elseif(strpos(trim($line), "CURRENCY") === 0)
                                     $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
-                                elseif(strpos($line, "EMAIL_WEBMASTER") !== FALSE)
+                                elseif(strpos(trim($line), "EMAIL_WEBMASTER") === 0)
                                     $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
-                                elseif(strpos($line, "TEMPLATE_DIR") !== FALSE)
+                                elseif(strpos(trim($line), "TEMPLATE_DIR") === 0)
                                     $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');\n";
-                                elseif(strpos($line, "LANG") !== FALSE)
+                                elseif(strpos(trim($line), "LANG") === 0)
                                     $config[$line_number] = "\tdefine('LANG', '".substr($_POST['template'], -2)."');\n";
-                                elseif(strpos($line_number, 'date_default_timezone_set') !== FALSE)
+                                elseif(strpos(trim($line), 'date_default_timezone_set') === 0)
                                     $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
                             }
 
