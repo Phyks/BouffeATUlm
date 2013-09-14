@@ -569,7 +569,7 @@
 
                     $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['to'], 'from_user'=> (int) $_GET['from'], 'invoice_id'=> (int) $_GET['invoice_id']));
 
-                    if($paybacks == false) {
+                    if($paybacks !== false) {
                         foreach($paybacks as $payback) {
                             $payback->delete();
                         }
@@ -581,7 +581,6 @@
                         array_map("unlink", $tmp_files);
                     }
 
-                    exit();
                     header('location: index.php');
                     exit();
                 }
