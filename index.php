@@ -278,16 +278,18 @@
                 if($invoices !== FALSE) {
                     foreach($invoices as $invoice) {
                         if($invoice->getBuyer() == $_GET['user_id']) {
-                            $invoice->setBuyer(0);
-                            $invoice->save();
+                            $invoice->delete();
                         }
                         if($invoice->getUsersIn()->inUsersIn($_GET['user_id'])) {
                             $users_in = $invoice->getUsersIn()->get();
-                            $users_in[0] = $users_in[$_GET['user_id']];
                             unset($users_in[$_GET['user_id']]);
 
-                            $invoice->setUsersIn($users_in);
-                            $invoice->save();
+                            if(empty($users_in))
+                                $invoice->delete();
+                            else {
+                                $invoice->setUsersIn($users_in);
+                                $invoice->save();
+                            }
                         }
                     }
                 }
@@ -297,15 +299,14 @@
                 $paybacks = $paybacks->load(array('from_user'=>(int) $_GET['user_id']));
                 if($paybacks !== FALSE) {
                     foreach($paybacks as $payback) {
-                        $payback->setFrom(0);
-                        $payback->save();
+                        $payback->delete();
                     }
                 }
+                $paybacks = new Payback();
                 $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['user_id']));
                 if($paybacks !== FALSE) {
                     foreach($paybacks as $payback) {
-                        $payback->setTo(0);
-                        $payback->save();
+                        $payback->delete();
                     }
                 }
 
