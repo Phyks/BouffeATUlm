@@ -671,6 +671,11 @@
                                 foreach($invoices_list_balances as $invoice) {
                                     if($invoice->getUsersIn()->inUsersIn($user1->getId())) {
                                         $balances[$user1->getId()][$user2->getId()] += $invoice->getAmountPerPerson($user1->getId());
+
+                                        $payback_balance = new Payback();
+                                        $payback_balance = $payback_balance->load(array('invoice_id'=>$invoice->getId(), 'from_user'=>$user1->getId(), 'to_user'=>$user2->getId()), true);
+                                        if($payback_balance !== false)
+                                            $balances[$user1->getId()][$user2->getId()] -= $payback_balance->getAmount();
                                     }
                                 }
                             }
@@ -682,8 +687,18 @@
                                 foreach($invoices_list_balances as $invoice) {
                                     if($invoice->getUsersIn()->inUsersIn($user2->getId())) {
                                         $balances[$user1->getId()][$user2->getId()] -= $invoice->getAmountPerPerson($user2->getId());
+
+                                        $payback_balance = new Payback();
+                                        $payback_balance = $payback_balance->load(array('invoice_id'=>$invoice->getId(), 'from_user'=>$user2->getId(), 'to_user'=>$user1->getId()), true);
+                                        if($payback_balance !== false)
+                                            $balances[$user1->getId()][$user2->getId()] += $payback_balance->getAmount();
                                     }
                                 }
+                            }
+
+                            if($balances[$user1->getId()][$user2->getId()] == 0) {
+                                $balances[$user1->getId()][$user2->getId()] = '-';
+                                $balances[$user2->getId()][$user1->getId()] = '-';
                             }
                         }
                     }
