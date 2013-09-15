@@ -124,18 +124,22 @@ class Storage {
                     $value = array($value);
                 }
 
-                foreach($value as $value_array) {
+                foreach($value as $key=>$value_array) {
                     if($value_array == 'AND' || $value_array == 'OR') {
                         $query .= ' '.$value_array.' ';
                         continue;
                     }
 
-                    if(substr($value_array, 0, 1) == "<")
-                        $query .= $field.'<:'.$field;
+                    if(substr($value_array, 0, 2) == "<=")
+                        $query .= $field.'<=:'.$field.$key;
+                    elseif(substr($value_array, 0, 1) == "<")
+                        $query .= $field.'<:'.$field.$key;
+                    elseif(substr($value_array, 0, 2) == ">=")
+                        $query .= $field.'>=:'.$field.$key;
                     elseif(substr($value_array, 0, 1) == ">")
-                        $query .= $field.'>:'.$field;
+                        $query .= $field.'>:'.$field.$key;
                     else
-                        $query .= $field.'=:'.$field;
+                        $query .= $field.'=:'.$field.$key;
                 }
             }
         }
@@ -150,14 +154,16 @@ class Storage {
                 if($fields[$field] == 'date')
                     $value = $value->format('Y-m-d H:i:s');
 
-                foreach($value as $value_array) {
+                foreach($value as $key=>$value_array) {
                     if($value_array == 'AND' || $value_array == 'OR')
                         continue;
 
-                    if(substr($value_array, 0, 1) == ">" || substr($value_array, 0, 1) == "<")
-                        $query->bindValue(':'.$field, substr($value_array, 0, 1));
-                    else
-                        $query->bindValue(':'.$field, $value_array);
+                    if(substr($value_array, 0, 2) == ">=" || substr($value_array, 0, 2) == "<=")
+                        $value_array = substr($value_array, 2);
+                    elseif(substr($value_array, 0, 1) == ">" || substr($value_array, 0, 1) == "<")
+                        $value_array = substr($value_array, 1);
+                    
+                    $query->bindValue(':'.$field.$key, $value_array);
                 }
             }
         }

@@ -29,7 +29,13 @@
     </table>
 </div>
 <div id="detailed_summary">
-    <h2>Detailed list of bills for last month</h2>
+    <h2>Detailed list of bills{if condition="$all == 0"} for last month{/if}</h2>
+
+    {if condition="$all == 0"}
+        <p class="center"><a href="?all=1">Display all bills</a></p>
+    {else}
+        <p class="center"><a href="?all=0">Only display bills for last month</a></p>
+    {/if}
 
     {if condition="$invoices !== false && count($invoices)>=1"}
         <table id="list_expenses">

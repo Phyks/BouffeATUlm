@@ -606,8 +606,11 @@
 
 
         default:
+            if(empty($_GET['all']))
+                $_GET['all'] = 0;
+
             // Display cached page in priority
-            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin())) {
+            if($cache = $tpl->cache('index', $expire_time = 600, $cache_id = $current_user->getLogin().$_GET['all'])) {
                 echo $cache;
             }
             else {
@@ -615,7 +618,14 @@
                 $users_list = $users_list->load();
 
                 $invoices_list = new Invoice();
-                $invoices_list = $invoices_list->load();
+                if(empty($_GET['all'])) {
+                    $invoices_list = $invoices_list->load(array('date'=>array('>='.date('Y-m').'-01 00:00:00', 'AND', '<='.date('Y-m').'-31 23:59:59')));
+                    $tpl->assign('all', 0);
+                }
+                else {
+                    $invoices_list = $invoices_list->load();
+                    $tpl->assign('all', 1);
+                }
 
                 if($invoices_list === false) $invoices_list = array();
 
@@ -678,7 +688,7 @@
                 $tpl->assign('balances', secureDisplay($balances));
 
                 // Cache the page (1 month to make it almost permanent and only regenerate it upon new invoice)
-                $tpl->cache('index', 108000, $current_user->getLogin());
+                $tpl->cache('index', 108000, $current_user->getLogin().$_GET['all']);
 
                 $tpl->draw('index');
                 break;

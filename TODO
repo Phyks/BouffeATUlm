@@ -2,11 +2,14 @@
 * JSON output => do index view
 * API
 * Reattribute all invoices / paybacks to unknown user when deleting a user ?
-* User groups
 * cf TODO in files
 * French template
 * Favicon
-* Dépenses du dernier mois
+
+Improvements :
+==============
+* User groups
+* Search invoice
 
 Manage paybacks :
 =================
