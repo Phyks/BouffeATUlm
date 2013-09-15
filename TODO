@@ -1,14 +1,19 @@
-* Don't cache the username
-* JSON output => do index view
-* API
-* cf TODO in files
-* French template
-* Favicon
+Issues :
+========
+None
+
+To fix :
+========
+* Best way to not cache the username on index page
 
 Improvements :
 ==============
+* French template
 * User groups
 * Search invoice
+* JSON output => do index view
+* API
+* cf TODO in files
 
 Manage paybacks :
 =================
