@@ -20,8 +20,10 @@
                 {loop="users"}
                     {if condition="$balances[$value1->getId()][$value2->getId()] === 'X'"}
                     <td class="cell-disabled"></td>
-                    {else}
+                    {elseif condition="$balances[$value1->getId()][$value2->getId()] === '-' || ($value2->getId() != $current_user->getId() && !$current_user->getAdmin())"}
                         <td>{$balances[$value1->getId()][$value2->getId()]}</td>
+                    {else}
+                        <td><a href="?do=payall&amp;from={$value1->getId()}&amp;to={$value2->getId()}">{$balances[$value1->getId()][$value2->getId()]}</a></td>
                     {/if}
                 {/loop}
             </tr>

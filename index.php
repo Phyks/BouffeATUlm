@@ -602,14 +602,81 @@
                     exit();
                 }
                 else {
-                    $tpl->assign('error', $errors['unauthorized']);
-                    $tpl->draw('index');
+                    header('location: index.php');
+                    exit();
                 }
             }
             else {
                 header('location: index.php');
                 exit();
             }
+            break;
+
+        case 'payall':
+            if(!empty($_GET['from']) && !empty($_GET['to'])) {
+                if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
+                    // Confirm all paybacks when to is buyer
+                    $invoices = new Invoice();
+                    $invoices = $invoices->load(array('buyer'=>(int) $_GET['to']));
+
+                    if($invoices !== false) {
+                        foreach($invoices as $invoice) {
+                            $paybacks = new Payback();
+                            $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>(int) $_GET['to'], 'from_user'=>(int) $_GET['from']));
+
+                            if($paybacks === false) {
+                                $payback = new Payback();
+                                $payback->setTo($_GET['to']);
+                                $payback->setFrom($_GET['from']);
+                                $payback->setAmount($invoice->getAmountPerPerson($_GET['from']));
+                                $payback->setInvoice($invoice->getId());
+                                $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                $payback->save();
+                            }
+                        }
+                    }
+
+                    // Confirm all paybacks when from is buyer
+                    $invoices = new Invoice();
+                    $invoices = $invoices->load(array('buyer'=>(int) $_GET['from']));
+
+                    if($invoices !== false) {
+                        foreach($invoices as $invoice) {
+                            $paybacks = new Payback();
+                            $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>(int) $_GET['from'], 'from_user'=>(int) $_GET['to']));
+
+                            if($paybacks === false) {
+                                $payback = new Payback();
+                                $payback->setTo($_GET['from']);
+                                $payback->setFrom($_GET['to']);
+                                $payback->setAmount($invoice->getAmountPerPerson($_GET['to']));
+                                $payback->setInvoice($invoice->getId());
+                                $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                $payback->save();
+                            }
+                        }
+                    }
+
+                    // Clear the cache
+                    $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
+                    if(is_array($tmp_files)) {
+                        array_map("unlink", $tmp_files);
+                    }
+
+                    header('location: index.php');
+                    exit();
+                }
+                else {
+                    header('location: index.php');
+                    exit();
+                }
+
+            }
+            else {
+                header('location: index.php');
+                exit();
+            }
+            break;
 
 
         default:
