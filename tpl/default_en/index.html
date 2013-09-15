@@ -60,31 +60,33 @@
                             {elseif condition="$value2 == 1"}
                                 ({$value2} guest)
                             {/if}
-                            - 
-                            {if condition="$paybacks[$value1->getId()] === false || !in_array($key2, array_keys($paybacks[$value1->getId()]))"}
-                                {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                    <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Confirm payback">
-                                {/if}
-                                    Remains {$value1->getAmountPerPerson($key2)} {$currency}
-                                {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                    </a>
-                                {/if}
-                            {else}
-                                {if condition="$paybacks[$value1->getId()][$key2]->getAmount() == $value1->getAmountPerPerson($key2)"}
+                            {if condition="$value1->getBuyer() != $key2"}
+                                - 
+                                {if condition="$paybacks[$value1->getId()] === false || !in_array($key2, array_keys($paybacks[$value1->getId()]))"}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                        <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Delete payback">
+                                        <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Confirm payback">
                                     {/if}
-                                        Paid
+                                        Remains {$value1->getAmountPerPerson($key2)} {$currency}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                         </a>
-                                    {/if}   
+                                    {/if}
                                 {else}
-                                    {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                        <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}" title="Confirm payback">
-                                    {/if}
-                                        Remains {$value1->getAmountPerPerson($key2) - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
-                                    {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                        </a>
+                                    {if condition="$paybacks[$value1->getId()][$key2]->getAmount() == $value1->getAmountPerPerson($key2)"}
+                                        {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
+                                            <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Delete payback">
+                                        {/if}
+                                            Paid
+                                        {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
+                                            </a>
+                                        {/if}   
+                                    {else}
+                                        {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
+                                            <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}" title="Confirm payback">
+                                        {/if}
+                                            Remains {$value1->getAmountPerPerson($key2) - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
+                                        {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
+                                            </a>
+                                        {/if}
                                     {/if}
                                 {/if}
                             {/if}

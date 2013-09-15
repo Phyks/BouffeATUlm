@@ -1,7 +1,6 @@
 * Don't cache the username
 * JSON output => do index view
 * API
-* Reattribute all invoices / paybacks to unknown user when deleting a user ?
 * cf TODO in files
 * French template
 * Favicon

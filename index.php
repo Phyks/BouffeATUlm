@@ -9,7 +9,8 @@
         'unable_write_config'=>array('fr'=>'Impossible d\'écrire le fichier data/config.php. Vérifiez les permissions.', 'en'=>'Unable to write data/config.php file. Check permissions.'),
         'negative_amount'=>array('fr'=>'Montant négatif non autorisé.', 'en'=>'Negative amount not allowed.'),
         'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.'),
-        'unauthorized'=>array('fr'=>'Vous n\'avez pas le droit de faire cette action.', 'en'=>'You are not authorized to do that.')
+        'unauthorized'=>array('fr'=>'Vous n\'avez pas le droit de faire cette action.', 'en'=>'You are not authorized to do that.'),
+        'no_users'=>array('fr'=>'Vous devez ajouter au moins un autre utilisateur.', 'en'=>'You must add at least one more user beside you.')
     );
 
     $localized = array(
@@ -284,7 +285,7 @@
                             $users_in = $invoice->getUsersIn()->get();
                             unset($users_in[$_GET['user_id']]);
 
-                            if(empty($users_in))
+                            if(empty($users_in) || array_keys($users_in) == array($invoice->getBuyer()))
                                 $invoice->delete();
                             else {
                                 $invoice->setUsersIn($users_in);
@@ -438,29 +439,34 @@
                         $tpl->assign('error', $errors['negative_amount'][LANG]);
                     }
                     else {
-                        $invoice = new Invoice();
-
-                        if(!empty($_POST['id']))
-                            $invoice->setId($_POST['id']);
-
-                        $invoice->setWhat($_POST['what']);
-                        $invoice->setAmount($_POST['amount']);
-                        $invoice->setBuyer($current_user->getId());
-                        $invoice->setDate(0, int2ampm($_POST['date_hour']), $_POST['date_day'], $_POST['date_month'], $_POST['date_year']);
-
-                        
-                        $invoice->setUsersIn($users_in);
-
-                        $invoice->save();
-
-                        // Clear the cache
-                        $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
-                        if(is_array($tmp_files)) {
-                            array_map("unlink", $tmp_files);
+                        if(array_keys($users_in) == array($current_user->getId())) {
+                            $tpl->assign('error', $errors['no_users'][LANG]);
                         }
+                        else {
+                            $invoice = new Invoice();
 
-                        header('location: index.php?'.$get_redir);
-                        exit();
+                            if(!empty($_POST['id']))
+                                $invoice->setId($_POST['id']);
+
+                            $invoice->setWhat($_POST['what']);
+                            $invoice->setAmount($_POST['amount']);
+                            $invoice->setBuyer($current_user->getId());
+                            $invoice->setDate(0, int2ampm($_POST['date_hour']), $_POST['date_day'], $_POST['date_month'], $_POST['date_year']);
+
+                            
+                            $invoice->setUsersIn($users_in);
+
+                            $invoice->save();
+
+                            // Clear the cache
+                            $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
+                            if(is_array($tmp_files)) {
+                                array_map("unlink", $tmp_files);
+                            }
+
+                            header('location: index.php?'.$get_redir);
+                            exit();
+                        }
                     }
                 }
                 else {
@@ -524,7 +530,7 @@
             break;
 
         case 'confirm_payback':
-            if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['invoice_id'])) {
+            if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['invoice_id']) && $_GET['from'] != $_GET['to']) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
                     $invoice = new Invoice();
                     $invoice = $invoice->load(array('id'=>(int) $_GET['invoice_id']), true);
