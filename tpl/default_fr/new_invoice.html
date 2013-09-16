@@ -1,16 +1,16 @@
 {include="header"}
 
-<h2>{if condition="$id != 0"}Edit{else}Add{/if} a bill</h2>
+<h2>{if condition="$id != 0"}Modifier{else}Ajouter{/if} une dépense</h2>
 
 <form method="post" action="index.php?do=new_invoice" id="invoice_form">
     <fieldset>
-        <legend>Expense</legend>
+        <legend>Dépense</legend>
         <p>
-            <label for="what">What ? </label>
+            <label for="what">Quoi ? </label>
         </p>
         <textarea name="what" id="what" rows="10">{$what_post}</textarea>
         <p>
-            <label for="amount">Amount : </label>
+            <label for="amount">Montant : </label>
             <input type="text" name="amount" id="amount" {if condition="$amount_post != 0"} value="{$amount_post}" {/if} size="5"/> {$currency}
         </p>
         <p>
@@ -37,13 +37,13 @@
         </p>
     </fieldset>
     <fieldset>
-        <legend>Users in ?</legend>
+        <legend>Participants ?</legend>
         {loop="users"}
-        <input type="checkbox" name="users_in[]" value="{$value->getId()}" id="users_in_{$value->getId()}" {if condition="($current_user->getId() == $value->getId() && empty($users_in)) || in_array($value->getId(), array_keys($users_in))"} checked {/if}/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> and <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" {if condition="in_array($value->getId(), array_keys($users_in))"} value="{$users_in[$value->getId()]}" {else} value="0" {/if} onkeyup="guest_user_label({$value->getId()});"/><label for="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}_label"> guest</label>.<br/>
+        <input type="checkbox" name="users_in[]" value="{$value->getId()}" id="users_in_{$value->getId()}" {if condition="($current_user->getId() == $value->getId() && empty($users_in)) || in_array($value->getId(), array_keys($users_in))"} checked {/if}/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> et <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" {if condition="in_array($value->getId(), array_keys($users_in))"} value="{$users_in[$value->getId()]}" {else} value="0" {/if} onkeyup="guest_user_label({$value->getId()});"/><label for="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}_label"> invité</label>.<br/>
         {/loop}
     </fieldset>
     <p class="center">
-        <input type="submit" value="{if condition='$id != 0'}Edit{else}Add{/if}"/>
+        <input type="submit" value="{if condition='$id != 0'}Modifier{else}Ajouter{/id}"/>
         {if condition="$id != 0"}<input type="hidden" name="id" value="{$id}"/>{/if}
         <input type="hidden" name="token" value="{$token}"/>
     </p>

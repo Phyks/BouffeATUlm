@@ -4,16 +4,16 @@ None
 
 To fix :
 ========
-* Best way to not cache the username on index page
+* Better way to not cache the username on index page
 
 Improvements :
 ==============
-* French template
 * User groups
 * Search invoice
 * JSON output => do index view
 * API
 * cf TODO in files
+* README file
 
 Manage paybacks :
 =================

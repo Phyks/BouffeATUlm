@@ -64,6 +64,7 @@
         }
 
         public function setAmount($amount) {
+            $amount = str_replace(',', '.', $amount);
             $this->amount = (int) ($amount * 100); // Amount is stored in cents
         }
 

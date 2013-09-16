@@ -5,11 +5,11 @@
 {/if}
 
 <div id="quick_summary">
-    <h2>Balance</h2>
-    <p class="center">Read <em>line</em> owes <em>case</em> {$currency} to <em>column</em>. You can click on links to confirm the payback.
+    <h2>Bilan</h2>
+    <p class="center">Lire <em>ligne</em> doit <em>case</em> {$currency} à <em>colonne</em>. Vous pouvez cliquer sur les liens pour confirmer les remboursements.
     <table id="balance_table"> 
         <tr>
-            <th>Owes\To</th>
+            <th>Doit\À</th>
             {loop="users"}
             <th>{$value->getDisplayName()}</th>
             {/loop}
@@ -31,24 +31,24 @@
     </table>
 </div>
 <div id="detailed_summary">
-    <h2>Detailed list of bills{if condition="$all == 0"} for last month{/if}</h2>
+    <h2>Liste détaillée des dépenses{if condition="$all == 0"} du dernier mois{/if}</h2>
 
     {if condition="$all == 0"}
-        <p class="center"><a href="?all=1">Display all bills</a></p>
+        <p class="center"><a href="?all=1">Afficher toutes les dépenses</a></p>
     {else}
-        <p class="center"><a href="?all=0">Only display bills for last month</a></p>
+        <p class="center"><a href="?all=0">Afficher uniquement les dépenses du dernier mois</a></p>
     {/if}
 
     {if condition="$invoices !== false && count($invoices)>=1"}
         <table id="list_expenses">
             <tr>
                 <th>Date</th>
-                <th>Paid by</th>
-                <th>Users in</th>
-                <th>Amount</th>
-                <th>What ?</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th>Payé par</th>
+                <th>Participants</th>
+                <th>Montant</th>
+                <th>Quoi ?</th>
+                <th>Modifier</th>
+                <th>Supprimer</th>
             </tr>
             {loop="invoices"}
                 <tr>
@@ -66,26 +66,26 @@
                                 - 
                                 {if condition="$paybacks[$value1->getId()] === false || !in_array($key2, array_keys($paybacks[$value1->getId()]))"}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                        <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Confirm payback">
+                                        <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Confirmer le remboursement">
                                     {/if}
-                                        Remains {$value1->getAmountPerPerson($key2)} {$currency}
+                                        Reste {$value1->getAmountPerPerson($key2)} {$currency}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                         </a>
                                     {/if}
                                 {else}
                                     {if condition="$paybacks[$value1->getId()][$key2]->getAmount() == $value1->getAmountPerPerson($key2)"}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                            <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Delete payback">
+                                            <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Supprimer le remboursement">
                                         {/if}
-                                            Paid
+                                            Payé
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                             </a>
                                         {/if}   
                                     {else}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                            <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}" title="Confirm payback">
+                                            <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}" title="Confirmer le remboursement">
                                         {/if}
-                                            Remains {$value1->getAmountPerPerson($key2) - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
+                                            Reste {$value1->getAmountPerPerson($key2) - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                             </a>
                                         {/if}
@@ -99,14 +99,14 @@
                     <td>{$value->getWhat()}</td>
                     <td>
                         {if condition="$value->getBuyer() == $current_user->getId() || $current_user->getAdmin()"}
-                            <a href="index.php?do=edit_invoice&id={$value->getId()}">Edit</a>
+                            <a href="index.php?do=edit_invoice&id={$value->getId()}">Modifier</a>
                         {else}
-                            -
+                        -
                         {/if}
                     </td>
                     <td>
                         {if condition="$value->getBuyer() == $current_user->getId() || $current_user->getAdmin()"}
-                            <a href="index.php?do=delete_invoice&id={$value->getId()}">Delete</a>
+                            <a href="index.php?do=delete_invoice&id={$value->getId()}">Supprimer</a>
                         {else}
                             -
                         {/if}
@@ -115,7 +115,7 @@
             {/loop}
         </table>
     {else}
-        <p class="center">No bills added.</p>
+        <p class="center">Aucune dépense à afficher.</p>
     {/if}
 </div>
 {include="footer"}
