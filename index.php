@@ -211,7 +211,8 @@
                         $user->save();
 
                         // Clear the cache
-                        array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                        array_map("unlink", $cached_files);
 
                         header('location: index.php?do=edit_users&'.$get_redir);
                         exit();
@@ -313,7 +314,8 @@
 
 
                 // Clear the cache
-                array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+                ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                array_map("unlink", $cached_files);
 
                 header('location: index.php?do=edit_users&'.$get_redir);
                 exit();
@@ -325,7 +327,8 @@
                 setNotice($_POST['notice']);
 
                 // Clear the cache
-                array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+                ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                array_map("unlink", $cached_files);
     
                 header('location: index.php?'.$get_redir);
                 exit();
@@ -349,35 +352,36 @@
                             $config = file('data/config.php');
 
                             foreach($config as $line_number=>$line) {
-                                if(strpos(trim($line), "MYSQL_HOST") === 0)
+                                if(strpos(trim($line), "MYSQL_HOST") !== false)
                                     $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
-                                elseif(strpos(trim($line), "MYSQL_LOGIN") === 0)
+                                elseif(strpos(trim($line), "MYSQL_LOGIN") !== false)
                                     $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
-                                elseif(strpos(trim($line), "MYSQL_PASSWORD") === 0 && !empty($_POST['mysql_password']))
+                                elseif(strpos(trim($line), "MYSQL_PASSWORD") !== false && !empty($_POST['mysql_password']))
                                     $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
-                                elseif(strpos(trim($line), "MYSQL_DB") === 0)
+                                elseif(strpos(trim($line), "MYSQL_DB") !== false)
                                     $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
-                                elseif(strpos(trim($line), "MYSQL_PREFIX") === 0 && !empty($_POST['mysql_prefix']))
+                                elseif(strpos(trim($line), "MYSQL_PREFIX") !== false && !empty($_POST['mysql_prefix']))
                                     $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
-                                elseif(strpos(trim($line), "INSTANCE_TITLE") === 0)
+                                elseif(strpos(trim($line), "INSTANCE_TITLE") !== false)
                                     $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
-                                elseif(strpos(trim($line), "BASE_URL") === 0)
+                                elseif(strpos(trim($line), "BASE_URL") !== false)
                                     $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
-                                elseif(strpos(trim($line), "CURRENCY") === 0)
+                                elseif(strpos(trim($line), "CURRENCY") !== false)
                                     $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
-                                elseif(strpos(trim($line), "EMAIL_WEBMASTER") === 0)
+                                elseif(strpos(trim($line), "EMAIL_WEBMASTER") !== false)
                                     $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
-                                elseif(strpos(trim($line), "TEMPLATE_DIR") === 0)
+                                elseif(strpos(trim($line), "TEMPLATE_DIR") !== false)
                                     $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');\n";
-                                elseif(strpos(trim($line), "LANG") === 0)
+                                elseif(strpos(trim($line), "LANG") !== false)
                                     $config[$line_number] = "\tdefine('LANG', '".substr($_POST['template'], -2)."');\n";
-                                elseif(strpos(trim($line), 'date_default_timezone_set') === 0)
+                                elseif(strpos(trim($line), 'date_default_timezone_set') !== false)
                                     $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
                             }
 
                             if(file_put_contents("data/config.php", $config)) {
                                 // Clear the cache
-                                array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+                                ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                                array_map("unlink", $cached_files);
 
                                 header('location: index.php?'.$get_redir);
                                 exit();
@@ -459,10 +463,8 @@
                             $invoice->save();
 
                             // Clear the cache
-                            $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
-                            if(is_array($tmp_files)) {
-                                array_map("unlink", $tmp_files);
-                            }
+                            ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                            array_map("unlink", $cached_files);
 
                             header('location: index.php?'.$get_redir);
                             exit();
@@ -513,7 +515,8 @@
                     }
 
                     // Clear the cache
-                    array_map("unlink", glob(raintpl::$cache_dir."*.rtpl.php"));
+                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                    array_map("unlink", $cached_files);
 
                     header('location: index.php?'.$get_redir);
                     exit();
@@ -560,10 +563,8 @@
                     $payback->save();
                     
                     // Clear the cache
-                    $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
-                    if(is_array($tmp_files)) {
-                        array_map("unlink", $tmp_files);
-                    }
+                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                    array_map("unlink", $cached_files);
 
                     header('location: index.php');
                     exit();
@@ -593,10 +594,8 @@
                     }
 
                     // Clear the cache
-                    $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
-                    if(is_array($tmp_files)) {
-                        array_map("unlink", $tmp_files);
-                    }
+                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                    array_map("unlink", $cached_files);
 
                     header('location: index.php');
                     exit();
@@ -658,10 +657,8 @@
                     }
 
                     // Clear the cache
-                    $tmp_files = glob(raintpl::$cache_dir."*.rtpl.php");
-                    if(is_array($tmp_files)) {
-                        array_map("unlink", $tmp_files);
-                    }
+                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                    array_map("unlink", $cached_files);
 
                     header('location: index.php');
                     exit();
