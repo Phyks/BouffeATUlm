@@ -51,7 +51,7 @@
             <label for="template">Template : </label>
             <select name="template" id="template">
                 {loop="templates"}
-                <option value="{$value['value']}" {if condition="$value == $current_template"} selected="selected" {/if}>{$value['option']}</option>
+                <option value="{$value['value']}" {if condition="$value['value'] == $current_template"} selected="selected" {/if}>{$value['option']}</option>
                 {/loop}
             </select
         </p>
