@@ -43,7 +43,7 @@
         {/loop}
     </fieldset>
     <p class="center">
-        <input type="submit" value="{if condition='$id != 0'}Modifier{else}Ajouter{/id}"/>
+        <input type="submit" value="{if condition="$id != 0"}Modifier{else}Ajouter{/if}"/>
         {if condition="$id != 0"}<input type="hidden" name="id" value="{$id}"/>{/if}
         <input type="hidden" name="token" value="{$token}"/>
     </p>
