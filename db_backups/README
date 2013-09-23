@@ -1,0 +1,1 @@
+This directory will contain the backups of your database, stored before each global payback. Make sure it is readable *AND* writable by the script.

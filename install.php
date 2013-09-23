@@ -9,7 +9,11 @@
     }
 
     if(!is_writable('data/')) {
-        $error = "The script seems to be unable to write to <em>data/</em> folder (to write the <em>data/config.php</em> configuration file). You should give write access during install and disable them after (chmod 777 -R data/ to install and chmod 755 -R data/ after installation for example).";
+        $error = "The script seems to be unable to write to <em>data/</em> folder (to write the <em>data/config.php</em> configuration file). You should give write access during install and disable them after (chmod 777 -R data/ to install and chmod 755 -R data/ after installation for example). You'll need right access on this folder each time you will want to edit settings.";
+        $block_form = true;
+    }
+    if(!is_writable('db_backups/')) {
+        $error = "The script seems to be unable to write to <em>db_backups/</em> folder (to write the database backups). You should give write access.";
         $block_form = true;
     }
 

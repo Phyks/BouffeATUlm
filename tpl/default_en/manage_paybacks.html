@@ -1,0 +1,43 @@
+{include="header"}
+
+{if condition="!empty($list)"}
+    <h2>Manage global paybacks</h2>
+        <p class="center"><a href="?do=manage_paybacks&new=1">Add a new global payback</a></p>
+
+        {if condition="count($global_paybacks) > 0"}
+            <p>List of previous global paybacks :</p>
+            <dl>
+                {loop="$global_paybacks"}
+                    <dt>{$value['date']}</dt>
+                    <dd><a href="?do=see_paybacks&id={$value['id']}">Payback n°{$value['id']}</a></dd>
+                {/loop}
+            </dl>
+        {/if}
+{else}
+    <h2>Add a global paybck</h2>
+    <p>You can add a global payback using this page. Such a payback aims at minimizing as much as possible the number of individual paybacks between users. So, the index page table will be resetted and a new table will be created. This new table will be available in the "see global paybacks" page and will contain as least exchange as possible.</p>
+
+    <p>For eample, if a user A owes 5{$currency} to a user B and if B owes 5{$currency} to C, after the global paybacks, these paybacks will simplify and A will owe  5{$currency} to C only.</p>
+
+    <p><strong>Note : <span class="red">It's not possible to revert this operation, unless you handle the restoration of data in your database manually. Be sure you want to launch this procedure before clicking on the button below.</span></strong></p>
+
+    <p><strong>Note :</strong> A backup of your database right now will be made and stored in the db_backup folder at the root of your instance. You'll be able to restore the current status of your database in case of error from your part.</p>
+
+    <hr/>
+
+    <p>If you confirm the creation of a global payback, please select right below the users you want to include in the payback.</p>
+
+    <form method="post" action="?do=manage_paybacks&new=1" id="global_payback_form">
+        <fieldset>
+            <legend>Users to include</legend>
+            {loop="$users"}
+                <input type="checkbox" id="users_in_{$value->getId()}" name="users_in[]" value="{$value->getId()}"/>
+                <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label><br/>
+            {/loop}
+    </fieldset>
+    <p>
+        <input type="submit" onclick="confirm('You are going to add a global payback which includes the selected user. Confirm ?');" value="Confirm"/>
+    </p>
+    </form>
+{/if}
+{include="footer"}
