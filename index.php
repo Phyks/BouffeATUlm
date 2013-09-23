@@ -686,8 +686,8 @@
                     $global_payback = new GlobalPayback();
 
                     // Backup database
-                    if(!is_dir('db_backup')) {
-                        mkdir('db_backup');
+                    if(!is_dir('db_backups')) {
+                        mkdir('db_backups');
                     }
                     system("mysqldump -h ".MYSQL_HOST." -u ".MYSQL_LOGIN." -p ".MYSQL_PASSWORD." ".MYSQL_DB." > db_backup/".date('d-m-Y_H:i'));
 
