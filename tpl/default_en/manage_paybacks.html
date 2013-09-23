@@ -4,12 +4,12 @@
     <h2>Manage global paybacks</h2>
         <p class="center"><a href="?do=manage_paybacks&new=1">Add a new global payback</a></p>
 
-        {if condition="count($global_paybacks) > 0"}
+        {if condition="$global_paybacks !== FALSE"}
             <p>List of previous global paybacks :</p>
             <dl>
                 {loop="$global_paybacks"}
-                    <dt>{$value['date']}</dt>
-                    <dd><a href="?do=see_paybacks&id={$value['id']}">Payback n°{$value['id']}</a></dd>
+                    <dt>{$value->getDate()}</dt>
+                    <dd><a href="?do=see_paybacks&id={$value->getId()}">Payback n°{$value->getId()}</a></dd>
                 {/loop}
             </dl>
         {/if}

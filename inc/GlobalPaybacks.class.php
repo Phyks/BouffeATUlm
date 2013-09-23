@@ -39,7 +39,7 @@
         // Setters
         // =======
         public function setId($id) {
-            $this->users_in->setInvoiceId($id);
+            $this->users_in->setPaybackId($id);
             $this->id = (int) $id;
         }
 

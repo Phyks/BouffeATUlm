@@ -39,6 +39,13 @@
 
             //Create table "Paybacks"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Paybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, invoice_id INT(11), KEY invoice_id (invoice_id), amount INT(11), from_user INT(11), to_user INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+
+            // Create table "GlobalPaybacks"
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'GlobalPaybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+
+            // Create table "Users_in_GlobalPaybacks"
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users_in_GlobalPaybacks (global_payback_id INT(11) NOT NULL, KEY global_payback_id (global_payback_id), user1_id INT(11), user2_id INT(11), amount INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+
         } catch (PDOException $e) {
             $error = 'Unable to connect to database and create database, check your credentials and config.<br/>Error message : '.$e->getMessage().'.';
         }

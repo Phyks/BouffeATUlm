@@ -678,8 +678,11 @@
 
         case "manage_paybacks":
             if(empty($_GET['new'])) {
+                $global_paybacks = new GlobalPayback();
+                $global_paybacks = $global_paybacks->load();
+
                 $tpl->assign('list', true);
-                $tpl->assign('global_paybacks', array(array("id"=>1, "date"=>"now")));
+                $tpl->assign('global_paybacks', $global_paybacks);
             }
             else {
                 if(!empty($_POST['users_in'])) {
@@ -689,7 +692,7 @@
                     if(!is_dir('db_backups')) {
                         mkdir('db_backups');
                     }
-                    system("mysqldump -h ".MYSQL_HOST." -u ".MYSQL_LOGIN." -p ".MYSQL_PASSWORD." ".MYSQL_DB." > db_backup/".date('d-m-Y_H:i'));
+                    system("mysqldump -h ".MYSQL_HOST." -u ".MYSQL_LOGIN." -p ".MYSQL_PASSWORD." ".MYSQL_DB." > db_backups/".date('d-m-Y_H:i'));
 
                     $users_in = array();
                     foreach($_POST['users_in'] as $user1_id) {
@@ -704,7 +707,7 @@
                                     $users_in[$user1_id][$user2_id] = 0;
                                 }
                                 else {
-                                    $users_in[$user1_id][$user2_id] = -$users_in[$user1_id][$user2_id];
+                                    $users_in[$user1_id][$user2_id] = -$users_in[$user2_id][$user1_id];
                                     $users_in[$user2_id][$user1_id] = 0;
                                 }
                             }
@@ -763,6 +766,8 @@
                         }
                     }
 
+                    var_dump($users_in);
+
                     $global_payback->setUsersIn($users_in);
                     $global_payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
                     $global_payback->save();
@@ -771,7 +776,7 @@
                     ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
                     array_map("unlink", $cached_files);
 
-                    header('location: index.php?do=edit_users&'.$get_redir);
+                    header('location: index.php?do=manage_paybacks&'.$get_redir);
                     exit();
                 }
                 

@@ -4,12 +4,12 @@
     <h2>Gérer les remboursements globaux</h2>
         <p class="center"><a href="?do=manage_paybacks&new=1">Ajouter un remboursement global</a></p>
 
-        {if condition="count($global_paybacks) > 0"}
+        {if condition="$global_paybacks !== FALSE"}
             <p>Liste des remboursements globaux précédents :</p>
             <dl>
                 {loop="$global_paybacks"}
-                    <dt>{$value['date']}</dt>
-                    <dd><a href="?do=see_paybacks&id={$value['id']}">Remboursement n°{$value['id']}</a></dd>
+                <dt>{$value->getDate()}</dt>
+                <dd><a href="?do=see_paybacks&id={$value->getId()}">Remboursement n°{$value->getId()}</a></dd>
                 {/loop}
             </dl>
         {/if}

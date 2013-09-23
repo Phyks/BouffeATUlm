@@ -6,12 +6,12 @@
         protected $payback_id = 0, $users_list;
         //users_list is a 2D array of users_id and amount between them
         //user1 owes amount to user2
-        protected $TABLE_NAME = "Users_in_GlobalPayback";
+        protected $TABLE_NAME = "Users_in_GlobalPaybacks";
         protected $fields = array(
             'global_payback_id'=>'int',
             'user1_id'=>'int',
             'user2_id'=>'int',
-            'amount'=>'float'
+            'amount'=>'int'
             );
 
         public function __construct() {
@@ -114,9 +114,9 @@
 
             foreach($this->users_list as $user1=>$temp) {
                 foreach($temp as $user2=>$amount) {
-                    $query->bindParam(':user1_id', intval($user1));
-                    $query->bindParam(':user2_id', intval($user2));
-                    $query->bindParam(':amount', floatval($amount));
+                    $query->bindValue(':user1_id', intval($user1));
+                    $query->bindValue(':user2_id', intval($user2));
+                    $query->bindValue(':amount', floatval($amount));
                     $query->execute();
                 }
             }

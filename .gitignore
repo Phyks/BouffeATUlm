@@ -3,3 +3,5 @@
 old
 data/
 tmp/
+db_backups/*
+!db_backups/README
