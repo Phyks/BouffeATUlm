@@ -19,7 +19,7 @@
 
         public function __construct() {
             parent::__construct();
-            $this->users_in = new UsersIn();
+            $this->users_in = new UsersIn('invoice');
         }
 
         // Getters
@@ -89,11 +89,15 @@
         // Get the amount to pay by person
         // ===============================
         public function getAmountPerPerson($id) {
-            $guests = $this->users_in->get();
-            $guests = $guests[(int) $id];
+            $users_in = $this->users_in->get();
+            $guests = 0;
+
+            foreach($users_in as $user=>$guests_user) {
+                $guests += (int) $guests_user;
+            }
 
             // Amount is stored in cents
-            return round($this->amount / 100 / (count($this->users_in->get()) + $guests), 2);
+            return round($this->amount / 100 / (count($users_in) + $guests) * (1 + $users_in[(int) $id]), 2); // Note : $users_in[(int) $id] is the number of guests for user $id
         }
 
         // Maps htmlspecialchars on the class before display
