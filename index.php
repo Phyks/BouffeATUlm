@@ -23,6 +23,7 @@
     require_once('inc/User.class.php');
     require_once('inc/Invoices.class.php');
     require_once('inc/Paybacks.class.php');
+    require_once('inc/GlobalPaybacks.class.php');
     require_once('inc/rain.tpl.class.php');
     require_once('inc/functions.php');
     require_once('inc/Ban.inc.php');
@@ -353,29 +354,29 @@
 
                             foreach($config as $line_number=>$line) {
                                 if(strpos(trim($line), "MYSQL_HOST") !== false)
-                                    $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
+                                    $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');";
                                 elseif(strpos(trim($line), "MYSQL_LOGIN") !== false)
-                                    $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
+                                    $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');";
                                 elseif(strpos(trim($line), "MYSQL_PASSWORD") !== false && !empty($_POST['mysql_password']))
-                                    $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
+                                    $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');";
                                 elseif(strpos(trim($line), "MYSQL_DB") !== false)
-                                    $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
+                                    $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');";
                                 elseif(strpos(trim($line), "MYSQL_PREFIX") !== false && !empty($_POST['mysql_prefix']))
-                                    $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
+                                    $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');";
                                 elseif(strpos(trim($line), "INSTANCE_TITLE") !== false)
-                                    $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
+                                    $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');";
                                 elseif(strpos(trim($line), "BASE_URL") !== false)
-                                    $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
+                                    $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');";
                                 elseif(strpos(trim($line), "CURRENCY") !== false)
-                                    $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
+                                    $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');";
                                 elseif(strpos(trim($line), "EMAIL_WEBMASTER") !== false)
-                                    $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
+                                    $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');";
                                 elseif(strpos(trim($line), "TEMPLATE_DIR") !== false)
-                                    $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');\n";
+                                    $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');";
                                 elseif(strpos(trim($line), "LANG") !== false)
-                                    $config[$line_number] = "\tdefine('LANG', '".substr($_POST['template'], -2)."');\n";
+                                    $config[$line_number] = "\tdefine('LANG', '".substr($_POST['template'], -2)."');";
                                 elseif(strpos(trim($line), 'date_default_timezone_set') !== false)
-                                    $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
+                                    $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');";
                             }
 
                             if(file_put_contents("data/config.php", $config)) {
@@ -673,6 +674,113 @@
                 header('location: index.php');
                 exit();
             }
+            break;
+
+        case "manage_paybacks":
+            if(empty($_GET['new'])) {
+                $tpl->assign('list', true);
+                $tpl->assign('global_paybacks', array(array("id"=>1, "date"=>"now")));
+            }
+            else {
+                if(!empty($_POST['users_in'])) {
+                    $global_payback = new GlobalPayback();
+
+                    // Backup database
+                    if(!is_dir('db_backup')) {
+                        mkdir('db_backup');
+                    }
+                    system("mysqldump -h ".MYSQL_HOST." -u ".MYSQL_LOGIN." -p ".MYSQL_PASSWORD." ".MYSQL_DB." > db_backup/".date('d-m-Y_H:i'));
+
+                    $users_in = array();
+                    foreach($_POST['users_in'] as $user1_id) {
+                        $user1_id = intval($user1_id);
+                        foreach($_POST['users_in'] as $user2_id) {
+                            $user2_id = intval($user2_id);
+                            if($user1_id == $user2_id) {
+                                $users_in[$user1_id][$user2_id] = 0;
+                            }
+                            elseif(!empty($users_in[$user2_id][$user1_id])) {
+                                if($users_in[$user2_id][$user1_id] > 0) {
+                                    $users_in[$user1_id][$user2_id] = 0;
+                                }
+                                else {
+                                    $users_in[$user1_id][$user2_id] = -$users_in[$user1_id][$user2_id];
+                                    $users_in[$user2_id][$user1_id] = 0;
+                                }
+                            }
+                            else {
+                                // Get the amount user1 owes to user2
+                                $users_in[$user1_id][$user2_id] = 0;
+
+                                // Confirm all paybacks when user2 is buyer
+                                $invoices = new Invoice();
+                                $invoices = $invoices->load(array('buyer'=>$user2_id));
+
+                                if($invoices !== false) {
+                                    foreach($invoices as $invoice) {
+                                        $paybacks = new Payback();
+                                        $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user2_id, 'from_user'=>$user1_id));
+
+                                        if($paybacks === false) {
+                                            $payback = new Payback();
+                                            $payback->setTo($user2_id);
+                                            $payback->setFrom($user1_id);
+                                            $payback->setAmount($invoice->getAmountPerPerson($user1_id));
+                                            $payback->setInvoice($invoice->getId());
+                                            $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                            $payback->save();
+
+                                            // Add the amount to what user1 owes to user2
+                                            $users_in[$user1_id][$user2_id] += $payback->getAmount();
+                                        }
+                                    }
+                                }
+
+                                // Confirm all paybacks when from is buyer
+                                $invoices = new Invoice();
+                                $invoices = $invoices->load(array('buyer'=>$user1_id));
+
+                                if($invoices !== false) {
+                                    foreach($invoices as $invoice) {
+                                        $paybacks = new Payback();
+                                        $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user1_id, 'from_user'=>$user2_id));
+
+                                        if($paybacks === false) {
+                                            $payback = new Payback();
+                                            $payback->setTo($user1_id);
+                                            $payback->setFrom($user2_id);
+                                            $payback->setAmount($invoice->getAmountPerPerson($user2_id));
+                                            $payback->setInvoice($invoice->getId());
+                                            $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                            $payback->save();
+
+                                            // Substract the amount to what user1 owes to user2
+                                            $users_in[$user1_id][$user2_id] -= $payback->getAmount();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $global_payback->setUsersIn($users_in);
+                    $global_payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                    $global_payback->save();
+
+                    // Clear the cache
+                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                    array_map("unlink", $cached_files);
+
+                    header('location: index.php?do=edit_users&'.$get_redir);
+                    exit();
+                }
+                
+                $users_list = new User();
+                $users_list = $users_list->load();
+
+                $tpl->assign('users', $users_list);
+            }
+            $tpl->draw('manage_paybacks');
             break;
 
 

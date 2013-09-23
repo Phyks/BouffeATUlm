@@ -10,6 +10,11 @@ body {
     margin: 0;
 }
 
+body>p, body>ul, body>dl {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
 fieldset {
     border: 1px solid #999;
     margin-bottom: 1em;
@@ -55,8 +60,18 @@ h2 {
     border-left: none;
 }
 
+hr {
+    width: 33%;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
 input[type="checkbox"] {
     margin-left: 2em;
+}
+
+.red {
+    color: red;
 }
 
 .center {
@@ -120,12 +135,16 @@ input[type=submit] {
     text-align: center
 }
 
-#edit_password_form, #edit_user_form, #invoice_form, #notice_form {
+#edit_password_form, #edit_user_form, #invoice_form, #notice_form, #global_payback_form {
     width: 67%;
     margin: auto;
 }
 
-#edit_password_form p, #edit_user_form p, #notice_form p {
+#global_payback_form fieldset {
+    margin-top: 2em;
+}
+
+#edit_password_form p, #edit_user_form p, #notice_form p, #global_payback_form p {
     text-align: center;
 }
 

@@ -2,14 +2,16 @@
     require_once('data/config.php');
     require_once('Storage.class.php');
 
-    class UsersIn extends Storage {
-        protected $invoice_id = 0, $users_list;
-        //users_list is an array of users_id and number of guest per user
-        protected $TABLE_NAME = "Users_in_invoices";
+    class UsersInGlobalPayback extends Storage {
+        protected $payback_id = 0, $users_list;
+        //users_list is a 2D array of users_id and amount between them
+        //user1 owes amount to user2
+        protected $TABLE_NAME = "Users_in_GlobalPayback";
         protected $fields = array(
-            'invoice_id'=>'int',
-            'user_id'=>'int',
-            'guests'=>'int'
+            'global_payback_id'=>'int',
+            'user1_id'=>'int',
+            'user2_id'=>'int',
+            'amount'=>'float'
             );
 
         public function __construct() {
@@ -19,8 +21,8 @@
 
         // Getters
         // =======
-        public function getInvoiceId() {
-            return $this->invoice_id;
+        public function getPaybackId() {
+            return $this->payback_id;
         }
 
         public function get() {
@@ -29,34 +31,24 @@
 
         // Setters
         // =======
-        public function setInvoiceId($id) {
-            $this->invoice_id = (int) $id;
+        public function setPaybackId($id) {
+            $this->payback_id = (int) $id;
         }
 
         public function set($users_in) {
-            foreach($users_in as $user=>$guest) {
-                if($guest < 0)
-                    $users_in[$user] = 0;
-                else
-                    $users_in[$user] = (int) $guest;
-            }
             $this->users_list = $users_in;
-        }
-
-        // Check if a user is in a specified invoice
-        // =========================================
-        public function inUsersIn($id) {
-            return in_array($id, array_keys($this->users_list));
         }
 
         // Maps htmlspecialchars on the class before display
         // =================================================
         public function secureDisplay() {
-            $this->invoice_id = (int) $this->invoice_id;
+            $this->payback_id = (int) $this->payback_id;
 
             $temp_array = array();
-            foreach($this->users_list as $user=>$guests) {
-                $temp_array[(int) $user] = (int) $guests;
+            foreach($this->users_list as $user1=>$temp) {
+                foreach($temp as $user2=>$amount) {
+                    $temp_array[(int) $user1][(int) [$user2]] = (float) $amount;
+                }
             }
             $this->users_list = $temp_array;
 
@@ -75,16 +67,16 @@
                 $query .= $field;
             }
 
-            $query .= ' FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE invoice_id=:invoice_id';
+            $query .= ' FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE payback_id=:payback_id';
 
             $query = $this->getConnection()->prepare($query);
-            $query->bindParam(':invoice_id', $this->invoice_id);
+            $query->bindParam(':payback_id', $this->payback_id);
             $query->execute();
 
             $results = $query->fetchAll();
             $this->users_list = array();
             foreach($results as $result) {
-                $this->users_list[(int) $result['user_id']] = (int) $result['guests'];
+                $this->users_list[(int) $result['user1_id']][(int) $result['user2_id']] = (float) $result['amount'];
             }
         }
 
@@ -93,17 +85,17 @@
         public function save() {
             // TODO : Optimize ?
 
-            $query = 'SELECT COUNT(invoice_id) FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE invoice_id=:invoice_id';
+            $query = 'SELECT COUNT(payback_id) FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE payback_id=:payback_id';
             $query = $this->getConnection()->prepare($query);
-            $query->bindParam(':invoice_id', $this->invoice_id);
+            $query->bindParam(':payback_id', $this->payback_id);
             $query->execute();
 
             $count = $query->fetchColumn(0);
 
             if($count != 0) {
                 // If there are already some records, delete them first
-                $query = $this->getConnection()->prepare('DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE invoice_id=:invoice_id');
-                $query->bindParam(':invoice_id', $this->invoice_id);
+                $query = $this->getConnection()->prepare('DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE payback_id=:payback_id');
+                $query->bindParam(':payback_id', $this->payback_id);
                 $query->execute();
             }
 
@@ -114,24 +106,27 @@
                 $query .= $field;
             }
 
-            $query .= ') VALUES(:invoice_id, :user_id, :guests)';
+            $query .= ') VALUES(:payback_id, :user1_id, :user2_id, :amount)';
 
             $query = $this->getConnection()->prepare($query);
 
-            $query->bindParam(':invoice_id', $this->invoice_id);
+            $query->bindParam(':payback_id', $this->payback_id);
 
-            foreach($this->users_list as $user=>$guests) {
-                $query->bindParam(':user_id', intval($user));
-                $query->bindParam(':guests', intval($guests));
-                $query->execute();
+            foreach($this->users_list as $user1=>$temp) {
+                foreach($temp as $user2=>$amount) {
+                    $query->bindParam(':user1_id', intval($user1));
+                    $query->bindParam(':user2_id', intval($user2));
+                    $query->bindParam(':amount', floatval($amount));
+                    $query->execute();
+                }
             }
         }
 
         // Override delete() method
         // ========================
         public function delete() {
-            $query = $this->getConnection()->prepare('DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE invoice_id=:invoice_id');
-            $query->bindParam(':invoice_id', $this->invoice_id);
+            $query = $this->getConnection()->prepare('DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE payback_id=:payback_id');
+            $query->bindParam(':payback_id', $this->payback_id);
             $query->execute();
         }
     }
