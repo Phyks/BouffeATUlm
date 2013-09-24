@@ -698,6 +698,39 @@
             $tpl->draw('see_paybacks');
             break;
 
+        case "confirm_global_paybacks":
+            if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['payback_id']) && $_GET['from'] != $_GET['to']) {
+                if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
+                    $global_payback = new GlobalPayback();
+                    $global_payback = $global_payback->load(array('id'=>(int) $_GET['payback_id']), true);
+
+                    $users_in = $global_payback->getUsersIn()->get();
+
+                    $users_in[(int) $_GET['from']][(int) $_GET['to']] = 0;
+                    $users_in[(int) $_GET['to']][(int) $_GET['from']] = 0;
+
+                    $global_payback->setUsersIn($users_in);
+
+                    $global_payback->save();
+
+                    // Clear the cache
+                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                    array_map("unlink", $cached_files);
+
+                    header('location: index.php');
+                    exit();
+
+                }
+                else {
+                    $tpl->assign('error', $errors['unauthorized']);
+                    $tpl->draw('index');
+                }
+            }
+            else {
+                header('location: index.php?'.$get_redir);
+            }
+            break;
+
         case "manage_paybacks":
             if(empty($_GET['new'])) {
                 $global_paybacks = new GlobalPayback();

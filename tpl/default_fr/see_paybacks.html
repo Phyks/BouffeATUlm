@@ -32,7 +32,7 @@
                     {else}
                         <td>
                             {if condition="$table[$key1][$key2] != 0"}
-                                <a href="?do=confirm_global_paybacks&amp;from={$key1}&amp;to={$key2}" title="Confirmer le remboursement">{$table[$key1][$key2]}</a>
+                                <a href="?do=confirm_global_paybacks&amp;from={$key1}&amp;to={$key2}&amp;payback_id={$global_paybacks->getId()}" title="Confirmer le remboursement">{$table[$key1][$key2]}</a>
                             {else}
                                 -
                             {/if}
