@@ -160,7 +160,7 @@ textarea#what {
     width: 75%;
 }
 
-#list_expenses tr:hover, #balance_table tr:not(:first-child):hover *, .highlight_td {
+#list_expenses tr:hover, #balance_table tr:not(:first-child):hover *, #global_paybacks_table tr:not(:first-child):hover *, .highlight_td {
     background-color: green;
 }
 

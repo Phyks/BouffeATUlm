@@ -1,0 +1,48 @@
+{include="header"}
+
+{if condition="empty($id)"}
+    <h2>Global paybacks list</h2>
+        {if condition="$global_paybacks !== FALSE"}
+            <dl>
+                {loop="$global_paybacks"}
+                <dt>{$value->getDate()}</dt>
+                <dd><a href="?do=see_paybacks&id={$value->getId()}">Payback n°{$value->getId()}</a></dd>
+                {/loop}
+            </dl>
+        {else}
+            <p>No global paybacks available.</p>
+        {/if}
+{else}
+    <h2>Payback n°{$global_paybacks->getId()}</h2>
+
+    {$table=$global_paybacks->getUsersIn()->get()}
+    <table id="global_paybacks_table">
+        <tr>
+            <th>Owes / To</th>
+            {loop="$global_paybacks->getUsersIn()->get()"}
+                <th>{$users[$key1]->getDisplayName()}</th>
+            {/loop}
+        </tr>
+        {loop="$global_paybacks->getUsersIn()->get()"}
+            <tr>
+                <th>{$users[$key1]->getDisplayName()}</th>
+                {loop="$global_paybacks->getUsersIn()->get()"}
+                    {if condition="$key1 == $key2"}
+                        <td class="cell-disabled"></td>
+                    {else}
+                        <td>
+                            {if condition="$table[$key1][$key2] != 0"}
+                                <a href="?do=confirm_global_paybacks&amp;from={$key1}&amp;to={$key2}" title="Confirm payback">{$table[$key1][$key2]}</a>
+                            {else}
+                                -
+                            {/if}
+                        </td>
+                    {/if}
+                {/loop}
+            </tr>
+        {/loop}
+    </table>
+
+    <p class="center"><a href="?do=see_paybacks">Go back to global paybacks list</a></p>
+{/if}
+{include="footer"}

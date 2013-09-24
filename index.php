@@ -676,6 +676,28 @@
             }
             break;
 
+        case "see_paybacks":
+            $global_paybacks = new GlobalPayback();
+    
+            if(empty($_GET['id'])) {
+                $global_paybacks = $global_paybacks->load();
+            }
+            else {
+                $global_paybacks = $global_paybacks->load(array('id'=>(int) $_GET['id']), true);
+                $tpl->assign('id', (int) $_GET['id']);
+
+                $users_list = new User();
+                $users_list = $users_list->load();
+
+                $tpl->assign('users', $users_list);
+            }
+
+            $tpl->assign('list', true);
+            $tpl->assign('global_paybacks', $global_paybacks);
+
+            $tpl->draw('see_paybacks');
+            break;
+
         case "manage_paybacks":
             if(empty($_GET['new'])) {
                 $global_paybacks = new GlobalPayback();
@@ -765,8 +787,6 @@
                             }
                         }
                     }
-
-                    var_dump($users_in);
 
                     $global_payback->setUsersIn($users_in);
                     $global_payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
