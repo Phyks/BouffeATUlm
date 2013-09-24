@@ -67,10 +67,10 @@
                 $query .= $field;
             }
 
-            $query .= ' FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE payback_id=:payback_id';
+            $query .= ' FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE global_payback_id=:global_payback_id';
 
             $query = $this->getConnection()->prepare($query);
-            $query->bindParam(':payback_id', $this->payback_id);
+            $query->bindParam(':global_payback_id', $this->payback_id);
             $query->execute();
 
             $results = $query->fetchAll();
