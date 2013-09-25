@@ -2,7 +2,6 @@ Issues :
 ========
 * Check CSRF everywhere
 * Close a global payback
-* Sort global paybacks DESC by DATE or id
 
 Improvements :
 ==============

@@ -681,6 +681,14 @@
     
             if(empty($_GET['id'])) {
                 $global_paybacks = $global_paybacks->load();
+
+                if($global_paybacks !== false) {
+                    $sort_keys = array();
+                    foreach($global_paybacks as $key=>$entry) {
+                        $sort_keys[$key] = $entry->getId();
+                    }
+                    array_multisort($sort_keys, SORT_DESC, $global_paybacks);
+                }
             }
             else {
                 $global_paybacks = $global_paybacks->load(array('id'=>(int) $_GET['id']), true);
@@ -717,7 +725,7 @@
                     ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
                     array_map("unlink", $cached_files);
 
-                    header('location: index.php');
+                    header('location: see_paybacks.php?id='.(int)$_GET['payback_id']);
                     exit();
 
                 }
@@ -735,6 +743,15 @@
             if(empty($_GET['new'])) {
                 $global_paybacks = new GlobalPayback();
                 $global_paybacks = $global_paybacks->load();
+
+                // Sort paybacks by id DESC
+                if($global_paybacks !== false) {
+                    $sort_keys = array();
+                    foreach($global_paybacks as $key=>$entry) {
+                        $sort_keys[$key] = $entry->getId();
+                    }
+                    array_multisort($sort_keys, SORT_DESC, $global_paybacks);
+                }
 
                 $tpl->assign('list', true);
                 $tpl->assign('global_paybacks', $global_paybacks);
