@@ -719,13 +719,20 @@
 
                     $global_payback->setUsersIn($users_in);
 
+                    if($global_payback->getUsersIn()->isEmpty()) {
+                        $global_payback->setClosed(true);
+                    }
+                    else {
+                        $global_payback->setClosed(false);
+                    }
+
                     $global_payback->save();
 
                     // Clear the cache
                     ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
                     array_map("unlink", $cached_files);
 
-                    header('location: see_paybacks.php?id='.(int)$_GET['payback_id']);
+                    header('location: ?do=see_paybacks&id='.(int)$_GET['payback_id']);
                     exit();
 
                 }
@@ -839,6 +846,14 @@
                     }
 
                     $global_payback->setUsersIn($users_in);
+
+                    if($global_payback->getUsersIn()->isEmpty()) {
+                        $global_payback->setClosed(true);
+                    }
+                    else {
+                        $global_payback->setClosed(false);
+                    }
+
                     $global_payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
                     $global_payback->save();
 

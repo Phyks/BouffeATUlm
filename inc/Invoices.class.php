@@ -59,7 +59,7 @@
         }
 
         public function setDate($minute, $hour, $day, $month, $year) {
-            if((int) $minute < 10) $minute = '0'.$minute;
+            if((int) $minute < 10) $minute = '0'.(int) $minute;
 
             $this->date = DateTime::createFromFormat('Y-n-j G:i', $year.'-'.(int) $month.'-'.(int) $day.' '.(int) $hour.':'.$minute);
         }

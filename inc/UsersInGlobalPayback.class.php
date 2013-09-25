@@ -55,6 +55,19 @@
             return $this;
         }
 
+        // Test if the payback should be closed
+        // ====================================
+        public function isEmpty() {
+            foreach($this->users_list as $user1=>$temp) {
+                foreach($temp as $user2=>$amount) {
+                    if($amount != 0) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         // Override load() method
         // ======================
         public function load() {
@@ -85,7 +98,7 @@
         public function save() {
             // TODO : Optimize ?
 
-            $query = 'SELECT COUNT(payback_id) FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE payback_id=:payback_id';
+            $query = 'SELECT COUNT(global_payback_id) FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE global_payback_id=:payback_id';
             $query = $this->getConnection()->prepare($query);
             $query->bindParam(':payback_id', $this->payback_id);
             $query->execute();
@@ -94,7 +107,7 @@
 
             if($count != 0) {
                 // If there are already some records, delete them first
-                $query = $this->getConnection()->prepare('DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE payback_id=:payback_id');
+                $query = $this->getConnection()->prepare('DELETE FROM '.MYSQL_PREFIX.$this->TABLE_NAME.' WHERE global_payback_id=:payback_id');
                 $query->bindParam(':payback_id', $this->payback_id);
                 $query->execute();
             }

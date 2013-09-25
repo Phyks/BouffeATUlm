@@ -1,7 +1,6 @@
 Issues :
 ========
 * Check CSRF everywhere
-* Close a global payback
 
 Improvements :
 ==============
@@ -11,7 +10,3 @@ Improvements :
 * API
 * cf TODO in files
 * README file
-
-Manage paybacks :
-=================
-* TODO : Global payback

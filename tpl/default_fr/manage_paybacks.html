@@ -9,7 +9,7 @@
             <dl>
                 {loop="$global_paybacks"}
                 <dt>{$value->getDate()}</dt>
-                <dd><a href="?do=see_paybacks&id={$value->getId()}">Remboursement n°{$value->getId()}</a></dd>
+                <dd>{if condition="$value->getClosed() === true"}[Terminé] {/if}<a href="?do=see_paybacks&id={$value->getId()}">Remboursement n°{$value->getId()}</a></dd>
                 {/loop}
             </dl>
         {/if}
@@ -36,7 +36,7 @@
             {/loop}
     </fieldset>
     <p>
-        <input type="submit" onclick="confirm('Vous êtes sur le point d\'ajouter un remboursement global incluant les utilisateurs sélectionnés.');" value="Valider"/>
+        <input type="submit" onclick="return confirm('Vous êtes sur le point d\'ajouter un remboursement global incluant les utilisateurs sélectionnés.');" value="Valider"/>
     </p>
     </form>
 {/if}

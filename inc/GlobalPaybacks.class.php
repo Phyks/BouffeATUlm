@@ -4,7 +4,7 @@
     require_once('UsersInGlobalPayback.class.php');
 
     class GlobalPayback extends Storage {
-        protected $id = 0, $date, $users_in;
+        protected $id = 0, $date, $users_in, $closed;
         // date is a DateTime object
         // buyer is a User object
         // users_in is a UsersIn objects
@@ -12,11 +12,13 @@
         protected $fields = array(
             'id'=>'key',
             'date'=>'date',
+            'closed'=>'bool'
             );
 
         public function __construct() {
             parent::__construct();
             $this->users_in = new UsersInGlobalPayback();
+            $this->date = new Datetime();
         }
 
         // Getters
@@ -36,6 +38,10 @@
             return $this->users_in;
         }
 
+        public function getClosed() {
+            return (bool) $this->closed;
+        }
+
         // Setters
         // =======
         public function setId($id) {
@@ -44,7 +50,7 @@
         }
 
         public function setDate($minute, $hour, $day, $month, $year) {
-            if((int) $minute < 10) $minute = '0'.$minute;
+            if((int) $minute < 10) $minute = '0'.(int) $minute;
 
             $this->date = DateTime::createFromFormat('Y-n-j G:i', $year.'-'.(int) $month.'-'.(int) $day.' '.(int) $hour.':'.$minute);
         }
@@ -52,6 +58,10 @@
         public function setUsersIn($users_in) {
             // Note : users_in in param is an array with users in listed and guests for each user
             $this->users_in->set($users_in);
+        }
+
+        public function setClosed($closed) {
+            $this->closed = (bool) $closed;
         }
 
         // Maps htmlspecialchars on the class before display
@@ -71,6 +81,7 @@
 
             $this->setId($data['id']);
             $this->date = DateTime::createFromFormat('Y-m-d H:i:s', $data['date']);
+            $this->setClosed($data['closed']);
         }
         
         // Override parent load() method
