@@ -23,7 +23,7 @@
                     {elseif condition="$balances[$value1->getId()][$value2->getId()] === '-' || ($value2->getId() != $current_user->getId() && !$current_user->getAdmin())"}
                         <td>{$balances[$value1->getId()][$value2->getId()]}</td>
                     {else}
-                        <td><a href="?do=payall&amp;from={$value1->getId()}&amp;to={$value2->getId()}">{$balances[$value1->getId()][$value2->getId()]}</a></td>
+                        <td><a href="?do=payall&amp;from={$value1->getId()}&amp;to={$value2->getId()}&amp;token={$token}">{$balances[$value1->getId()][$value2->getId()]}</a></td>
                     {/if}
                 {/loop}
             </tr>
@@ -66,7 +66,7 @@
                                 - 
                                 {if condition="$paybacks[$value1->getId()] === false || !in_array($key2, array_keys($paybacks[$value1->getId()]))"}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                        <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Confirm payback">
+                                        <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;token={$token}" title="Confirm payback">
                                     {/if}
                                         Remains {$value1->getAmountPerPerson($key2)} {$currency}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
@@ -75,7 +75,7 @@
                                 {else}
                                     {if condition="$paybacks[$value1->getId()][$key2]->getAmount() == $value1->getAmountPerPerson($key2)"}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                            <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}" title="Delete payback">
+                                            <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;token={$token}" title="Delete payback">
                                         {/if}
                                             Paid
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
@@ -83,7 +83,7 @@
                                         {/if}   
                                     {else}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                            <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}" title="Confirm payback">
+                                            <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}&amp;token={$token}" title="Confirm payback">
                                         {/if}
                                             Remains {$value1->getAmountPerPerson($key2) - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
@@ -106,7 +106,7 @@
                     </td>
                     <td>
                         {if condition="$value->getBuyer() == $current_user->getId() || $current_user->getAdmin()"}
-                            <a href="index.php?do=delete_invoice&id={$value->getId()}">Delete</a>
+                            <a href="index.php?do=delete_invoice&id={$value->getId()}&token={$token}">Delete</a>
                         {else}
                             -
                         {/if}

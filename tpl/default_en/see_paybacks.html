@@ -8,7 +8,7 @@
                 <dt>{$value->getDate()}</dt>
                 <dd>
                     {if condition="$value->getClosed() !== false"}
-                         <a href="?do=see_paybacks&id={$value->getId()}" onclick="return confirm("Are you sure you want to confirm this payback ? This action can't be undone easily");">Payback n°{$value->getId()}</a>
+                         <a href="?do=see_paybacks&id={$value->getId()}">Payback n°{$value->getId()}</a>
                     {else}
                         [Closed] Payback n°{$value->getId()}
                     {/if}
@@ -41,7 +41,7 @@
                         {else}
                             <td>
                                 {if condition="$table[$key1][$key2] != 0"}
-                                    <a href="?do=confirm_global_paybacks&amp;from={$key1}&amp;to={$key2}&amp;payback_id={$global_paybacks->getId()}" title="Confirm payback">{$table[$key1][$key2]}</a>
+                                <a href="?do=confirm_global_paybacks&amp;from={$key1}&amp;to={$key2}&amp;payback_id={$global_paybacks->getId()}&amp;token={$token}" title="Confirm payback" onclick="return confirm("Are you sure you want to confirm this payback ? This action can't be undone easily");">{$table[$key1][$key2]}</a>
                                 {else}
                                     -
                                 {/if}

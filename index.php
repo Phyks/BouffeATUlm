@@ -259,80 +259,97 @@
                 $user_id = $current_user->getId();
             }
 
-            $user = new User();
-            $user = $user->load(array('id'=>$user_id), true);
-            $user->newJsonToken();
-            $user->save();
-            $_SESSION['current_user'] = $user->sessionStore();
-
-            header('location: index.php?do=password&'.$get_redir);
-            exit();
+            if(checkToken(600, 'password')) {  
+                $user = new User();
+                $user = $user->load(array('id'=>$user_id), true);
+                $user->newJsonToken();
+                $user->save();
+                $_SESSION['current_user'] = $user->sessionStore();
+                
+                header('location: index.php?do=password&'.$get_redir);
+                exit();
+            }
+            else {
+                $tpl->assign('error', $errors['token_error'][LANG]);
+                $tpl->draw('index');
+            }
             break;
 
         case 'delete_user':
             if($_GET['user_id'] != $current_user->getId()) {
-                $user = new User();
-                $user->setId($_GET['user_id']);
-                $user->delete();
+                if(checkToken(600, 'edit_users')) {
+                    $user = new User();
+                    $user->setId($_GET['user_id']);
+                    $user->delete();
 
-                // Update concerned invoices
-                $invoices = new Invoice();
-                $invoices = $invoices->load();
-                if($invoices !== FALSE) {
-                    foreach($invoices as $invoice) {
-                        if($invoice->getBuyer() == $_GET['user_id']) {
-                            $invoice->delete();
-                        }
-                        if($invoice->getUsersIn()->inUsersIn($_GET['user_id'])) {
-                            $users_in = $invoice->getUsersIn()->get();
-                            unset($users_in[$_GET['user_id']]);
-
-                            if(empty($users_in) || array_keys($users_in) == array($invoice->getBuyer()))
+                    // Update concerned invoices
+                    $invoices = new Invoice();
+                    $invoices = $invoices->load();
+                    if($invoices !== FALSE) {
+                        foreach($invoices as $invoice) {
+                            if($invoice->getBuyer() == $_GET['user_id']) {
                                 $invoice->delete();
-                            else {
-                                $invoice->setUsersIn($users_in);
-                                $invoice->save();
+                            }
+                            if($invoice->getUsersIn()->inUsersIn($_GET['user_id'])) {
+                                $users_in = $invoice->getUsersIn()->get();
+                                unset($users_in[$_GET['user_id']]);
+
+                                if(empty($users_in) || array_keys($users_in) == array($invoice->getBuyer()))
+                                    $invoice->delete();
+                                else {
+                                    $invoice->setUsersIn($users_in);
+                                    $invoice->save();
+                                }
                             }
                         }
                     }
-                }
 
-                // Update paybacks
-                $paybacks = new Payback();
-                $paybacks = $paybacks->load(array('from_user'=>(int) $_GET['user_id']));
-                if($paybacks !== FALSE) {
-                    foreach($paybacks as $payback) {
-                        $payback->delete();
+                    // Update paybacks
+                    $paybacks = new Payback();
+                    $paybacks = $paybacks->load(array('from_user'=>(int) $_GET['user_id']));
+                    if($paybacks !== FALSE) {
+                        foreach($paybacks as $payback) {
+                            $payback->delete();
+                        }
                     }
-                }
-                $paybacks = new Payback();
-                $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['user_id']));
-                if($paybacks !== FALSE) {
-                    foreach($paybacks as $payback) {
-                        $payback->delete();
+                    $paybacks = new Payback();
+                    $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['user_id']));
+                    if($paybacks !== FALSE) {
+                        foreach($paybacks as $payback) {
+                            $payback->delete();
+                        }
                     }
+
+
+                    // Clear the cache
+                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                    array_map("unlink", $cached_files);
+
+                    header('location: index.php?do=edit_users&'.$get_redir);
+                    exit();
                 }
-
-
-                // Clear the cache
-                ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                array_map("unlink", $cached_files);
-
-                header('location: index.php?do=edit_users&'.$get_redir);
-                exit();
+                else {
+                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->draw('index');
+                }
             }
             break;
 
         case 'edit_notice':
             if(isset($_POST['notice'])) {
-                setNotice($_POST['notice']);
+                if(checkToken(600, 'settings')) {
+                    setNotice($_POST['notice']);
 
-                // Clear the cache
-                ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                array_map("unlink", $cached_files);
-    
-                header('location: index.php?'.$get_redir);
-                exit();
+                    // Clear the cache
+                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                    array_map("unlink", $cached_files);
+        
+                    header('location: index.php?'.$get_redir);
+                    exit();
+                }
+                else {
+                    $tpl->assign('error', $errors['token_error'][LANG]);
+                }
             }
 
             $tpl->assign('show_settings', false);
@@ -499,31 +516,37 @@
 
         case 'delete_invoice':
             if(!empty($_GET['id'])) {
-                $invoice = new Invoice();
-                $invoice = $invoice->load(array('id'=>(int) $_GET['id']), true);
+                if(checkToken(600, 'invoice')) {
+                    $invoice = new Invoice();
+                    $invoice = $invoice->load(array('id'=>(int) $_GET['id']), true);
 
-                if($current_user->getAdmin() || $invoice->getBuyer() == $current_user->getId()) {
-                    $invoice->delete();
+                    if($current_user->getAdmin() || $invoice->getBuyer() == $current_user->getId()) {
+                        $invoice->delete();
 
-                    // Delete related paybacks
-                    $paybacks = new Payback();
-                    $paybacks = $paybacks->load(array('invoice_id'=>(int) $_GET['id']));
+                        // Delete related paybacks
+                        $paybacks = new Payback();
+                        $paybacks = $paybacks->load(array('invoice_id'=>(int) $_GET['id']));
 
-                    if($paybacks !== false) {
-                        foreach($paybacks as $payback) {
-                            $payback->delete();
+                        if($paybacks !== false) {
+                            foreach($paybacks as $payback) {
+                                $payback->delete();
+                            }
                         }
+
+                        // Clear the cache
+                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                        array_map("unlink", $cached_files);
+
+                        header('location: index.php?'.$get_redir);
+                        exit();
                     }
-
-                    // Clear the cache
-                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                    array_map("unlink", $cached_files);
-
-                    header('location: index.php?'.$get_redir);
-                    exit();
+                    else {
+                        $tpl->assign('error', $errors['unauthorized'][LANG]);
+                        $tpl->draw('index');
+                    }
                 }
                 else {
-                    $tpl->assign('error', $errors['unauthorized']);
+                    $tpl->assign('error', $errors['token_error'][LANG]);
                     $tpl->draw('index');
                 }
             }
@@ -536,43 +559,49 @@
         case 'confirm_payback':
             if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['invoice_id']) && $_GET['from'] != $_GET['to']) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
-                    $invoice = new Invoice();
-                    $invoice = $invoice->load(array('id'=>(int) $_GET['invoice_id']), true);
+                    if(checkToken(600, 'invoice')) {
+                        $invoice = new Invoice();
+                        $invoice = $invoice->load(array('id'=>(int) $_GET['invoice_id']), true);
 
-                    $payback = new Payback();
+                        $payback = new Payback();
 
-                    if(!empty($_GET['payback_id'])) {
-                        $payback = $payback->load(array('id'=>(int) $_GET['payback_id']), true);
+                        if(!empty($_GET['payback_id'])) {
+                            $payback = $payback->load(array('id'=>(int) $_GET['payback_id']), true);
 
-                        if($payback->getFrom() != $_GET['from'] || $payback->getTo() != $_GET['to']) {
-                            $payback = new Payback();
+                            if($payback->getFrom() != $_GET['from'] || $payback->getTo() != $_GET['to']) {
+                                $payback = new Payback();
+                            }
                         }
+                        else {
+                            $payback = $payback->load(array('invoice_id'=>(int) $_GET['invoice_id'], 'to_user'=>(int) $_GET['to'], 'from_user'=>(int) $_GET['from']), true);
+
+                            if($payback == false)
+                                $payback = new Payback();
+                        }
+
+                        $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                        $payback->setInvoice($_GET['invoice_id']);
+                        $payback->setAmount($invoice->getAmountPerPerson($_GET['from']));
+                        $payback->setFrom($_GET['from']);
+                        $payback->setTo($_GET['to']);
+
+                        $payback->save();
+                        
+                        // Clear the cache
+                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                        array_map("unlink", $cached_files);
+
+                        header('location: index.php');
+                        exit();
                     }
                     else {
-                        $payback = $payback->load(array('invoice_id'=>(int) $_GET['invoice_id'], 'to_user'=>(int) $_GET['to'], 'from_user'=>(int) $_GET['from']), true);
-
-                        if($payback == false)
-                            $payback = new Payback();
+                        $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->draw('index');
                     }
-
-                    $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                    $payback->setInvoice($_GET['invoice_id']);
-                    $payback->setAmount($invoice->getAmountPerPerson($_GET['from']));
-                    $payback->setFrom($_GET['from']);
-                    $payback->setTo($_GET['to']);
-
-                    $payback->save();
-                    
-                    // Clear the cache
-                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                    array_map("unlink", $cached_files);
-
-                    header('location: index.php');
-                    exit();
 
                 }
                 else {
-                    $tpl->assign('error', $errors['unauthorized']);
+                    $tpl->assign('error', $errors['unauthorized'][LANG]);
                     $tpl->draw('index');
                 }
             }
@@ -584,22 +613,29 @@
         case 'delete_payback':
             if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['invoice_id'])) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
-                    $paybacks = new Payback();
+                    if(checkToken(600, 'invoice')) {
+                        $paybacks = new Payback();
 
-                    $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['to'], 'from_user'=> (int) $_GET['from'], 'invoice_id'=> (int) $_GET['invoice_id']));
+                        $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['to'], 'from_user'=> (int) $_GET['from'], 'invoice_id'=> (int) $_GET['invoice_id']));
 
-                    if($paybacks !== false) {
-                        foreach($paybacks as $payback) {
-                            $payback->delete();
+                        if($paybacks !== false) {
+                            foreach($paybacks as $payback) {
+                                $payback->delete();
+                            }
                         }
+
+                        // Clear the cache
+                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                        array_map("unlink", $cached_files);
+
+                        header('location: index.php');
+                        exit();
+                    }
+                    else {
+                        $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->draw('index');
                     }
 
-                    // Clear the cache
-                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                    array_map("unlink", $cached_files);
-
-                    header('location: index.php');
-                    exit();
                 }
                 else {
                     header('location: index.php');
@@ -615,54 +651,61 @@
         case 'payall':
             if(!empty($_GET['from']) && !empty($_GET['to'])) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
-                    // Confirm all paybacks when to is buyer
-                    $invoices = new Invoice();
-                    $invoices = $invoices->load(array('buyer'=>(int) $_GET['to']));
+                    if(checkToken(600, 'invoice')) {
+                        // Confirm all paybacks when to is buyer
+                        $invoices = new Invoice();
+                        $invoices = $invoices->load(array('buyer'=>(int) $_GET['to']));
 
-                    if($invoices !== false) {
-                        foreach($invoices as $invoice) {
-                            $paybacks = new Payback();
-                            $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>(int) $_GET['to'], 'from_user'=>(int) $_GET['from']));
+                        if($invoices !== false) {
+                            foreach($invoices as $invoice) {
+                                $paybacks = new Payback();
+                                $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>(int) $_GET['to'], 'from_user'=>(int) $_GET['from']));
 
-                            if($paybacks === false) {
-                                $payback = new Payback();
-                                $payback->setTo($_GET['to']);
-                                $payback->setFrom($_GET['from']);
-                                $payback->setAmount($invoice->getAmountPerPerson($_GET['from']));
-                                $payback->setInvoice($invoice->getId());
-                                $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                                $payback->save();
+                                if($paybacks === false) {
+                                    $payback = new Payback();
+                                    $payback->setTo($_GET['to']);
+                                    $payback->setFrom($_GET['from']);
+                                    $payback->setAmount($invoice->getAmountPerPerson($_GET['from']));
+                                    $payback->setInvoice($invoice->getId());
+                                    $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                    $payback->save();
+                                }
                             }
                         }
-                    }
 
-                    // Confirm all paybacks when from is buyer
-                    $invoices = new Invoice();
-                    $invoices = $invoices->load(array('buyer'=>(int) $_GET['from']));
+                        // Confirm all paybacks when from is buyer
+                        $invoices = new Invoice();
+                        $invoices = $invoices->load(array('buyer'=>(int) $_GET['from']));
 
-                    if($invoices !== false) {
-                        foreach($invoices as $invoice) {
-                            $paybacks = new Payback();
-                            $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>(int) $_GET['from'], 'from_user'=>(int) $_GET['to']));
+                        if($invoices !== false) {
+                            foreach($invoices as $invoice) {
+                                $paybacks = new Payback();
+                                $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>(int) $_GET['from'], 'from_user'=>(int) $_GET['to']));
 
-                            if($paybacks === false) {
-                                $payback = new Payback();
-                                $payback->setTo($_GET['from']);
-                                $payback->setFrom($_GET['to']);
-                                $payback->setAmount($invoice->getAmountPerPerson($_GET['to']));
-                                $payback->setInvoice($invoice->getId());
-                                $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                                $payback->save();
+                                if($paybacks === false) {
+                                    $payback = new Payback();
+                                    $payback->setTo($_GET['from']);
+                                    $payback->setFrom($_GET['to']);
+                                    $payback->setAmount($invoice->getAmountPerPerson($_GET['to']));
+                                    $payback->setInvoice($invoice->getId());
+                                    $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                    $payback->save();
+                                }
                             }
                         }
+
+                        // Clear the cache
+                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                        array_map("unlink", $cached_files);
+
+                        header('location: index.php');
+                        exit();
+                    }
+                    else {
+                        $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->draw('index');
                     }
 
-                    // Clear the cache
-                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                    array_map("unlink", $cached_files);
-
-                    header('location: index.php');
-                    exit();
                 }
                 else {
                     header('location: index.php');
@@ -702,6 +745,7 @@
 
             $tpl->assign('list', true);
             $tpl->assign('global_paybacks', $global_paybacks);
+            $tpl->assign('payback', generateToken('global_payback'));
 
             $tpl->draw('see_paybacks');
             break;
@@ -709,35 +753,40 @@
         case "confirm_global_paybacks":
             if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['payback_id']) && $_GET['from'] != $_GET['to']) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
-                    $global_payback = new GlobalPayback();
-                    $global_payback = $global_payback->load(array('id'=>(int) $_GET['payback_id']), true);
+                    if(checkToken(600, 'global_payback')) {
+                        $global_payback = new GlobalPayback();
+                        $global_payback = $global_payback->load(array('id'=>(int) $_GET['payback_id']), true);
 
-                    $users_in = $global_payback->getUsersIn()->get();
+                        $users_in = $global_payback->getUsersIn()->get();
 
-                    $users_in[(int) $_GET['from']][(int) $_GET['to']] = 0;
-                    $users_in[(int) $_GET['to']][(int) $_GET['from']] = 0;
+                        $users_in[(int) $_GET['from']][(int) $_GET['to']] = 0;
+                        $users_in[(int) $_GET['to']][(int) $_GET['from']] = 0;
 
-                    $global_payback->setUsersIn($users_in);
+                        $global_payback->setUsersIn($users_in);
 
-                    if($global_payback->getUsersIn()->isEmpty()) {
-                        $global_payback->setClosed(true);
+                        if($global_payback->getUsersIn()->isEmpty()) {
+                            $global_payback->setClosed(true);
+                        }
+                        else {
+                            $global_payback->setClosed(false);
+                        }
+
+                        $global_payback->save();
+
+                        // Clear the cache
+                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                        array_map("unlink", $cached_files);
+
+                        header('location: ?do=see_paybacks&id='.(int)$_GET['payback_id']);
+                        exit();
                     }
                     else {
-                        $global_payback->setClosed(false);
+                        header('location: index.php');
+                        exit();
                     }
-
-                    $global_payback->save();
-
-                    // Clear the cache
-                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                    array_map("unlink", $cached_files);
-
-                    header('location: ?do=see_paybacks&id='.(int)$_GET['payback_id']);
-                    exit();
-
                 }
                 else {
-                    $tpl->assign('error', $errors['unauthorized']);
+                    $tpl->assign('error', $errors['token_error'][LANG]);
                     $tpl->draw('index');
                 }
             }
@@ -765,104 +814,110 @@
             }
             else {
                 if(!empty($_POST['users_in'])) {
-                    $global_payback = new GlobalPayback();
+                    if(checkToken(600, 'global_payback')) {
+                        $global_payback = new GlobalPayback();
 
-                    // Backup database
-                    if(!is_dir('db_backups')) {
-                        mkdir('db_backups');
-                    }
-                    system("mysqldump -h ".MYSQL_HOST." -u ".MYSQL_LOGIN." -p ".MYSQL_PASSWORD." ".MYSQL_DB." > db_backups/".date('d-m-Y_H:i'));
+                        // Backup database
+                        if(!is_dir('db_backups')) {
+                            mkdir('db_backups');
+                        }
+                        system("mysqldump -h ".MYSQL_HOST." -u ".MYSQL_LOGIN." -p ".MYSQL_PASSWORD." ".MYSQL_DB." > db_backups/".date('d-m-Y_H:i'));
 
-                    $users_in = array();
-                    foreach($_POST['users_in'] as $user1_id) {
-                        $user1_id = intval($user1_id);
-                        foreach($_POST['users_in'] as $user2_id) {
-                            $user2_id = intval($user2_id);
-                            if($user1_id == $user2_id) {
-                                $users_in[$user1_id][$user2_id] = 0;
-                            }
-                            elseif(!empty($users_in[$user2_id][$user1_id])) {
-                                if($users_in[$user2_id][$user1_id] > 0) {
+                        $users_in = array();
+                        foreach($_POST['users_in'] as $user1_id) {
+                            $user1_id = intval($user1_id);
+                            foreach($_POST['users_in'] as $user2_id) {
+                                $user2_id = intval($user2_id);
+                                if($user1_id == $user2_id) {
                                     $users_in[$user1_id][$user2_id] = 0;
                                 }
-                                else {
-                                    $users_in[$user1_id][$user2_id] = -$users_in[$user2_id][$user1_id];
-                                    $users_in[$user2_id][$user1_id] = 0;
-                                }
-                            }
-                            else {
-                                // Get the amount user1 owes to user2
-                                $users_in[$user1_id][$user2_id] = 0;
-
-                                // Confirm all paybacks when user2 is buyer
-                                $invoices = new Invoice();
-                                $invoices = $invoices->load(array('buyer'=>$user2_id));
-
-                                if($invoices !== false) {
-                                    foreach($invoices as $invoice) {
-                                        $paybacks = new Payback();
-                                        $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user2_id, 'from_user'=>$user1_id));
-
-                                        if($paybacks === false) {
-                                            $payback = new Payback();
-                                            $payback->setTo($user2_id);
-                                            $payback->setFrom($user1_id);
-                                            $payback->setAmount($invoice->getAmountPerPerson($user1_id));
-                                            $payback->setInvoice($invoice->getId());
-                                            $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                                            $payback->save();
-
-                                            // Add the amount to what user1 owes to user2
-                                            $users_in[$user1_id][$user2_id] += $payback->getAmount();
-                                        }
+                                elseif(!empty($users_in[$user2_id][$user1_id])) {
+                                    if($users_in[$user2_id][$user1_id] > 0) {
+                                        $users_in[$user1_id][$user2_id] = 0;
+                                    }
+                                    else {
+                                        $users_in[$user1_id][$user2_id] = -$users_in[$user2_id][$user1_id];
+                                        $users_in[$user2_id][$user1_id] = 0;
                                     }
                                 }
+                                else {
+                                    // Get the amount user1 owes to user2
+                                    $users_in[$user1_id][$user2_id] = 0;
 
-                                // Confirm all paybacks when from is buyer
-                                $invoices = new Invoice();
-                                $invoices = $invoices->load(array('buyer'=>$user1_id));
+                                    // Confirm all paybacks when user2 is buyer
+                                    $invoices = new Invoice();
+                                    $invoices = $invoices->load(array('buyer'=>$user2_id));
 
-                                if($invoices !== false) {
-                                    foreach($invoices as $invoice) {
-                                        $paybacks = new Payback();
-                                        $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user1_id, 'from_user'=>$user2_id));
+                                    if($invoices !== false) {
+                                        foreach($invoices as $invoice) {
+                                            $paybacks = new Payback();
+                                            $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user2_id, 'from_user'=>$user1_id));
 
-                                        if($paybacks === false) {
-                                            $payback = new Payback();
-                                            $payback->setTo($user1_id);
-                                            $payback->setFrom($user2_id);
-                                            $payback->setAmount($invoice->getAmountPerPerson($user2_id));
-                                            $payback->setInvoice($invoice->getId());
-                                            $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                                            $payback->save();
+                                            if($paybacks === false) {
+                                                $payback = new Payback();
+                                                $payback->setTo($user2_id);
+                                                $payback->setFrom($user1_id);
+                                                $payback->setAmount($invoice->getAmountPerPerson($user1_id));
+                                                $payback->setInvoice($invoice->getId());
+                                                $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                                $payback->save();
 
-                                            // Substract the amount to what user1 owes to user2
-                                            $users_in[$user1_id][$user2_id] -= $payback->getAmount();
+                                                // Add the amount to what user1 owes to user2
+                                                $users_in[$user1_id][$user2_id] += $payback->getAmount();
+                                            }
+                                        }
+                                    }
+
+                                    // Confirm all paybacks when from is buyer
+                                    $invoices = new Invoice();
+                                    $invoices = $invoices->load(array('buyer'=>$user1_id));
+
+                                    if($invoices !== false) {
+                                        foreach($invoices as $invoice) {
+                                            $paybacks = new Payback();
+                                            $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user1_id, 'from_user'=>$user2_id));
+
+                                            if($paybacks === false) {
+                                                $payback = new Payback();
+                                                $payback->setTo($user1_id);
+                                                $payback->setFrom($user2_id);
+                                                $payback->setAmount($invoice->getAmountPerPerson($user2_id));
+                                                $payback->setInvoice($invoice->getId());
+                                                $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                                $payback->save();
+
+                                                // Substract the amount to what user1 owes to user2
+                                                $users_in[$user1_id][$user2_id] -= $payback->getAmount();
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    $global_payback->setUsersIn($users_in);
+                        $global_payback->setUsersIn($users_in);
 
-                    if($global_payback->getUsersIn()->isEmpty()) {
-                        $global_payback->setClosed(true);
+                        if($global_payback->getUsersIn()->isEmpty()) {
+                            $global_payback->setClosed(true);
+                        }
+                        else {
+                            $global_payback->setClosed(false);
+                        }
+
+                        $global_payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                        $global_payback->save();
+
+                        // Clear the cache
+                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                        array_map("unlink", $cached_files);
+
+                        header('location: index.php?do=manage_paybacks&'.$get_redir);
+                        exit();
                     }
                     else {
-                        $global_payback->setClosed(false);
+                        $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->draw('index');
                     }
-
-                    $global_payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                    $global_payback->save();
-
-                    // Clear the cache
-                    ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                    array_map("unlink", $cached_files);
-
-                    header('location: index.php?do=manage_paybacks&'.$get_redir);
-                    exit();
                 }
                 
                 $users_list = new User();
@@ -870,6 +925,7 @@
 
                 $tpl->assign('users', $users_list);
             }
+            $tpl->assign('payback', generateToken('global_payback'));
             $tpl->draw('manage_paybacks');
             break;
 
@@ -970,6 +1026,9 @@
                 $tpl->assign('invoices', secureDisplay($invoices_list));
                 $tpl->assign('paybacks', secureDisplay($paybacks));
                 $tpl->assign('balances', secureDisplay($balances));
+
+                $tpl->assign('token', generate_token('invoice'));
+
 
                 // Cache the page (1 month to make it almost permanent and only regenerate it upon new invoice)
                 $tpl->cache('index', 108000, $current_user->getLogin().$_GET['all']);

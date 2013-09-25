@@ -37,6 +37,7 @@
     </fieldset>
     <p>
         <input type="submit" onclick="return confirm('Vous êtes sur le point d\'ajouter un remboursement global incluant les utilisateurs sélectionnés.');" value="Valider"/>
+        <input type="hidden" name="token" value="{$token}"/>
     </p>
     </form>
 {/if}

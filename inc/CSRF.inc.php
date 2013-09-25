@@ -19,8 +19,13 @@
         if(session_id() == '')
             session_start();
 
-        if(isset($_SESSION[$name.'_token']) && isset($_SESSION[$name.'_token_time']) && isset($_POST['token'])) {
-            if($_SESSION[$name.'_token'] == $_POST['token']) {
+        if(isset($_SESSION[$name.'_token']) && isset($_SESSION[$name.'_token_time']) && (isset($_POST['token']) || isset($_GET['token']))) {
+            if(!empty($_POST['token']))
+                $token = $_POST['token'];
+            else
+                $token = $_GET['token'];
+
+            if($_SESSION[$name.'_token'] == $token) {
                 if($_SESSION[$name.'_token_time'] >= (time() - (int) $time))
                     return true;
             }

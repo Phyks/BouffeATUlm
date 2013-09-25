@@ -19,7 +19,7 @@
         <td>{$value->getDisplayName()}</td>
         <td>{$value->getAdmin() ? "Yes" : "No"}</td>
         <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Edit</a></td>
-        <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&user_id={$value->getId()}">Delete</a>{/if}</td>
+        <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&amp;user_id={$value->getId()}&amp;token={$token}">Delete</a>{/if}</td>
     </tr>
     {/loop}
 </table>
@@ -52,7 +52,7 @@
 
 {if condition="$user_id != -1"}
     <h2>Personal token for this user</h2>
-    <p>The personal token for this user to be used with the API is : {$user_data->getJsonToken()}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&user_id={$user_data->getId()}">generate a new one</a>.</p>
+    <p>The personal token for this user to be used with the API is : {$user_data->getJsonToken()}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&user_id={$user_data->getId()}&token={$token}">generate a new one</a>.</p>
 {/if}
 
 {elseif condition="$view == 'password'"}

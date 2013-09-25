@@ -19,7 +19,7 @@
         <td>{$value->getDisplayName()}</td>
         <td>{$value->getAdmin() ? "Yes" : "No"}</td>
         <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Modifier</a></td>
-        <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&user_id={$value->getId()}">Supprimer</a>{/if}</td>
+        <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&amp;user_id={$value->getId()}&amp;token={$token}">Supprimer</a>{/if}</td>
     </tr>
     {/loop}
 </table>
@@ -64,6 +64,6 @@
 </form>
 
 <h2>Votre jeton de connexion à l'API</h2>
-<p>Votre jeton personnel de connexion à l'API est : {$json_token}.<br/>Si vous pensez qu'il a pu être compromis, vous pouvez <a href="index.php?do=new_token">en générer un nouveau</a>.</p>
+<p>Votre jeton personnel de connexion à l'API est : {$json_token}.<br/>Si vous pensez qu'il a pu être compromis, vous pouvez <a href="index.php?do=new_token&amp;token={$token}">en générer un nouveau</a>.</p>
 {/if}
 {include="footer"}
