@@ -259,7 +259,7 @@
                 $user_id = $current_user->getId();
             }
 
-            if(checkToken(600, 'password')) {  
+            if(check_token(600, 'password')) {  
                 $user = new User();
                 $user = $user->load(array('id'=>$user_id), true);
                 $user->newJsonToken();
@@ -277,7 +277,7 @@
 
         case 'delete_user':
             if($_GET['user_id'] != $current_user->getId()) {
-                if(checkToken(600, 'edit_users')) {
+                if(check_token(600, 'edit_users')) {
                     $user = new User();
                     $user->setId($_GET['user_id']);
                     $user->delete();
@@ -337,7 +337,7 @@
 
         case 'edit_notice':
             if(isset($_POST['notice'])) {
-                if(checkToken(600, 'settings')) {
+                if(check_token(600, 'settings')) {
                     setNotice($_POST['notice']);
 
                     // Clear the cache
@@ -516,7 +516,7 @@
 
         case 'delete_invoice':
             if(!empty($_GET['id'])) {
-                if(checkToken(600, 'invoice')) {
+                if(check_token(600, 'invoice')) {
                     $invoice = new Invoice();
                     $invoice = $invoice->load(array('id'=>(int) $_GET['id']), true);
 
@@ -559,7 +559,7 @@
         case 'confirm_payback':
             if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['invoice_id']) && $_GET['from'] != $_GET['to']) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
-                    if(checkToken(600, 'invoice')) {
+                    if(check_token(600, 'invoice')) {
                         $invoice = new Invoice();
                         $invoice = $invoice->load(array('id'=>(int) $_GET['invoice_id']), true);
 
@@ -613,7 +613,7 @@
         case 'delete_payback':
             if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['invoice_id'])) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
-                    if(checkToken(600, 'invoice')) {
+                    if(check_token(600, 'invoice')) {
                         $paybacks = new Payback();
 
                         $paybacks = $paybacks->load(array('to_user'=>(int) $_GET['to'], 'from_user'=> (int) $_GET['from'], 'invoice_id'=> (int) $_GET['invoice_id']));
@@ -651,7 +651,7 @@
         case 'payall':
             if(!empty($_GET['from']) && !empty($_GET['to'])) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
-                    if(checkToken(600, 'invoice')) {
+                    if(check_token(600, 'invoice')) {
                         // Confirm all paybacks when to is buyer
                         $invoices = new Invoice();
                         $invoices = $invoices->load(array('buyer'=>(int) $_GET['to']));
@@ -745,7 +745,7 @@
 
             $tpl->assign('list', true);
             $tpl->assign('global_paybacks', $global_paybacks);
-            $tpl->assign('payback', generateToken('global_payback'));
+            $tpl->assign('payback', generate_token('global_payback'));
 
             $tpl->draw('see_paybacks');
             break;
@@ -753,7 +753,7 @@
         case "confirm_global_paybacks":
             if(!empty($_GET['from']) && !empty($_GET['to']) && !empty($_GET['payback_id']) && $_GET['from'] != $_GET['to']) {
                 if($_GET['to'] == $current_user->getId() || $current_user->getAdmin()) {
-                    if(checkToken(600, 'global_payback')) {
+                    if(check_token(600, 'global_payback')) {
                         $global_payback = new GlobalPayback();
                         $global_payback = $global_payback->load(array('id'=>(int) $_GET['payback_id']), true);
 
@@ -814,7 +814,7 @@
             }
             else {
                 if(!empty($_POST['users_in'])) {
-                    if(checkToken(600, 'global_payback')) {
+                    if(check_token(600, 'global_payback')) {
                         $global_payback = new GlobalPayback();
 
                         // Backup database
@@ -925,7 +925,7 @@
 
                 $tpl->assign('users', $users_list);
             }
-            $tpl->assign('payback', generateToken('global_payback'));
+            $tpl->assign('payback', generate_token('global_payback'));
             $tpl->draw('manage_paybacks');
             break;
 
@@ -953,6 +953,13 @@
                 }
 
                 if($invoices_list === false) $invoices_list = array();
+                else {
+                    $sort_keys = array();
+                    foreach($invoices_list as $key=>$entry) {
+                        $sort_keys[$key] = $entry->getDate();
+                    }
+                    array_multisort($sort_keys, SORT_DESC, $invoices_list);
+                }
 
                 $paybacks = array();
                 foreach($invoices_list as $invoice) {
