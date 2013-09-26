@@ -29,12 +29,12 @@
             <tr>
                 <th>Owes / To</th>
                 {loop="$global_paybacks->getUsersIn()->get()"}
-                    <th>{$users[$key1]->getDisplayName()}</th>
+                <th>{if condition="!empty($users[$key1])"}{$users[$key1]->getDisplayName()}{else}Deleted user{/if}</th>
                 {/loop}
             </tr>
             {loop="$global_paybacks->getUsersIn()->get()"}
                 <tr>
-                    <th>{$users[$key1]->getDisplayName()}</th>
+                    <th>{if condition="!empty($users[$key1])"}{$users[$key1]->getDisplayName()}{else}Deleted user{/if}</th>
                     {loop="$global_paybacks->getUsersIn()->get()"}
                         {if condition="$key1 == $key2"}
                             <td class="cell-disabled"></td>

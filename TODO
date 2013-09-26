@@ -1,9 +1,3 @@
-Issues :
-========
-* Test fr
-* Paybacks and user deletion
-* Minify CSS / JS
-
 Improvements :
 ==============
 * User groups
@@ -11,3 +5,4 @@ Improvements :
 * JSON output => do index view
 * API
 * README file
+* Minify CSS / JS
