@@ -52,7 +52,7 @@
 
 {if condition="$user_id != -1"}
     <h2>Personal token for this user</h2>
-    <p>The personal token for this user to be used with the API is : {$user_data->getJsonToken()}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&user_id={$user_data->getId()}&token={$token}">generate a new one</a>.</p>
+    <p>The personal token for this user to be used with the API is : {$user_data->getJsonToken()}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&user_id={$user_data->getId()}&amp;token={$token}">generate a new one</a>.</p>
 {/if}
 
 {elseif condition="$view == 'password'"}
@@ -64,6 +64,6 @@
 </form>
 
 <h2>Your personal token to use the API</h2>
-<p>Your personal token to use the API is : {$json_token}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token">generate a new one</a>.</p>
+<p>Your personal token to use the API is : {$json_token}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&amp;token={$token}">generate a new one</a>.</p>
 {/if}
 {include="footer"}

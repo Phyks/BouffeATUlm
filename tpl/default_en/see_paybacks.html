@@ -7,7 +7,7 @@
                 {loop="$global_paybacks"}
                 <dt>{$value->getDate()}</dt>
                 <dd>
-                    {if condition="$value->getClosed() !== false"}
+                    {if condition="$value->getClosed() === false"}
                          <a href="?do=see_paybacks&id={$value->getId()}">Payback n°{$value->getId()}</a>
                     {else}
                         [Closed] Payback n°{$value->getId()}

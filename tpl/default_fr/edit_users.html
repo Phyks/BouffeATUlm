@@ -52,7 +52,7 @@
 
 {if condition="$user_id != -1"}
     <h2>Jeton d'identification pour l'utilisateur</h2>
-    <p>Le jeton personnel d'identification à utiliser pour la connection à l'API est : {$user_data->getJsonToken()}.<br/>Si vous pensez qu'il a pu être compromis, vous pouvez <a href="index.php?do=new_token&user_id={$user_data->getId()}">en générer un nouveau</a>.</p>
+    <p>Le jeton personnel d'identification à utiliser pour la connection à l'API est : {$user_data->getJsonToken()}.<br/>Si vous pensez qu'il a pu être compromis, vous pouvez <a href="index.php?do=new_token&user_id={$user_data->getId()}&amp;token={$token}">en générer un nouveau</a>.</p>
 {/if}
 
 {elseif condition="$view == 'password'"}

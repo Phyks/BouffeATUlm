@@ -259,19 +259,24 @@
                 $user_id = $current_user->getId();
             }
 
-            if(check_token(600, 'password')) {  
+            if(check_token(600, 'password') || check_token(600, 'edit_users')) {  
                 $user = new User();
                 $user = $user->load(array('id'=>$user_id), true);
                 $user->newJsonToken();
                 $user->save();
                 $_SESSION['current_user'] = $user->sessionStore();
                 
-                header('location: index.php?do=password&'.$get_redir);
+                if(!empty($_GET['user_id']))
+                    header('location: index.php?do=edit_users&user_id='.$user_id);
+                else
+                    header('location: index.php?do=password&'.$get_redir);
                 exit();
             }
             else {
                 $tpl->assign('error', $errors['token_error'][LANG]);
+                $tpl->assign('block_error', true);
                 $tpl->draw('index');
+                exit();
             }
             break;
 
@@ -330,7 +335,9 @@
                 }
                 else {
                     $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('block_error', 'true');
                     $tpl->draw('index');
+                    exit();
                 }
             }
             break;
@@ -544,12 +551,16 @@
                     }
                     else {
                         $tpl->assign('error', $errors['unauthorized'][LANG]);
+                        $tpl->assign('block_error', true);
                         $tpl->draw('index');
+                        exit();
                     }
                 }
                 else {
                     $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('block_error', true);
                     $tpl->draw('index');
+                    exit();
                 }
             }
             else {
@@ -598,13 +609,17 @@
                     }
                     else {
                         $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->assign('block_error', true);
                         $tpl->draw('index');
+                        exit();
                     }
 
                 }
                 else {
                     $tpl->assign('error', $errors['unauthorized'][LANG]);
+                    $tpl->assign('block_error', true);
                     $tpl->draw('index');
+                    exit();
                 }
             }
             else {
@@ -635,7 +650,9 @@
                     }
                     else {
                         $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->assign('block_error', true);
                         $tpl->draw('index');
+                        exit();
                     }
 
                 }
@@ -705,7 +722,9 @@
                     }
                     else {
                         $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->assign('block_error', true);
                         $tpl->draw('index');
+                        exit();
                     }
 
                 }
@@ -747,7 +766,7 @@
 
             $tpl->assign('list', true);
             $tpl->assign('global_paybacks', $global_paybacks);
-            $tpl->assign('payback', generate_token('global_payback'));
+            $tpl->assign('token', generate_token('global_payback'));
 
             $tpl->draw('see_paybacks');
             break;
@@ -789,7 +808,9 @@
                 }
                 else {
                     $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('block_error', true);
                     $tpl->draw('index');
+                    exit();
                 }
             }
             else {
@@ -815,7 +836,7 @@
                 $tpl->assign('global_paybacks', $global_paybacks);
             }
             else {
-                if(!empty($_POST['users_in'])) {
+                if(!empty($_POST['users_in']) && count($_POST['users_in']) > 1) {
                     if(check_token(600, 'global_payback')) {
                         $global_payback = new GlobalPayback();
 
@@ -918,7 +939,9 @@
                     }
                     else {
                         $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->assign('block_error', true);
                         $tpl->draw('index');
+                        exit();
                     }
                 }
                 
@@ -927,7 +950,7 @@
 
                 $tpl->assign('users', $users_list);
             }
-            $tpl->assign('payback', generate_token('global_payback'));
+            $tpl->assign('token', generate_token('global_payback'));
             $tpl->draw('manage_paybacks');
             break;
 

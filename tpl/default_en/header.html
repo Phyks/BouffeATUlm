@@ -31,4 +31,5 @@
     {/if}
 </div>
 {/if}
-{if condition="!empty($error)"}<p class="error">{$error}</p>{/if}
+{if condition="!empty($error)"}<p class="error">{$error}</p>
+{if condition="!empty($block_error) && $block_error"}<p class="center"><a href="{$base_url}" onclick="window.history.back(); return false;">Go back to previous page</a></p></body></html>{function="exit();"}{/if}{/if}
