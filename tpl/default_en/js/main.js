@@ -26,10 +26,15 @@ function set_days_month_year() {
 }
 
 function guest_user_label(id) {
-    if(document.getElementById('guest_user_'+id).value > 1)
+    if(document.getElementById('guest_user_'+id).value > 1) {
         document.getElementById('guest_user_'+id+'_label').innerHTML = ' guests';
+
+        if(!document.getElementById('users_in_'+id).checked) {
+            document.getElementById('users_in_'+id).checked = true;
+        }
+    }
     else
-        document.getElementById('guest_user_'+id+'_label').innerHTML = ' guest';
+        document.getElementById('guest_user_'+id+'_label').innerHTML = ' guest'; 
 }
 
 function toggle_password(id) {
