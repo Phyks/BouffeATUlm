@@ -1,7 +1,10 @@
 Issues :
 ========
-* Check box on invoice form when modifying guests
 * Regenerate token
+* Global paybacks
+* Test fr
+* Paybacks and user deletion
+* Minify CSS / JS
 
 Improvements :
 ==============
@@ -9,5 +12,4 @@ Improvements :
 * Search invoice
 * JSON output => do index view
 * API
-* cf TODO in files
 * README file

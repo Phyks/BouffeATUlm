@@ -337,6 +337,7 @@
 
         case 'edit_notice':
             if(isset($_POST['notice'])) {
+                $tpl->assign('notice', htmlspecialchars($_POST['notice']));
                 if(check_token(600, 'settings')) {
                     setNotice($_POST['notice']);
 
@@ -353,6 +354,7 @@
             }
 
             $tpl->assign('show_settings', false);
+            $tpl->assign('token', generate_token('settings'));
             $tpl->draw('settings');
             break;
 
