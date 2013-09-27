@@ -39,7 +39,7 @@ table {
 }
 
 table td, table th {
-    padding: 0.5em;
+    padding: 0.75em;
     border: 1px solid black;
 }
 
@@ -133,6 +133,10 @@ input[type=submit] {
     margin: auto;
     width: 67%;
     text-align: center
+}
+
+#connexion_form .label-block {
+    width: 150px;
 }
 
 #edit_password_form, #edit_user_form, #invoice_form, #notice_form, #global_payback_form {

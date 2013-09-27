@@ -17,7 +17,7 @@
         <td>{$value->getId()}</td>
         <td>{$value->getLogin()}</td>
         <td>{$value->getDisplayName()}</td>
-        <td>{$value->getAdmin() ? "Yes" : "No"}</td>
+        <td>{$value->getAdmin() ? "Oui" : "Non"}</td>
         <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Modifier</a></td>
         <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&amp;user_id={$value->getId()}&amp;token={$token}">Supprimer</a>{/if}</td>
     </tr>
@@ -60,7 +60,7 @@
 <form method="post" action="index.php?do=password" id="edit_password_form">
     <p><label for="password" class="label-block">Nouveau mot de passe : </label><input type="password" id="password" name="password"/> <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Afficher / Masquer"/></a></p>
     <p><label for="password_confirm" class="label-block">Confirmation : </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Afficher / Masquer"/></a></p>
-    <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
+    <p class="center"><input type="submit" value="Enregistrer"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
 
 <h2>Votre jeton de connexion à l'API</h2>

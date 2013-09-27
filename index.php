@@ -10,11 +10,9 @@
         'negative_amount'=>array('fr'=>'Montant négatif non autorisé.', 'en'=>'Negative amount not allowed.'),
         'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.'),
         'unauthorized'=>array('fr'=>'Vous n\'avez pas le droit de faire cette action.', 'en'=>'You are not authorized to do that.'),
-        'no_users'=>array('fr'=>'Vous devez ajouter au moins un autre utilisateur.', 'en'=>'You must add at least one more user beside you.')
-    );
-
-    $localized = array(
-        'guest'=>array('fr'=>'invité', 'en'=>'guest')
+        'no_users'=>array('fr'=>'Vous devez ajouter au moins un autre utilisateur.', 'en'=>'You must add at least one more user beside you.'),
+        'what_unknown,'=>array('fr'=>'Vous devez renseigner un objet pour la dépense.', 'en'=>'You must add something to describe this invoice in "what" field.'),
+        'incorrect_amount'=>array('fr'=>'Montant incorrect ou nul.', 'en'=>'Incorrect amount or amount is zero.')
     );
 
     // Include necessary files
@@ -150,6 +148,8 @@
             }
             $tpl->assign('connection', true);
             $tpl->assign('user_post', (!empty($_POST['login'])) ? htmlspecialchars($_POST['login']) : '');
+            if(!empty($error))
+                $tpl->assign('error', $error);
             $tpl->assign('token', generate_token('connection'));
             $tpl->draw('connection');
             break;
@@ -517,6 +517,12 @@
             $tpl->assign('amount_post', (!empty($amount) ? (float) $amount : 0));
             $tpl->assign('what_post', (!empty($what) ? htmlspecialchars($what) : ''));
             $tpl->assign('users', secureDisplay($users_list));
+
+            if(empty($_POST['what']))
+                $tpl->assign('error', $errors['what_unknown'][LANG]);
+            if((float) $_POST['amount'] == 0)
+                $tpl->assign('error', $errors['incorrect_amount'][LANG]);
+
             $tpl->assign('users_in', (!empty($users_in) ? $users_in : array()));
             $tpl->assign('id', (!empty($_GET['id']) ? (int) $_GET['id'] : 0));
             $tpl->assign('token', generate_token('new_invoice'));

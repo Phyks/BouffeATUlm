@@ -44,6 +44,26 @@ function toggle_password(id) {
         document.getElementById(id).type = 'password';
 }
 
+function payback_nobody() {
+    var users = document.getElementById('global_payback_form').getElementsByClassName("users_in");
+
+    for(var index = 0; index < users.length; index ++) {
+        users[index].checked = false;
+    }
+
+    return false;
+}
+
+function payback_everybody() {
+    var users = document.getElementById('global_payback_form').getElementsByClassName("users_in");
+
+    for(var index = 0; index < users.length; index ++) {
+        users[index].checked = true;
+    }
+
+    return false;
+}
+
 $(document).ready(function() {
     $('#balance_table td, #global_paybacks_table td').hover(function() {
         $(this).closest('tr').find('td,th').addClass('highlight_td');

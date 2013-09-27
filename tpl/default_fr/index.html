@@ -58,9 +58,9 @@
                         {loop="$value->getUsersIn()->get()"}
                             {$users[$key2]->getDisplayName()}
                             {if condition="$value2 > 1"}
-                                ({$value2} guests)
+                                ({$value2} invités)
                             {elseif condition="$value2 == 1"}
-                                ({$value2} guest)
+                                ({$value2} invité)
                             {/if}
                             {if condition="$value1->getBuyer() != $key2"}
                                 - 

@@ -31,9 +31,10 @@
         <fieldset>
             <legend>Utilisateurs à inclure</legend>
             {loop="$users"}
-                <input type="checkbox" id="users_in_{$value->getId()}" name="users_in[]" value="{$value->getId()}"/>
+                <input type="checkbox" id="users_in_{$value->getId()}" name="users_in[]" class="users_in" value="{$value->getId()}" checked="checked"/>
                 <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label><br/>
-            {/loop}
+            {/loop}<br/>
+            Sélectionner : <a href="" onclick="return payback_nobody();">Personne</a> / <a href="" onclick="return payback_everybody();">Tout le monde</a>
     </fieldset>
     <p>
         <input type="submit" onclick="return confirm('Vous êtes sur le point d\'ajouter un remboursement global incluant les utilisateurs sélectionnés.');" value="Valider"/>

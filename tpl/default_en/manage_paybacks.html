@@ -31,9 +31,10 @@
         <fieldset>
             <legend>Users to include</legend>
             {loop="$users"}
-                <input type="checkbox" id="users_in_{$value->getId()}" name="users_in[]" value="{$value->getId()}"/>
+                <input type="checkbox" id="users_in_{$value->getId()}" name="users_in[]" class="users_in" value="{$value->getId()}" checked="checked"/>
                 <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label><br/>
-            {/loop}
+            {/loop}<br/>
+            Select : <a href="" onclick="return payback_nobody();">Nobody</a> / <a href="" onclick="return payback_everybody();">Everybody</a>
     </fieldset>
     <p>
         <input type="submit" onclick="return confirm('You are going to add a global payback which includes the selected user. Confirm ?');" value="Confirm"/>
