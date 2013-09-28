@@ -163,7 +163,7 @@
             break;
 
         case 'password':
-            if(!empty($_POST['email'])) {
+            if(!empty($_POST['email']) && !empty($_POST['notifications'])) {
                 if(check_token(600, 'password')) {
                     if(!empty($_POST['password']) && !empty($_POST['password_confirm'])) {
                         if($_POST['password'] == $_POST['password_confirm']) {
@@ -180,6 +180,7 @@
                         $tpl->assign('error', $errors['email_invalid'][LANG]);
                     }
                     
+                    $current_user->setNotifications($_POST['notifications']);
                     $current_user->save();
 
                     if(!empty($error)) {
@@ -205,7 +206,7 @@
                 exit();
             }
 
-            if(!empty($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['email']) && (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
+            if(!empty($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['email']) && (!empty($_POST['password']) && !empty($_POST['notifications']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
                 if(check_token(600, 'edit_users')) {
                     $user = new User();
                     if(!empty($_POST['user_id'])) {
@@ -223,6 +224,8 @@
 
                     if($user->setEmail($_POST['email']) !== false) {
                         if(!empty($_POST['user_id']) || $user->isUnique()) {
+                            $user->setNotifications($_POST['notifications']);
+
                             $user->save();
 
                             // Clear the cache
