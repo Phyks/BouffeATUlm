@@ -12,7 +12,8 @@
         'unauthorized'=>array('fr'=>'Vous n\'avez pas le droit de faire cette action.', 'en'=>'You are not authorized to do that.'),
         'no_users'=>array('fr'=>'Vous devez ajouter au moins un autre utilisateur.', 'en'=>'You must add at least one more user beside you.'),
         'what_unknown,'=>array('fr'=>'Vous devez renseigner un objet pour la dépense.', 'en'=>'You must add something to describe this invoice in "what" field.'),
-        'incorrect_amount'=>array('fr'=>'Montant incorrect ou nul.', 'en'=>'Incorrect amount or amount is zero.')
+        'incorrect_amount'=>array('fr'=>'Montant incorrect ou nul.', 'en'=>'Incorrect amount or amount is zero.'),
+        'email_invalid'=>array('fr'=>'L\'adresse e-mail est invalide.', 'en'=>'Incorrect e-mail address.')
     );
 
     // Include necessary files
@@ -162,23 +163,35 @@
             break;
 
         case 'password':
-            if(!empty($_POST['password']) && !empty($_POST['password_confirm'])) {
-                if($_POST['password'] == $_POST['password_confirm']) {
-                    if(check_token(600, 'password')) {
-                        $current_user->setPassword($current_user->encrypt($_POST['password']));
-                        $current_user->save();
+            if(!empty($_POST['email'])) {
+                if(check_token(600, 'password')) {
+                    if(!empty($_POST['password']) && !empty($_POST['password_confirm'])) {
+                        if($_POST['password'] == $_POST['password_confirm']) {
+                            $current_user->setPassword($current_user->encrypt($_POST['password']));
+                        }
+                        else {
+                            $error = true;
+                            $tpl->assign('error', $errors['password_mismatch'][LANG]);
+                        }
+                    }
 
+                    if($current_user->setEmail($_POST['email']) === false) {
+                        $error = true;
+                        $tpl->assign('error', $errors['email_invalid'][LANG]);
+                    }
+                    
+                    $current_user->save();
+
+                    if(!empty($error)) {
                         header('location: index.php?'.$get_redir);
                         exit();
                     }
-                    else {
-                        $tpl->assign('error', $errors['token_error'][LANG]);
-                    }
                 }
                 else {
-                    $tpl->assign('error', $errors['password_mismatch'][LANG]);
+                    $tpl->assign('error', $errors['token_error'][LANG]);
                 }
             }
+
             $tpl->assign('view', 'password');
             $tpl->assign('json_token', htmlspecialchars($current_user->getJsonToken()));
             $tpl->assign('token', generate_token('password'));
@@ -192,7 +205,7 @@
                 exit();
             }
 
-            if(!empty($_POST['login']) && !empty($_POST['display_name']) && (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
+            if(!empty($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['email']) && (!empty($_POST['password']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
                 if(check_token(600, 'edit_users')) {
                     $user = new User();
                     if(!empty($_POST['user_id'])) {
@@ -208,18 +221,23 @@
                     }
                     $user->setAdmin($_POST['admin']);
 
-                    if(!empty($_POST['user_id']) || $user->isUnique()) {
-                        $user->save();
+                    if($user->setEmail($_POST['email']) !== false) {
+                        if(!empty($_POST['user_id']) || $user->isUnique()) {
+                            $user->save();
 
-                        // Clear the cache
-                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                        array_map("unlink", $cached_files);
+                            // Clear the cache
+                            ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+                            array_map("unlink", $cached_files);
 
-                        header('location: index.php?do=edit_users&'.$get_redir);
-                        exit();
+                            header('location: index.php?do=edit_users&'.$get_redir);
+                            exit();
+                        }
+                        else {
+                            $tpl->assign('error', $errors['user_already_exists'][LANG]);
+                        }
                     }
                     else {
-                        $tpl->assign('error', $errors['user_already_exists'][LANG]);
+                        $tpl->assign('error', $errors['email_invalid'][LANG]);
                     }
                 }
                 else {
@@ -245,6 +263,7 @@
                 $tpl->assign('view', 'list_users');
             }
             $tpl->assign('login_post', (!empty($_POST['login']) ? htmlspecialchars($_POST['login']) : ''));
+            $tpl->assign('email_post', (!empty($_POST['email']) ? htmlspecialchars($_POST['email']) : ''));
             $tpl->assign('display_name_post', (!empty($_POST['display_name']) ? htmlspecialchars($_POST['display_name']) : ''));
             $tpl->assign('admin_post', (isset($_POST['admin']) ? (int) $_POST['admin'] : -1));
             $tpl->assign('token', generate_token('edit_users'));

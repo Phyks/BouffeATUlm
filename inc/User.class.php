@@ -3,15 +3,17 @@ require_once('data/config.php');
 require_once('Storage.class.php');
 
 class User extends Storage {
-    protected $id = 0, $login, $display_name, $password, $admin, $json_token;
+    protected $id = 0, $login, $email, $display_name, $password, $admin, $json_token, $notifications;
     protected $TABLE_NAME = "Users";
     protected $fields = array(
         'id'=>'key',
         'login'=>'string',
+        'email'=>'string',
         'display_name'=>'string',
         'password'=>'password',
         'admin'=>'bool',
         'json_token'=>'string',
+        'notifications'=>'int'
         );
 
     public function __construct() {
@@ -32,12 +34,20 @@ class User extends Storage {
         return $this->id;
     }
 
+    public function getEmail() {
+        return $this->email;
+    }
+
     public function getAdmin() {
         return $this->admin;
     }
 
     public function getJsonToken() {
         return $this->json_token;
+    }
+
+    public function getNotifications() {
+        return $this->notifications;
     }
 
     // Setters
@@ -48,6 +58,16 @@ class User extends Storage {
 
     public function setLogin($login) {
         $this->login = $login;
+    }
+
+    public function setEmail($email) {
+        if(filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
+            $this->email = $email;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     public function setDisplayName($display_name) {
@@ -64,6 +84,26 @@ class User extends Storage {
 
     public function setJsonToken($token) {
         $this->json_token = $token;
+    }
+
+    public function setNotifications($notifications) {
+        switch($notifications) {
+            case 1:
+                $this->notifications = 1;
+                break;
+
+            case 2:
+                $this->notifications = 2;
+                break;
+            
+            case 3:
+                $this->notifications = 3;
+                break;
+
+            default:
+                $this->notifications = 3;
+                break;
+        }
     }
 
     // Password functions
@@ -99,10 +139,10 @@ class User extends Storage {
     // ===============
     public function sessionStore($serialize = true) {
         if($serialize) {
-            return serialize(array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token));
+            return serialize(array('id'=>$this->id, 'login'=>$this->login, 'email'=>$this->email, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token, 'notifications'=>$this->notifications));
         }
         else {
-            return array('id'=>$this->id, 'login'=>$this->login, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token);
+            return array('id'=>$this->id, 'login'=>$this->login, 'email'=>$this->email, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token, 'notifications'=>$this->notifications);
         }
     }
 
@@ -114,10 +154,12 @@ class User extends Storage {
 
         $this->setId($user_data['id']);
         $this->setLogin($user_data['login']);
+        $this->setEmail($user_data['email']);
         $this->setDisplayName($user_data['display_name']);
         $this->setPassword($user_data['password']);
         $this->setAdmin($user_data['admin']);
         $this->setJsonToken($user_data['json_token']);
+        $this->setNotifications($user_data['notifications']);
     }
 
     // Check wether a user already exists or not 
@@ -137,9 +179,11 @@ class User extends Storage {
     public function secureDisplay() {
         $this->id = (int) $this->id;
         $this->login = htmlspecialchars($this->login);
+        $this->email = htmlspecialchars($this->email);
         $this->display_name = htmlspecialchars($this->display_name);
         $this->admin = (int) $this->admin;
         $this->json_token = htmlspecialchars($this->json_token);
+        $this->notifications = (int) $this->notifications;
 
         return $this;
     }

@@ -8,6 +8,7 @@
         <th>Id</th>
         <th>Login</th>
         <th>Display Name</th>
+        <th>E-mail address</th>
         <th>Is admin ?</th>
         <th>Edit</th>
         <th>Delete</th>
@@ -17,6 +18,7 @@
         <td>{$value->getId()}</td>
         <td>{$value->getLogin()}</td>
         <td>{$value->getDisplayName()}</td>
+        <td>{$value->getEmail()}</td>
         <td>{$value->getAdmin() ? "Yes" : "No"}</td>
         <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Edit</a></td>
         <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&amp;user_id={$value->getId()}&amp;token={$token}">Delete</a>{/if}</td>
@@ -31,6 +33,17 @@
     </p>
     <p>
         <label for="display_name" class="label-block">Displayed name : </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
+    </p>
+    <p>
+        <label for="email" class="label-block">E-mail address : </label><input type="text" name="email" id="email" {if condition="$email_post != ''"} value="{$email_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getEmail().'"' : ''} {/if}/>
+    </p>
+    <p>
+        <label for="notifications" class="label-block">Notifications for </label>
+        <select name="notifications" id="notifications">
+            <option value="1" {if condition="$user_data->getNotifications() == 1"}selected="selected"{/if}>nothing.</option>
+            <option value="2" {if condition="$user_data->getNotifications() == 2"}selected="selected"{/if}>global paybacks only.</option>
+            <option value="3" {if condition="$user_data->getNotifications() == 3"}selected="selected"{/if}>everything involving this user.</option>
+        </select>
     </p>
     <p>
         <label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/>  <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a>
@@ -60,6 +73,18 @@
 <form method="post" action="index.php?do=password" id="edit_password_form">
     <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/> <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
     <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
+    <p>
+        <label for="email" class="label-block">E-mail address : </label><input type="text" name="email" id="email" value="{$current_user->getEmail()}"/>
+    </p>
+    <p>
+        <label for="notifications" class="label-block">Notifications for </label>
+        <select name="notifications" id="notifications">
+            <option value="1" {if condition="$current_user->getNotifications() == 1"}selected="selected"{/if}>nothing.</option>
+            <option value="2" {if condition="$current_user->getNotifications() == 2"}selected="selected"{/if}>global paybacks only.</option>
+            <option value="3" {if condition="$current_user->getNotifications() == 3"}selected="selected"{/if}>everything involving you.</option>
+        </select>
+    </p>
+    <p><em>Note :</em> Leave blank the password fields if you don't want to edit password.</p>
     <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
 

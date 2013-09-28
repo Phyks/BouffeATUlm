@@ -8,6 +8,7 @@
         <th>Id</th>
         <th>Identifiant</th>
         <th>Nom affiché</th>
+        <th>Adresse e-mail</th>
         <th>Administrateur ?</th>
         <th>Modifier</th>
         <th>Supprimer</th>
@@ -17,6 +18,7 @@
         <td>{$value->getId()}</td>
         <td>{$value->getLogin()}</td>
         <td>{$value->getDisplayName()}</td>
+        <td>{$value->getEmail()}</td>
         <td>{$value->getAdmin() ? "Oui" : "Non"}</td>
         <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Modifier</a></td>
         <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&amp;user_id={$value->getId()}&amp;token={$token}">Supprimer</a>{/if}</td>
@@ -31,6 +33,17 @@
     </p>
     <p>
         <label for="display_name" class="label-block">Nom affiché : </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
+    </p>
+    <p>
+        <label for="email" class="label-block">Adresse e-mail : </label><input type="text" name="email" id="email" {if condition="$email_post != ''"} value="{$email_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getEmail().'"' : ''} {/if}/>
+    </p>
+    <p>
+        <label for="notifications" class="label-block">Notifications pour </label>
+        <select name="notifications" id="notifications">
+            <option value="1" {if condition="$user_data->getNotifications() == 1"}selected="selected"{/if}>rien.</option>
+            <option value="2" {if condition="$user_data->getNotifications() == 2"}selected="selected"{/if}>les remboursements globaux uniquement.</option>
+            <option value="3" {if condition="$user_data->getNotifications() == 3"}selected="selected"{/if}>tout ce qui concerne cet utilisateur.</option>
+        </select>
     </p>
     <p>
         <label for="password" class="label-block">Mot de passe : </label><input type="password" name="password" id="password"/>  <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Afficher / Masquer"/></a>
@@ -60,6 +73,19 @@
 <form method="post" action="index.php?do=password" id="edit_password_form">
     <p><label for="password" class="label-block">Nouveau mot de passe : </label><input type="password" id="password" name="password"/> <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Afficher / Masquer"/></a></p>
     <p><label for="password_confirm" class="label-block">Confirmation : </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Afficher / Masquer"/></a></p>
+    <p>
+        <label for="email" class="label-block">Adresse e-mail : </label><input type="text" name="email" id="email" value="{$current_user->getEmail()}"/>
+    </p>
+    <p>
+        <label for="notifications" class="label-block">Notifications pour </label>
+        <select name="notifications" id="notifications">
+            <option value="1" {if condition="$current_user->getNotifications() == 1"}selected="selected"{/if}>rien.</option>
+            <option value="2" {if condition="$current_user->getNotifications() == 2"}selected="selected"{/if}>les remboursements globaux uniquement.</option>
+            <option value="3" {if condition="$current_user->getNotifications() == 3"}selected="selected"{/if}>tout ce qui vous concerne.</option>
+        </select>
+    </p>
+
+    <p><em>Note :</em> Laissez les champs mot de passe vides pour ne pas modifier le mot de passe.</p>
     <p class="center"><input type="submit" value="Enregistrer"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
 
