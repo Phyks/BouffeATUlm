@@ -1,4 +1,3 @@
-* Check database creation in install.php
 * Don't display the whole balance table if not admin
 * Notifications by e-mail for users
 

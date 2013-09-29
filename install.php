@@ -29,7 +29,7 @@
             $db = new PDO('mysql:host='.$mysql_host.';dbname='.$mysql_db, $mysql_login, $mysql_password);
 
             //Create table "Users"
-            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1), json_token VARCHAR(32)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), email VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1), json_token VARCHAR(32), notifications TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             //Create table "Invoices"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, buyer INT(11), amount INT(11), what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
@@ -41,7 +41,7 @@
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Paybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, invoice_id INT(11), KEY invoice_id (invoice_id), amount INT(11), from_user INT(11), to_user INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             // Create table "GlobalPaybacks"
-            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'GlobalPaybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'GlobalPaybacks (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, closed TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             // Create table "Users_in_GlobalPaybacks"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users_in_GlobalPaybacks (global_payback_id INT(11) NOT NULL, KEY global_payback_id (global_payback_id), user1_id INT(11), user2_id INT(11), amount INT(11)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');

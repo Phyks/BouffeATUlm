@@ -11,7 +11,7 @@
         'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.'),
         'unauthorized'=>array('fr'=>'Vous n\'avez pas le droit de faire cette action.', 'en'=>'You are not authorized to do that.'),
         'no_users'=>array('fr'=>'Vous devez ajouter au moins un autre utilisateur.', 'en'=>'You must add at least one more user beside you.'),
-        'what_unknown,'=>array('fr'=>'Vous devez renseigner un objet pour la dépense.', 'en'=>'You must add something to describe this invoice in "what" field.'),
+        'what_unknown'=>array('fr'=>'Vous devez renseigner un objet pour la dépense.', 'en'=>'You must add something to describe this invoice in "what" field.'),
         'incorrect_amount'=>array('fr'=>'Montant incorrect ou nul.', 'en'=>'Incorrect amount or amount is zero.'),
         'email_invalid'=>array('fr'=>'L\'adresse e-mail est invalide.', 'en'=>'Incorrect e-mail address.')
     );
@@ -540,9 +540,9 @@
             $tpl->assign('what_post', (!empty($what) ? htmlspecialchars($what) : ''));
             $tpl->assign('users', secureDisplay($users_list));
 
-            if(empty($_POST['what']))
+            if(isset($_POST['what']) && empty($_POST['what']))
                 $tpl->assign('error', $errors['what_unknown'][LANG]);
-            if((float) $_POST['amount'] == 0)
+            if(!empty($_POST['amount']) && (float) $_POST['amount'] == 0)
                 $tpl->assign('error', $errors['incorrect_amount'][LANG]);
 
             $tpl->assign('users_in', (!empty($users_in) ? $users_in : array()));
