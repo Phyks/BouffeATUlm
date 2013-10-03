@@ -79,3 +79,21 @@
 
         return $return;
     }
+
+    // Sendmail function by Bronco
+    function sendmail($to, $subject = '[Bouffe@Ulm]', $msg, $from = null, $format = 'text/plain') {
+        $r = "\r\n";
+        $header = '';
+        $msg = wordwrap ($msg, 70, $r);
+        if ($format != 'text/plain') {
+            $msg = htmlspecialchars ($msg);
+        }
+        if (!empty ($from)) {
+            $header .= 'From: '.$from.$r;
+        }
+        $header =
+            'Content-Type: text/plain; charset="utf-8"'.$r.
+            'Content-Transfer-Encoding: 8bit'.$r.$header;
+        
+        return mail ($to, $subject, $msg, $header);
+    }

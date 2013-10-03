@@ -402,29 +402,29 @@
 
                             foreach($config as $line_number=>$line) {
                                 if(strpos(trim($line), "MYSQL_HOST") !== false)
-                                    $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');";
+                                    $config[$line_number] = "\tdefine('MYSQL_HOST', '".$_POST['mysql_host']."');\n";
                                 elseif(strpos(trim($line), "MYSQL_LOGIN") !== false)
-                                    $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');";
+                                    $config[$line_number] = "\tdefine('MYSQL_LOGIN', '".$_POST['mysql_login']."');\n";
                                 elseif(strpos(trim($line), "MYSQL_PASSWORD") !== false && !empty($_POST['mysql_password']))
-                                    $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');";
+                                    $config[$line_number] = "\tdefine('MYSQL_PASSWORD', '".$_POST['mysql_password']."');\n";
                                 elseif(strpos(trim($line), "MYSQL_DB") !== false)
-                                    $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');";
+                                    $config[$line_number] = "\tdefine('MYSQL_DB', '".$_POST['mysql_db']."');\n";
                                 elseif(strpos(trim($line), "MYSQL_PREFIX") !== false && !empty($_POST['mysql_prefix']))
-                                    $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');";
+                                    $config[$line_number] = "\tdefine('MYSQL_PREFIX', '".$_POST['mysql_prefix']."');\n";
                                 elseif(strpos(trim($line), "INSTANCE_TITLE") !== false)
-                                    $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');";
+                                    $config[$line_number] = "\tdefine('INSTANCE_TITLE', '".$_POST['instance_title']."');\n";
                                 elseif(strpos(trim($line), "BASE_URL") !== false)
-                                    $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');";
+                                    $config[$line_number] = "\tdefine('BASE_URL', '".$_POST['base_url']."');\n";
                                 elseif(strpos(trim($line), "CURRENCY") !== false)
-                                    $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');";
+                                    $config[$line_number] = "\tdefine('CURRENCY', '".$_POST['currency']."');\n";
                                 elseif(strpos(trim($line), "EMAIL_WEBMASTER") !== false)
-                                    $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');";
+                                    $config[$line_number] = "\tdefine('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');\n";
                                 elseif(strpos(trim($line), "TEMPLATE_DIR") !== false)
-                                    $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');";
+                                    $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');\n";
                                 elseif(strpos(trim($line), "LANG") !== false)
-                                    $config[$line_number] = "\tdefine('LANG', '".substr($_POST['template'], -2)."');";
+                                    $config[$line_number] = "\tdefine('LANG', '".substr($_POST['template'], -2)."');\n";
                                 elseif(strpos(trim($line), 'date_default_timezone_set') !== false)
-                                    $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');";
+                                    $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
                             }
 
                             if(file_put_contents("data/config.php", $config)) {

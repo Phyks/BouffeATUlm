@@ -90,13 +90,15 @@
                     $admin->setDisplayName($_POST['admin_display_name']);
                     $admin->setPassword($admin->encrypt($_POST['admin_password']));
                     $admin->setAdmin(true);
+                    $admin->setEmail($_POST['email_webmaster']);
+                    $admin->setNotifications(3);
                     $admin->newJsonToken();
                     $admin->save();
 
                     header('location: index.php');
                     exit();
                 } catch (Exception $e) {
-                    $erreur = 'An error occurred when inserting user in the database.<br/> Error message : '.$e->getMessage().'.';
+                    $error = 'An error occurred when inserting user in the database.<br/> Error message : '.$e->getMessage().'.';
                 }
             }
             else

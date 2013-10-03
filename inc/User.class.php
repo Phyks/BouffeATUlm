@@ -88,15 +88,15 @@ class User extends Storage {
 
     public function setNotifications($notifications) {
         switch($notifications) {
-            case 1:
+            case 1: // Nothing
                 $this->notifications = 1;
                 break;
 
-            case 2:
+            case 2: // Global paybacks only
                 $this->notifications = 2;
                 break;
             
-            case 3:
+            case 3: // Everything concerning you
                 $this->notifications = 3;
                 break;
 
