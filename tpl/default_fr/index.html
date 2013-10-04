@@ -6,29 +6,54 @@
 
 <div id="quick_summary">
     <h2>Bilan</h2>
-    <p class="center">Lire <em>ligne</em> doit <em>case</em> {$currency} à <em>colonne</em>. Vous pouvez cliquer sur les liens pour confirmer les remboursements.
-    <table id="balance_table"> 
-        <tr>
-            <th>Doit\À</th>
-            {loop="users"}
-            <th>{$value->getDisplayName()}</th>
-            {/loop}
-        </tr>
-        {loop="users"}
+    {if condition="$current_user->getAdmin()"}
+        <p class="center">Lire <em>ligne</em> doit <em>case</em> {$currency} à <em>colonne</em>. Vous pouvez cliquer sur les liens pour confirmer les remboursements.
+        <table id="balance_table"> 
             <tr>
-                <th>{$value->getDisplayName()}</th>
+                <th>Doit\À</th>
                 {loop="users"}
-                    {if condition="$balances[$value1->getId()][$value2->getId()] === 'X'"}
-                    <td class="cell-disabled"></td>
-                    {elseif condition="$balances[$value1->getId()][$value2->getId()] === '-' || ($value2->getId() != $current_user->getId() && !$current_user->getAdmin())"}
-                        <td>{$balances[$value1->getId()][$value2->getId()]}</td>
-                    {else}
-                        <td><a href="?do=payall&amp;from={$value1->getId()}&amp;to={$value2->getId()}&amp;token={$token}">{$balances[$value1->getId()][$value2->getId()]}</a></td>
-                    {/if}
+                <th>{$value->getDisplayName()}</th>
                 {/loop}
             </tr>
-        {/loop}
-    </table>
+            {loop="users"}
+                <tr>
+                    <th>{$value->getDisplayName()}</th>
+                    {loop="users"}
+                        {if condition="$balances[$value1->getId()][$value2->getId()] === 'X'"}
+                        <td class="cell-disabled"></td>
+                        {elseif condition="$balances[$value1->getId()][$value2->getId()] === '-' || ($value2->getId() != $current_user->getId() && !$current_user->getAdmin())"}
+                            <td>{$balances[$value1->getId()][$value2->getId()]}</td>
+                        {else}
+                            <td><a href="?do=payall&amp;from={$value1->getId()}&amp;to={$value2->getId()}&amp;token={$token}">{$balances[$value1->getId()][$value2->getId()]}</a></td>
+                        {/if}
+                    {/loop}
+                </tr>
+            {/loop}
+        </table>
+    {else}
+        <table>
+            <tr>
+                <th>Utilisateurs</th>
+                <th>Vous devez</th>
+                <th>Il vous doit</th>
+            </tr>
+            {loop="$users"}
+                {if condition="$balances[$value->getId()][$current_user->getId()] !== 'X' && $balances[$value->getId()][$current_user->getId()] !== '-'"}
+                    </tr>
+                        <td>{$value->getDisplayName()}</td>
+                        <td>-</td>
+                        <td>{$balances[$value->getId()][$current_user->getId()]}{$currency}</td>
+                    </tr>
+                {elseif condition="$balances[$current_user->getId()][$value->getId()] !== 'X' && $balances[$current_user->getId()][$value->getId()] !== '-'"}
+                    </tr>
+                        <td>{$value->getDisplayName()}</td>
+                        <td>{$balances[$current_user->getId()][$value->getId()]}{$currency}</td>
+                        <td>-</td>
+                    </tr>
+                {/if}
+            {/loop}
+        </table>
+    {/if}
 </div>
 <div id="detailed_summary">
     <h2>Liste détaillée des dépenses{if condition="$all == 0"} du dernier mois{/if}</h2>
