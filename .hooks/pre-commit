@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# This hook handle CSS and JS minification for the default templates.
+
+# ******************************************************************
+# You'll need to have java installed on your system to use this hook
+# ******************************************************************
+
+# *** Replace these two vars if need to use another YUICOMPRESSOR than provided ***
+YUICOMPRESSOR="../../.hooks/yuicompressor-2.4.8.jar"
+# ***
+
+# Templates to process
+TEMPLATES="tpl/default_en/ tpl/default_fr/"
+# =============
+
+for template in $TEMPLATES
+do
+    cd $template
+    if `git diff-index --cached HEAD | grep js/main.js > /dev/null 2>&1` || ! [ -e "js/main.min.js" ]
+    then
+        echo ">>> Minify hook started"
+        if [ -e "js/main.min.js" ]
+        then
+            rm js/main.min.js
+        fi
+
+        cat js/jquery-1.10.2.min.js js/main.js > js/main.tmp.js
+        java -jar $YUICOMPRESSOR -o "js/main.min.js" js/main.tmp.js
+        rm js/main.tmp.js
+
+        git add js/main.min.js
+        echo -e ">>> JS files minified.\n"
+    fi
+
+    if `git diff-index --cached HEAD | grep css/style.css > /dev/null 2>&1` || ! [ -e "css/style.min.css" ]
+    then 
+        echo ">>> Minify hook started"
+        if [ -e "css/style.min.css" ]
+        then
+            rm css/style.min.css
+        fi
+
+        java -jar $YUICOMPRESSOR css/style.css -o css/style.min.css
+        git add css/style.min.css
+        echo -e ">>> CSS files minified.\n"
+    fi
+    cd ../..
+done
+exit 0
