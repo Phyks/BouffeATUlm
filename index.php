@@ -206,11 +206,11 @@
                 exit();
             }
 
-            if(!empty($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['email']) && (!empty($_POST['password']) && !empty($_POST['notifications']) || !empty($_POST['user_id'])) && isset($_POST['admin'])) {
+            if(!empty($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['email']) && (!empty($_POST['password'])  || !empty($_POST['user_id'])) && !empty($_POST['notifications']) && isset($_POST['admin'])) {
                 if(check_token(600, 'edit_users')) {
                     $user = new User();
                     if(!empty($_POST['user_id'])) {
-                        $user->setId($_POST['user_id']);
+                        $user->load(array('id' => $_POST['user_id']));
                     }
                     else {
                         $user->newJsonToken();
