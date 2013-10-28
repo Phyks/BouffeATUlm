@@ -210,7 +210,7 @@
                 if(check_token(600, 'edit_users')) {
                     $user = new User();
                     if(!empty($_POST['user_id'])) {
-                        $user->load(array('id' => $_POST['user_id']));
+                        $user = $user->load(array('id' => $_POST['user_id']), true);
                     }
                     else {
                         $user->newJsonToken();
@@ -286,7 +286,9 @@
                 $user = $user->load(array('id'=>$user_id), true);
                 $user->newJsonToken();
                 $user->save();
-                $_SESSION['current_user'] = $user->sessionStore();
+
+                if(empty($_GET['user_id']))
+                    $_SESSION['current_user'] = $user->sessionStore();
                 
                 if(!empty($_GET['user_id']))
                     header('location: index.php?do=edit_users&user_id='.$user_id);
