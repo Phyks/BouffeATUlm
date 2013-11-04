@@ -903,20 +903,22 @@
 
                                     if($invoices !== false) {
                                         foreach($invoices as $invoice) {
-                                            $paybacks = new Payback();
-                                            $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user2_id, 'from_user'=>$user1_id));
+                                            if($invoice->getAmountPerPerson($user1_id) !== false) {
+                                                $paybacks = new Payback();
+                                                $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user2_id, 'from_user'=>$user1_id));
 
-                                            if($paybacks === false) {
-                                                $payback = new Payback();
-                                                $payback->setTo($user2_id);
-                                                $payback->setFrom($user1_id);
-                                                $payback->setAmount($invoice->getAmountPerPerson($user1_id));
-                                                $payback->setInvoice($invoice->getId());
-                                                $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                                                $payback->save();
+                                                if($paybacks === false) {
+                                                    $payback = new Payback();
+                                                    $payback->setTo($user2_id);
+                                                    $payback->setFrom($user1_id);
+                                                    $payback->setAmount($invoice->getAmountPerPerson($user1_id));
+                                                    $payback->setInvoice($invoice->getId());
+                                                    $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                                    $payback->save();
 
-                                                // Add the amount to what user1 owes to user2
-                                                $users_in[$user1_id][$user2_id] += $payback->getAmount();
+                                                    // Add the amount to what user1 owes to user2
+                                                    $users_in[$user1_id][$user2_id] += $payback->getAmount();
+                                                }
                                             }
                                         }
                                     }
@@ -927,20 +929,22 @@
 
                                     if($invoices !== false) {
                                         foreach($invoices as $invoice) {
-                                            $paybacks = new Payback();
-                                            $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user1_id, 'from_user'=>$user2_id));
+                                            if($invoice->getAmountPerPerson($user2_id) !== false) {
+                                                $paybacks = new Payback();
+                                                $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user1_id, 'from_user'=>$user2_id));
 
-                                            if($paybacks === false) {
-                                                $payback = new Payback();
-                                                $payback->setTo($user1_id);
-                                                $payback->setFrom($user2_id);
-                                                $payback->setAmount($invoice->getAmountPerPerson($user2_id));
-                                                $payback->setInvoice($invoice->getId());
-                                                $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                                                $payback->save();
+                                                if($paybacks === false) {
+                                                    $payback = new Payback();
+                                                    $payback->setTo($user1_id);
+                                                    $payback->setFrom($user2_id);
+                                                    $payback->setAmount($invoice->getAmountPerPerson($user2_id));
+                                                    $payback->setInvoice($invoice->getId());
+                                                    $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+                                                    $payback->save();
 
-                                                // Substract the amount to what user1 owes to user2
-                                                $users_in[$user1_id][$user2_id] -= $payback->getAmount();
+                                                    // Substract the amount to what user1 owes to user2
+                                                    $users_in[$user1_id][$user2_id] -= $payback->getAmount();
+                                                }
                                             }
                                         }
                                     }

@@ -26,7 +26,15 @@
         }
 
         public function get() {
-            return $this->users_list;
+            // Note : store amounts as int in database
+            $display = array();
+            foreach($this->users_list as $key1=>$temp) {
+                foreach($temp as $key2=>$amount) {
+                    $display[$key1][$key2] = (float) ($amount / 100);
+                }
+            }
+
+            return $display;
         }
 
         // Setters
@@ -36,7 +44,15 @@
         }
 
         public function set($users_in) {
-            $this->users_list = $users_in;
+            // Note : store amounts as int in database
+            $store = array();
+            foreach($users_in as $key1=>$temp) {
+                foreach($temp as $key2=>$amount) {
+                    $store[$key1][$key2] = (int) ($amount * 100);
+                }
+            }
+
+            $this->users_list = $store;
         }
 
         // Maps htmlspecialchars on the class before display
