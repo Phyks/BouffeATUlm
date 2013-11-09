@@ -97,7 +97,7 @@
             }
 
             // Amount is stored in cents
-            return round($this->amount / 100 / (count($users_in) + $guests) * (1 + $users_in[(int) $id]), 2); // Note : $users_in[(int) $id] is the number of guests for user $id
+            return (isset($users_in[(int) $id])) ? round($this->amount / 100 / (count($users_in) + $guests) * (1 + $users_in[(int) $id]), 2) : 0; // Note : $users_in[(int) $id] is the number of guests for user $id
         }
 
         // Maps htmlspecialchars on the class before display
