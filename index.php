@@ -1055,6 +1055,17 @@
                     $tpl->assign('all', 1);
                 }
 
+                // Only keep the invoices which concern the user (as buyer or user in) (only if user != admin)
+                // TODO : Optimize ?
+                if(!$current_user->getAdmin()) {
+                    foreach($invoices_list as $key=>$invoice) {
+                        if($invoice->getBuyer() != $current_user->getId() && !$invoice->getUsersIn()->inUsersIn($current_user->getId())) {
+                            unset($invoices_list[$key]);
+                        }
+                    }
+                }
+
+
                 if($invoices_list === false) $invoices_list = array();
                 else {
                     $sort_keys = array();
