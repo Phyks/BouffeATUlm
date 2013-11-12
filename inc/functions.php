@@ -97,3 +97,11 @@
         
         return mail ($to, $subject, $msg, $header);
     }
+
+    // Function to sort an array by abs desc
+    function sort_array_abs($a, $b) {
+        if(abs($a) == abs($b))
+            return 0;
+
+        return (abs($a) < abs($b)) ? 1 : -1;
+    }

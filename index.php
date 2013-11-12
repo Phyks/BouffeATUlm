@@ -952,6 +952,50 @@
                             }
                         }
 
+                        // Now, let's simplify the matrix ! :)
+                        // First, get the total balance by user (gains - debts)
+                        $balances = array();
+                        $simplified_balances = array();
+                        foreach($_POST['users_in'] as $user) {
+                            $balances[$user] = 0;
+                            foreach($_POST['users_in'] as $user2) {
+                                if(!empty($users_in[$user][$user2])) {
+                                    $balances[$user] -= $users_in[$user][$user2];
+                                }
+                                if(!empty($users_in[$user2][$user])) {
+                                    $balances[$user] += $users_in[$user2][$user];
+                                }
+                                $simplified_balances[$user][$user2] = 0;
+                            }
+                        }
+
+                        // Do while $balances is not identically filled with zeros
+                        while(count(array_unique($balances)) != 1 or $balances[key($balances)] != 0) {
+                            // Sort balances in abs values, desc
+                            uasort($balances, "sort_array_abs");
+
+                            // Get the largest one in abs
+                            // The following largest with opposite sign must pay him back the max
+                            reset($balances);
+                            $user1 = key($balances);
+
+                            foreach($balances as $user2=>$value) {
+                                if($value * $balances[$user1] < 0) {
+                                    if($balances[$user1] > 0) {
+                                        $simplified_balances[$user2][$user1] = abs($value);
+                                        $balances[$user1] -= abs($value);
+                                        $balances[$user2] += abs($value);
+                                    }
+                                    else {
+                                        $simplified_balances[$user1][$user2] = abs($value);
+                                        $balances[$user1] += abs($value);
+                                        $balances[$user2] -= abs($value);
+                                    } 
+                                    break;
+                                }
+                            }
+                        }
+
                         $global_payback->setUsersIn($users_in);
 
                         if($global_payback->getUsersIn()->isEmpty()) {
