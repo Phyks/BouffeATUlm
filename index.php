@@ -1143,6 +1143,15 @@
                     }
                 }
 
+                if(!$current_user->getAdmin()) {
+                    $user_balance = 0;
+                    foreach($users_list as $user1) {
+                        $user_balance -= $balances[$current_user->getId()][$user1->getId()];
+                        $user_balance += $balances[$user1->getId()][$current_user->getId()];
+                    }
+                    $tpl->assign('user_balance', $user_balance);
+                }
+
                 $tpl->assign('users', secureDisplay($users_list));
                 $tpl->assign('invoices', secureDisplay($invoices_list));
                 $tpl->assign('paybacks', secureDisplay($paybacks));
