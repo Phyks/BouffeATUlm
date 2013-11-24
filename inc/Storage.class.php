@@ -1,66 +1,21 @@
 <?php
 require_once('data/config.php');
+require_once('inc/MysqlConnector.php');
 
 class Storage {
     private $connection = null;
+    private $mysql_instance = null;
 
     public function __construct() {
-        $this->connect();
+        $this->mysql_instance = MysqlConnector::getInstance();
+        $this->connection = $this->mysql_instance->getConnection();
     }
 
     public function __destruct() {
-        $this->disconnect();
-    }
-
-    // Connection functions
-    // ====================
-    public function connect() {
-        $this->connection = new PDO('mysql:host='.MYSQL_HOST.';dbname='.MYSQL_DB, MYSQL_LOGIN, MYSQL_PASSWORD);
-        $this->connection->query('SET NAMES utf8');
-    }
-
-    public function disconnect() {
-        $this->connection = null;
-    }
-
-    // Getters
-    // =======
-    public function getHost() {
-        return $this->host;
-    }
-
-    public function getLogin() {
-        return $this->login;
-    }
-
-    public function getPassword() {
-        return $this->password;
-    }
-
-    public function getDb() {
-        return $this->db;
     }
 
     public function getConnection() {
         return $this->connection;
-    }
-
-    // Setters
-    // =======
-    public function setHost($host) {
-        $this->host = host;
-    }
-
-    public function setLogin($login) {
-        $this->login = $login;
-    }
-
-    public function setPassword($password) {
-        $this->password = $password;
-    }
-
-    public function setDb($db) {
-        $this->db = $db;
     }
 
     // Translates types in class to SQL types
