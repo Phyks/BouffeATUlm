@@ -125,10 +125,10 @@
 
             $this->date = DateTime::createFromFormat('Y-m-d H:i:s', $data['date']);
         }
-        
+
         // Override parent load() method
         // =============================
-        public function load($fields = NULL, $first_only = false) {
+        public function load($fields = NULL, $first_only = false, $key_array = 'id') {
             $return = parent::load($fields, $first_only); // Execute parent load
 
             if(is_array($return)) {

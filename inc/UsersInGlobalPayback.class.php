@@ -86,7 +86,7 @@
 
         // Override load() method
         // ======================
-        public function load() {
+        public function load($fields = NULL, $first_only = false, $key_array = 'id') {
             $query = 'SELECT ';
 
             $i = false;
