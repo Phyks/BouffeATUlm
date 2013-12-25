@@ -32,7 +32,6 @@
 
     // Long lasting session inspired by the work from sbgodin for shaarli
     define('WEB_PATH', substr($_SERVER["REQUEST_URI"], 0, 1+strrpos($_SERVER["REQUEST_URI"], '/', 0)));
-    define('STAY_SIGNED_IN_TOKEN', sha1(SALT.$_SERVER["REMOTE_ADDR"].SALT));
 
     if(!empty($_GET['json'])) {
         raintpl::$tpl_dir = 'tpl/json/';
@@ -65,8 +64,8 @@
             $user->setLogin($_COOKIE['bouffeatulm_login']);
 
             if(ban_canLogin() == false) {
-                setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], 0, WEB_PATH);
-                setcookie('bouffeatulm_staySignedIn', STAY_SIGNED_IN_TOKEN, 0, WEB_PATH);
+                setcookie('bouffeatulm_login', 0, 0, WEB_PATH);
+                setcookie('bouffeatulm_staySignedIn', 0, 0, WEB_PATH);
                 exit($errors['unknown_username_password'][LANG]);
             }
             else {
@@ -76,14 +75,14 @@
                     $_SESSION['current_user'] = $user->sessionStore();
                     $_SESSION['ip'] = user_ip();
                     setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], time()+31536000, WEB_PATH);
-                    setcookie('bouffeatulm_staySignedIn', STAY_SIGNED_IN_TOKEN, time()+31536000, WEB_PATH);
+                    setcookie('bouffeatulm_staySignedIn', $_COOKIE['bouffeatulm_staySignedIn'], time()+31536000, WEB_PATH);
                     header('location: index.php?'.$get_redir);
                     exit();
                 }
                 else {
                     ban_loginFailed();
-                    setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], 0, WEB_PATH);
-                    setcookie('bouffeatulm_staySignedIn', STAY_SIGNED_IN_TOKEN, 0, WEB_PATH);
+                    setcookie('bouffeatulm_login', 0, 0, WEB_PATH);
+                    setcookie('bouffeatulm_staySignedIn', 0, 0, WEB_PATH);
                     exit($errors['unknown_username_password'][LANG]);
                 }
             }
