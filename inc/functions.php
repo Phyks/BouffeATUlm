@@ -1,4 +1,10 @@
 <?php
+    function logout() {
+        setcookie('bouffeatulm_staySignedIn', FALSE, 0, WEB_PATH);
+        setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], 0, WEB_PATH);
+        session_destroy();
+    }
+
     function getNotice() {
         if(!file_exists('data/notice')) {
             file_put_contents('data/notice');

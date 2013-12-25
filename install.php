@@ -29,7 +29,7 @@
             $db = new PDO('mysql:host='.$mysql_host.';dbname='.$mysql_db, $mysql_login, $mysql_password);
 
             //Create table "Users"
-            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), email VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1), json_token VARCHAR(32), notifications TINYINT(1)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
+            $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Users (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, login VARCHAR(255), email VARCHAR(255), display_name VARCHAR(255), password VARCHAR(130), admin TINYINT(1), json_token VARCHAR(32), notifications TINYINT(1), stay_signed_in_token VARCHAR(32)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             //Create table "Invoices"
             $db->query('CREATE TABLE IF NOT EXISTS '.$mysql_prefix.'Invoices (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, date DATETIME, buyer INT(11), amount INT(11), what TEXT) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');

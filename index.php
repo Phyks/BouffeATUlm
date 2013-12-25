@@ -27,6 +27,13 @@
     require_once('inc/functions.php');
     require_once('inc/Ban.inc.php');
     require_once('inc/CSRF.inc.php');
+
+    session_start();
+
+    // Long lasting session inspired by the work from sbgodin for shaarli
+    define('WEB_PATH', substr($_SERVER["REQUEST_URI"], 0, 1+strrpos($_SERVER["REQUEST_URI"], '/', 0)));
+    define('STAY_SIGNED_IN_TOKEN', sha1(SALT.$_SERVER["REMOTE_ADDR"].SALT));
+
     if(!empty($_GET['json'])) {
         raintpl::$tpl_dir = 'tpl/json/';
         $get_redir = 'json=1';
@@ -47,28 +54,45 @@
     $tpl->assign('currency', htmlspecialchars(CURRENCY));
     $tpl->assign('email_webmaster', htmlspecialchars(EMAIL_WEBMASTER));
     
-    // Set sessions parameters
-    ini_set('session.use_cookies', 1);
-    ini_set('session.use_only_cookies', 1);
-    ini_set('session.use_trans_sid', false);
-    session_name('bouffeatulm');
-
-    // Regenerate session if needed
-    $cookie = session_get_cookie_params();
-    $cookie_dir = ''; if(dirname($_SERVER['SCRIPT_NAME']) != '/') $cookie_dir = dirname($_SERVER['SCRIPT_NAME']);
-    session_set_cookie_params($cookie['lifetime'], $cookie_dir, $_SERVER['HTTP_HOST']);
-    session_regenerate_id(true);
-
-    // Handle current user status
-    if(session_id() == '') session_start();
-
     $current_user = new User();
     if(isset($_SESSION['current_user'])) {
         $current_user->sessionRestore($_SESSION['current_user'], true);
     }
     else {
-        $current_user = false;
+        if(!empty($_COOKIE['bouffeatulm_staySignedIn']) && !empty($_COOKIE['bouffeatulm_login'])) {
+            // Connect back
+            $user = new User();
+            $user->setLogin($_COOKIE['bouffeatulm_login']);
+
+            if(ban_canLogin() == false) {
+                setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], 0, WEB_PATH);
+                setcookie('bouffeatulm_staySignedIn', STAY_SIGNED_IN_TOKEN, 0, WEB_PATH);
+                exit($errors['unknown_username_password'][LANG]);
+            }
+            else {
+                $user = $user->exists($_COOKIE['bouffeatulm_login']);
+                if($_COOKIE['bouffeatulm_staySignedIn'] === md5($user->getStaySignedInToken().$_SERVER['REMOTE_ADDR'])) {
+                    ban_loginOk();
+                    $_SESSION['current_user'] = $user->sessionStore();
+                    $_SESSION['ip'] = user_ip();
+                    setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], time()+31536000, WEB_PATH);
+                    setcookie('bouffeatulm_staySignedIn', STAY_SIGNED_IN_TOKEN, time()+31536000, WEB_PATH);
+                    header('location: index.php?'.$get_redir);
+                    exit();
+                }
+                else {
+                    ban_loginFailed();
+                    setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], 0, WEB_PATH);
+                    setcookie('bouffeatulm_staySignedIn', STAY_SIGNED_IN_TOKEN, 0, WEB_PATH);
+                    exit($errors['unknown_username_password'][LANG]);
+                }
+            }
+        }
+        else {
+            $current_user = false;
+        }
     }
+
     $tpl->assign('current_user', secureDisplay($current_user));
 
     if(!empty($_GET['json_token'])) {
@@ -96,7 +120,7 @@
         
         // If IP has changed, logout
         if($current_user !== false && user_ip() != $_SESSION['ip']) {
-            session_destroy();
+            logout();
             header('location: index.php?do=connect&'.$get_redir);
             exit();
         }
@@ -128,15 +152,12 @@
                         $_SESSION['ip'] = user_ip();
 
                         if(!empty($_POST['remember_me'])) { // Handle remember me cookie
-                            $_SESSION['remember_me'] = 31536000;
+                            $token = md5(uniqid(mt_rand(), true));
+                            $user->setStaySignedInToken($token);
+                            $user->save();
+                            setcookie('bouffeatulm_login', $_POST['login'], time()+31536000, WEB_PATH);
+                            setcookie('bouffeatulm_staySignedIn', md5($token.$_SERVER['REMOTE_ADDR']), time()+31536000, WEB_PATH);
                         }
-                        else {
-                            $_SESSION['remember_me'] = 0;
-                        }
-
-                        $cookie_dir = ''; if(dirname($_SERVER['SCRIPT_NAME']) != '/') $cookie_dir = dirname($_SERVER['SCRIPT_NAME']);
-                        session_set_cookie_params($_SESSION['remember_me'], $cookie_dir, $_SERVER['HTTP_HOST']);
-                        session_regenerate_id(true);
 
                         header('location: index.php?'.$get_redir);
                         exit();
@@ -157,7 +178,7 @@
 
         case 'disconnect':
             $current_user = false;
-            session_destroy();
+            logout();
             header('location: index.php?do=connect&'.$get_redir);
             exit();
             break;

@@ -3,7 +3,7 @@ require_once('data/config.php');
 require_once('Storage.class.php');
 
 class User extends Storage {
-    protected $id = 0, $login, $email, $display_name, $password, $admin, $json_token, $notifications;
+    protected $id = 0, $login, $email, $display_name, $password, $admin, $json_token, $notifications, $stay_signed_in_token;
     protected $TABLE_NAME = "Users";
     protected $fields = array(
         'id'=>'key',
@@ -13,11 +13,13 @@ class User extends Storage {
         'password'=>'password',
         'admin'=>'bool',
         'json_token'=>'string',
-        'notifications'=>'int'
+        'notifications'=>'int',
+        'stay_signed_in_token'=>'string'
         );
 
     public function __construct() {
         parent::__construct();
+        $stay_signed_in_token = 0;
     }
 
     // Getters
@@ -48,6 +50,10 @@ class User extends Storage {
 
     public function getNotifications() {
         return $this->notifications;
+    }
+
+    public function getStaySignedInToken() {
+        return $this->stay_signed_in_token;
     }
 
     // Setters
@@ -106,6 +112,10 @@ class User extends Storage {
         }
     }
 
+    public function setStaySignedInToken($token) {
+        $this->stay_signed_in_token = $token;
+    }
+
     // Password functions
     // ==================
     public function encrypt($text) {
@@ -139,10 +149,10 @@ class User extends Storage {
     // ===============
     public function sessionStore($serialize = true) {
         if($serialize) {
-            return serialize(array('id'=>$this->id, 'login'=>$this->login, 'email'=>$this->email, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token, 'notifications'=>$this->notifications));
+            return serialize(array('id'=>$this->id, 'login'=>$this->login, 'email'=>$this->email, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token, 'notifications'=>$this->notifications, 'stay_signed_in_token'=>$this->stay_signed_in_token));
         }
         else {
-            return array('id'=>$this->id, 'login'=>$this->login, 'email'=>$this->email, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token, 'notifications'=>$this->notifications);
+            return array('id'=>$this->id, 'login'=>$this->login, 'email'=>$this->email, 'display_name'=>$this->display_name, 'password'=>$this->password, 'admin'=>$this->admin, 'json_token'=>$this->json_token, 'notifications'=>$this->notifications, 'stay_signed_in_token'=>$this->stay_signed_in_token);
         }
     }
 
@@ -160,6 +170,7 @@ class User extends Storage {
         $this->setAdmin($user_data['admin']);
         $this->setJsonToken($user_data['json_token']);
         $this->setNotifications($user_data['notifications']);
+        $this->setStaySignedInToken($user_data['stay_signed_in_token']);
     }
 
     // Check wether a user already exists or not 
