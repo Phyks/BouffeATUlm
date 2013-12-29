@@ -91,6 +91,7 @@
                     $admin->setPassword($admin->encrypt($_POST['admin_password']));
                     $admin->setAdmin(true);
                     $admin->setEmail($_POST['email_webmaster']);
+                    $admin->setStaySignedInToken("");
                     $admin->setNotifications(3);
                     $admin->newJsonToken();
                     $admin->save();

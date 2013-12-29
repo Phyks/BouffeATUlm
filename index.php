@@ -241,6 +241,7 @@
                         $user->setPassword($user->encrypt($_POST['password']));
                     }
                     $user->setAdmin($_POST['admin']);
+                    $user->setStaySignedInToken("");
 
                     if($user->setEmail($_POST['email']) !== false) {
                         if(!empty($_POST['user_id']) || $user->isUnique()) {
