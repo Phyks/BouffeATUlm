@@ -12,6 +12,10 @@
         $error = "The script seems to be unable to write to <em>data/</em> folder (to write the <em>data/config.php</em> configuration file). You should give write access during install and disable them after (chmod 777 -R data/ to install and chmod 755 -R data/ after installation for example). You'll need right access on this folder each time you will want to edit settings.";
         $block_form = true;
     }
+    if(!is_writable('tmp/')) {
+        $error = "The script seems to be unable to write to <em>tmp/</em> folder (to store the cached files for templates). You should give write (chmod 777 -R tmp/.";
+        $block_form = true;
+    }
     if(!is_writable('db_backups/')) {
         $error = "The script seems to be unable to write to <em>db_backups/</em> folder (to write the database backups). You should give write access.";
         $block_form = true;
@@ -53,7 +57,7 @@
         if(!filter_var($_POST['email_webmaster'], FILTER_VALIDATE_EMAIL)) {
             $email = 'Webmaster\'s e-mail address is invalid.';
         }
-        
+
         if(empty($error)) {
             if(function_exists('mcrypt_create_iv')) {
                 $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
@@ -78,7 +82,7 @@
     define('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');
     define('TEMPLATE_DIR', 'tpl/default_".$_POST['lang']."/');
     define('LANG', '".$_POST['lang']."');
-    
+
     date_default_timezone_set('".$_POST['timezone']."');
     ";
 
@@ -106,6 +110,8 @@
                 $error = 'Unable to write configuration to config file data/config.php.';
         }
     }
+
+    $token = generate_token('install');
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -134,7 +140,7 @@
                 <p><label for="mysql_login">MySQL login : </label><input type="text" name="mysql_login" id="mysql_login" value="<?php echo (!empty($_POST['mysql_login'])) ? htmlspecialchars($_POST['mysql_login']) : '';?>"/></p>
                 <p><label for="mysql_password">MySQL password : </label><input type="password" name="mysql_password" id="mysql_password"/> <a href="" onclick="toggle_password('mysql_password'); return false;"><img src="tpl/default_en/img/toggleVisible.png" alt="Toggle visible"/></a></p>
                 <p>
-                <label for="mysql_db">Name of the MySQL database to use : </label><input type="text" name="mysql_db" id="mysql_db" value="<?php echo (!empty($_POST['mysql_db'])) ? htmlspecialchars($_POST['mysql_db']) : 'Bouffe@Ulm';?>"/><br/>
+                <label for="mysql_db">Name of the MySQL database to use : </label><input type="text" name="mysql_db" id="mysql_db" value="<?php echo (!empty($_POST['mysql_db'])) ? htmlspecialchars($_POST['mysql_db']) : 'BouffeATUlm';?>"/><br/>
                     <em>Note :</em> You <em>must</em> create this database first.
                 </p>
                 <p><label for="mysql_prefix">Prefix for the created tables : </label><input type="text" name="mysql_prefix" id="mysql_prefix" value="<?php echo (!empty($_POST['mysql_prefix'])) ? htmlspecialchars($_POST['mysql_prefix']) : 'bouffeatulm_';?>"/><br/>
@@ -161,7 +167,7 @@
                 <p><label for="admin_display_name">Displayed name for admin user : </label><input type="text" name="admin_display_name" id="admin_display_name" <?php echo (!empty($_POST['admin_display_name']) ? 'value="'.htmlspecialchars($_POST['admin_display_name']).'"' : '');?>/></p>
                 <p><label for="admin_password">Password for the admin : </label><input type="password" name="admin_password" id="admin_password"/> <a href="" onclick="toggle_password('admin_password'); return false;"><img src="tpl/default_en/img/toggleVisible.png" alt="Toggle visible"/></a></p>
             </fieldset>
-            <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" value="Install"><input type="hidden" name="token" value="<?php echo generate_token('install');?>"/></p>
+            <p class="center"><input <?php echo (!empty($block_form)) ? 'disabled ' : '';?>type="submit" value="Install"><input type="hidden" name="token" value="<?php echo $token;?>"/></p>
         </form>
     </body>
 </html>

@@ -1,7 +1,10 @@
 <?php
     function logout() {
         setcookie('bouffeatulm_staySignedIn', FALSE, 0, WEB_PATH);
-        setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], 0, WEB_PATH);
+
+        if(isset($_COOKIE['bouffeatulm_login']))
+            setcookie('bouffeatulm_login', $_COOKIE['bouffeatulm_login'], 0, WEB_PATH);
+
         session_destroy();
     }
 
@@ -100,7 +103,7 @@
         $header =
             'Content-Type: text/plain; charset="utf-8"'.$r.
             'Content-Transfer-Encoding: 8bit'.$r.$header;
-        
+
         return mail ($to, $subject, $msg, $header);
     }
 
