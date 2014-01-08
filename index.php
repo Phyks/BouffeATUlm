@@ -1031,7 +1031,7 @@
                                 }
                             }
 
-                            $global_payback->setUsersIn($users_in);
+                            $global_payback->setUsersIn($simplified_balances);
 
                             if($global_payback->getUsersIn()->isEmpty()) {
                                 $global_payback->setClosed(true);
@@ -1130,7 +1130,7 @@
                                     $balances[$user1->getId()][$user2->getId()] = '-';
                                 }
                                 else {
-                                    $balances[$user1->getId()][$user2->getId()] = -$balances[$user2->getId()][$user1->getId()];
+                                    $balances[$user1->getId()][$user2->getId()] = -round($balances[$user2->getId()][$user1->getId()], 2);
                                     $balances[$user2->getId()][$user1->getId()] = '-';
                                 }
                             }
@@ -1145,12 +1145,12 @@
                             if($invoices_list_balances !== false) {
                                 foreach($invoices_list_balances as $invoice) {
                                     if($invoice->getUsersIn()->inUsersIn($user1->getId())) {
-                                        $balances[$user1->getId()][$user2->getId()] += $invoice->getAmountPerPerson($user1->getId());
+                                        $balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()] + $invoice->getAmountPerPerson($user1->getId()), 2);
 
                                         $payback_balance = new Payback();
                                         $payback_balance = $payback_balance->load(array('invoice_id'=>$invoice->getId(), 'from_user'=>$user1->getId(), 'to_user'=>$user2->getId()), true);
                                         if($payback_balance !== false)
-                                            $balances[$user1->getId()][$user2->getId()] -= $payback_balance->getAmount();
+                                            $balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()] - $payback_balance->getAmount(), 2);
                                     }
                                 }
                             }
@@ -1161,12 +1161,12 @@
                             if($invoices_list_balances !== false) {
                                 foreach($invoices_list_balances as $invoice) {
                                     if($invoice->getUsersIn()->inUsersIn($user2->getId())) {
-                                        $balances[$user1->getId()][$user2->getId()] -= $invoice->getAmountPerPerson($user2->getId());
+                                        $balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()] - $invoice->getAmountPerPerson($user2->getId()), 2);
 
                                         $payback_balance = new Payback();
                                         $payback_balance = $payback_balance->load(array('invoice_id'=>$invoice->getId(), 'from_user'=>$user2->getId(), 'to_user'=>$user1->getId()), true);
                                         if($payback_balance !== false)
-                                            $balances[$user1->getId()][$user2->getId()] += $payback_balance->getAmount();
+                                            $balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()] + $payback_balance->getAmount(), 2);
                                     }
                                 }
                             }
@@ -1182,8 +1182,8 @@
                 if(!$current_user->getAdmin()) {
                     $user_balance = 0;
                     foreach($users_list as $user1) {
-                        $user_balance -= $balances[$current_user->getId()][$user1->getId()];
-                        $user_balance += $balances[$user1->getId()][$current_user->getId()];
+                        $user_balance = round($user_balance - $balances[$current_user->getId()][$user1->getId()], 2);
+                        $user_balance = round($user_balance + $balances[$user1->getId()][$current_user->getId()], 2);
                     }
                     $tpl->assign('user_balance', $user_balance);
                 }
