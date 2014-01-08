@@ -903,7 +903,7 @@
                             exit();
                         }
                         else {
-                            system("mysqldump -q -h ".MYSQL_HOST." -u ".MYSQL_LOGIN." -p ".MYSQL_PASSWORD." ".MYSQL_DB." > db_backups/".date('d-m-Y_H:i'));
+                            system("mysqldump -q -h \"".MYSQL_HOST."\" -u \"".MYSQL_LOGIN."\" -p\"".MYSQL_PASSWORD."\" \"".MYSQL_DB."\" > db_backups/".date('d-m-Y_H:i'));
 
                             $users_in = array();
                             foreach($_POST['users_in'] as $user1_id) {
@@ -998,7 +998,13 @@
                                 }
                             }
 
+                            // Round at 0.01 currency
+                            foreach($balances as $key=>$balance) {
+                                $balances[$key] = round($balance, 2);
+                            }
+
                             // Do while $balances is not identically filled with zeros
+                            $i = 0;
                             while(count(array_unique($balances)) != 1 or $balances[key($balances)] != 0) {
                                 // Sort balances in abs values, desc
                                 uasort($balances, "sort_array_abs");
@@ -1011,14 +1017,14 @@
                                 foreach($balances as $user2=>$value) {
                                     if($value * $balances[$user1] < 0) {
                                         if($balances[$user1] > 0) {
-                                            $simplified_balances[$user2][$user1] = abs($value);
-                                            $balances[$user1] -= abs($value);
-                                            $balances[$user2] += abs($value);
+                                            $simplified_balances[$user2][$user1] = round(abs($value), 2);
+                                            $balances[$user1] = round($balances[$user1] - abs($value), 2);
+                                            $balances[$user2] = round($balances[$user2] + abs($value), 2);
                                         }
                                         else {
-                                            $simplified_balances[$user1][$user2] = abs($value);
-                                            $balances[$user1] += abs($value);
-                                            $balances[$user2] -= abs($value);
+                                            $simplified_balances[$user1][$user2] = round(abs($value), 2);
+                                            $balances[$user1] = round($balances[$user1] + abs($value), 2);
+                                            $balances[$user2] = round($balances[$user2] - abs($value), 2);
                                         } 
                                         break;
                                     }
