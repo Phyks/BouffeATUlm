@@ -88,7 +88,7 @@
 
         // Get the amount to pay by person
         // ===============================
-        public function getAmountPerPerson($id) {
+        public function getAmountPerPerson($id, $round = true) {
             $users_in = $this->users_in->get();
             $guests = 0;
 
@@ -97,7 +97,12 @@
             }
 
             // Amount is stored in cents
-            return (isset($users_in[(int) $id])) ? round($this->amount / 100 / (count($users_in) + $guests) * (1 + $users_in[(int) $id]), 2) : 0; // Note : $users_in[(int) $id] is the number of guests for user $id
+            if($round) {
+	            return (isset($users_in[(int) $id])) ? round($this->amount / 100 / (count($users_in) + $guests) * (1 + $users_in[(int) $id]), 2) : 0; // Note : $users_in[(int) $id] is the number of guests for user $id
+	        }
+	        else {
+		        return (isset($users_in[(int) $id])) ? $this->amount / 100 / (count($users_in) + $guests) * (1 + $users_in[(int) $id]) : 0; // Note : $users_in[(int) $id] is the number of guests for user $id
+	        }
         }
 
         // Maps htmlspecialchars on the class before display

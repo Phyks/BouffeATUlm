@@ -7,6 +7,7 @@
         'user_already_exists'=>array('fr'=>'Un utilisateur avec le même login ou nom d\'affichage existe déjà. Choisissez un login ou un nom d\'affichage différent.', 'en'=>'A user with the same login or display name already exists. Choose a different login or display name.'),
         'write_error_data'=>array('fr'=>'Le script ne peut pas écrire dans le dossier data/, vérifiez les permissions sur ce dossier.', 'en'=>'The script can\'t write in data/ dir, check permissions set on this folder.'),
         'write_error_db_backups'=>array('fr'=>'Le script ne peut pas écrire dans le dossier db_backups/, vérifiez les permissions sur ce dossier.', 'en'=>'The script can\'t write in db_backup/ dir, check permissions set on this folder.'),
+        'db_dump_failed'=>array('fr'=>'Échec de la sauvegarde de la base de données. Aucune modification n\'a eu lieu.', 'en'=>'Unable to dump the database. No changes were made.'),
         'unable_write_config'=>array('fr'=>'Impossible d\'écrire le fichier data/config.php. Vérifiez les permissions.', 'en'=>'Unable to write data/config.php file. Check permissions.'),
         'negative_amount'=>array('fr'=>'Montant négatif non autorisé.', 'en'=>'Negative amount not allowed.'),
         'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.'),
@@ -527,7 +528,10 @@
 
                             $invoice->setWhat($_POST['what']);
                             $invoice->setAmount($_POST['amount']);
-                            $invoice->setBuyer($current_user->getId());
+
+                            if(empty($_POST['id']))
+                                $invoice->setBuyer($current_user->getId());
+
                             $invoice->setDate(0, int2ampm($_POST['date_hour']), $_POST['date_day'], $_POST['date_month'], $_POST['date_year']);
 
                             
@@ -903,153 +907,159 @@
                             exit();
                         }
                         else {
-                            system("mysqldump -q -h \"".MYSQL_HOST."\" -u \"".MYSQL_LOGIN."\" -p\"".MYSQL_PASSWORD."\" \"".MYSQL_DB."\" > db_backups/".date('d-m-Y_H:i'));
-
-                            $users_in = array();
-                            foreach($_POST['users_in'] as $user1_id) {
-                                $user1_id = intval($user1_id);
-                                foreach($_POST['users_in'] as $user2_id) {
-                                    $user2_id = intval($user2_id);
-                                    if($user1_id == $user2_id) {
-                                        $users_in[$user1_id][$user2_id] = 0;
-                                    }
-                                    elseif(!empty($users_in[$user2_id][$user1_id])) {
-                                        if($users_in[$user2_id][$user1_id] > 0) {
-                                            $users_in[$user1_id][$user2_id] = 0;
-                                        }
-                                        else {
-                                            $users_in[$user1_id][$user2_id] = -$users_in[$user2_id][$user1_id];
-                                            $users_in[$user2_id][$user1_id] = 0;
-                                        }
-                                    }
-                                    else {
-                                        // Get the amount user1 owes to user2
-                                        $users_in[$user1_id][$user2_id] = 0;
-
-                                        // Confirm all paybacks when user2 is buyer
-                                        $invoices = new Invoice();
-                                        $invoices = $invoices->load(array('buyer'=>$user2_id));
-
-                                        if($invoices !== false) {
-                                            foreach($invoices as $invoice) {
-                                                if($invoice->getAmountPerPerson($user1_id) !== false) {
-                                                    $paybacks = new Payback();
-                                                    $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user2_id, 'from_user'=>$user1_id));
-
-                                                    if($paybacks === false) {
-                                                        $payback = new Payback();
-                                                        $payback->setTo($user2_id);
-                                                        $payback->setFrom($user1_id);
-                                                        $payback->setAmount($invoice->getAmountPerPerson($user1_id));
-                                                        $payback->setInvoice($invoice->getId());
-                                                        $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                                                        $payback->save();
-
-                                                        // Add the amount to what user1 owes to user2
-                                                        $users_in[$user1_id][$user2_id] += $payback->getAmount();
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        // Confirm all paybacks when from is buyer
-                                        $invoices = new Invoice();
-                                        $invoices = $invoices->load(array('buyer'=>$user1_id));
-
-                                        if($invoices !== false) {
-                                            foreach($invoices as $invoice) {
-                                                if($invoice->getAmountPerPerson($user2_id) !== false) {
-                                                    $paybacks = new Payback();
-                                                    $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user1_id, 'from_user'=>$user2_id));
-
-                                                    if($paybacks === false) {
-                                                        $payback = new Payback();
-                                                        $payback->setTo($user1_id);
-                                                        $payback->setFrom($user2_id);
-                                                        $payback->setAmount($invoice->getAmountPerPerson($user2_id));
-                                                        $payback->setInvoice($invoice->getId());
-                                                        $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                                                        $payback->save();
-
-                                                        // Substract the amount to what user1 owes to user2
-                                                        $users_in[$user1_id][$user2_id] -= $payback->getAmount();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Now, let's simplify the matrix ! :)
-                            // First, get the total balance by user (gains - debts)
-                            $balances = array();
-                            $simplified_balances = array();
-                            foreach($_POST['users_in'] as $user) {
-                                $balances[$user] = 0;
-                                foreach($_POST['users_in'] as $user2) {
-                                    if(!empty($users_in[$user][$user2])) {
-                                        $balances[$user] -= $users_in[$user][$user2];
-                                    }
-                                    if(!empty($users_in[$user2][$user])) {
-                                        $balances[$user] += $users_in[$user2][$user];
-                                    }
-                                    $simplified_balances[$user][$user2] = 0;
-                                }
-                            }
-
-                            // Round at 0.01 currency
-                            foreach($balances as $key=>$balance) {
-                                $balances[$key] = round($balance, 2);
-                            }
-
-                            // Do while $balances is not identically filled with zeros
-                            $i = 0;
-                            while(count(array_unique($balances)) != 1 or $balances[key($balances)] != 0) {
-                                // Sort balances in abs values, desc
-                                uasort($balances, "sort_array_abs");
-
-                                // Get the largest one in abs
-                                // The following largest with opposite sign must pay him back the max
-                                reset($balances);
-                                $user1 = key($balances);
-
-                                foreach($balances as $user2=>$value) {
-                                    if($value * $balances[$user1] < 0) {
-                                        if($balances[$user1] > 0) {
-                                            $simplified_balances[$user2][$user1] = round(abs($value), 2);
-                                            $balances[$user1] = round($balances[$user1] - abs($value), 2);
-                                            $balances[$user2] = round($balances[$user2] + abs($value), 2);
-                                        }
-                                        else {
-                                            $simplified_balances[$user1][$user2] = round(abs($value), 2);
-                                            $balances[$user1] = round($balances[$user1] + abs($value), 2);
-                                            $balances[$user2] = round($balances[$user2] - abs($value), 2);
-                                        } 
-                                        break;
-                                    }
-                                }
-                            }
-
-                            $global_payback->setUsersIn($simplified_balances);
-
-                            if($global_payback->getUsersIn()->isEmpty()) {
-                                $global_payback->setClosed(true);
+                            if(system(escapeshellcmd("mysqldump -q -h \"".MYSQL_HOST."\" -u \"".MYSQL_LOGIN."\" -p\"".MYSQL_PASSWORD."\" \"".MYSQL_DB."\" > db_backups/".date('d-m-Y_H:i'))) === FALSE) {
+		                        $tpl->assign('error', $errors['db_dump_failed'][LANG]);
+		                        $tpl->assign('block_error', true);
+		                        $tpl->draw('index');
+		                        exit();
                             }
                             else {
-                                $global_payback->setClosed(false);
-                            }
+		                        $users_in = array();
+		                        foreach($_POST['users_in'] as $user1_id) {
+		                            $user1_id = intval($user1_id);
+		                            foreach($_POST['users_in'] as $user2_id) {
+		                                $user2_id = intval($user2_id);
+		                                if($user1_id == $user2_id) {
+		                                    $users_in[$user1_id][$user2_id] = 0;
+		                                }
+		                                elseif(!empty($users_in[$user2_id][$user1_id])) {
+		                                    if($users_in[$user2_id][$user1_id] > 0) {
+		                                        $users_in[$user1_id][$user2_id] = 0;
+		                                    }
+		                                    else {
+		                                        $users_in[$user1_id][$user2_id] = -$users_in[$user2_id][$user1_id];
+		                                        $users_in[$user2_id][$user1_id] = 0;
+		                                    }
+		                                }
+		                                else {
+		                                    // Get the amount user1 owes to user2
+		                                    $users_in[$user1_id][$user2_id] = 0;
 
-                            $global_payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
-                            $global_payback->save();
+		                                    // Confirm all paybacks when user2 is buyer
+		                                    $invoices = new Invoice();
+		                                    $invoices = $invoices->load(array('buyer'=>$user2_id));
 
-                            // Clear the cache
-                            ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
-                            array_map("unlink", $cached_files);
+		                                    if($invoices !== false) {
+		                                        foreach($invoices as $invoice) {
+		                                            if($invoice->getAmountPerPerson($user1_id) !== false) {
+		                                                $paybacks = new Payback();
+		                                                $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user2_id, 'from_user'=>$user1_id));
 
-                            header('location: index.php?do=manage_paybacks&'.$get_redir);
-                            exit();
-                        }
+		                                                if($paybacks === false) {
+		                                                    $payback = new Payback();
+		                                                    $payback->setTo($user2_id);
+		                                                    $payback->setFrom($user1_id);
+		                                                    $payback->setAmount($invoice->getAmountPerPerson($user1_id));
+		                                                    $payback->setInvoice($invoice->getId());
+		                                                    $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+		                                                    $payback->save();
+
+		                                                    // Add the amount to what user1 owes to user2
+		                                                    $users_in[$user1_id][$user2_id] += $payback->getAmount();
+		                                                }
+		                                            }
+		                                        }
+		                                    }
+
+		                                    // Confirm all paybacks when from is buyer
+		                                    $invoices = new Invoice();
+		                                    $invoices = $invoices->load(array('buyer'=>$user1_id));
+
+		                                    if($invoices !== false) {
+		                                        foreach($invoices as $invoice) {
+		                                            if($invoice->getAmountPerPerson($user2_id) !== false) {
+		                                                $paybacks = new Payback();
+		                                                $paybacks = $paybacks->load(array('invoice_id'=>$invoice->getId(), 'to_user'=>$user1_id, 'from_user'=>$user2_id));
+
+		                                                if($paybacks === false) {
+		                                                    $payback = new Payback();
+		                                                    $payback->setTo($user1_id);
+		                                                    $payback->setFrom($user2_id);
+		                                                    $payback->setAmount($invoice->getAmountPerPerson($user2_id));
+		                                                    $payback->setInvoice($invoice->getId());
+		                                                    $payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+		                                                    $payback->save();
+
+		                                                    // Substract the amount to what user1 owes to user2
+		                                                    $users_in[$user1_id][$user2_id] -= $payback->getAmount();
+		                                                }
+		                                            }
+		                                        }
+		                                    }
+		                                }
+		                            }
+		                        }
+
+		                        // Now, let's simplify the matrix ! :)
+		                        // First, get the total balance by user (gains - debts)
+		                        $balances = array();
+		                        $simplified_balances = array();
+		                        foreach($_POST['users_in'] as $user) {
+		                            $balances[$user] = 0;
+		                            foreach($_POST['users_in'] as $user2) {
+		                                if(!empty($users_in[$user][$user2])) {
+		                                    $balances[$user] -= $users_in[$user][$user2];
+		                                }
+		                                if(!empty($users_in[$user2][$user])) {
+		                                    $balances[$user] += $users_in[$user2][$user];
+		                                }
+		                                $simplified_balances[$user][$user2] = 0;
+		                            }
+		                        }
+
+		                        // Round at 0.01 currency
+		                        foreach($balances as $key=>$balance) {
+		                            $balances[$key] = round($balance, 2);
+		                        }
+
+		                        // Do while $balances is not identically filled with zeros
+		                        $i = 0;
+		                        while(count(array_unique($balances)) != 1 or $balances[key($balances)] != 0) {
+		                            // Sort balances in abs values, desc
+		                            uasort($balances, "sort_array_abs");
+
+		                            // Get the largest one in abs
+		                            // The following largest with opposite sign must pay him back the max
+		                            reset($balances);
+		                            $user1 = key($balances);
+
+		                            foreach($balances as $user2=>$value) {
+		                                if($value * $balances[$user1] < 0) {
+		                                    if($balances[$user1] > 0) {
+		                                        $simplified_balances[$user2][$user1] = round(abs($value), 2);
+		                                        $balances[$user1] = round($balances[$user1] - abs($value), 2);
+		                                        $balances[$user2] = round($balances[$user2] + abs($value), 2);
+		                                    }
+		                                    else {
+		                                        $simplified_balances[$user1][$user2] = round(abs($value), 2);
+		                                        $balances[$user1] = round($balances[$user1] + abs($value), 2);
+		                                        $balances[$user2] = round($balances[$user2] - abs($value), 2);
+		                                    } 
+		                                    break;
+		                                }
+		                            }
+		                        }
+
+		                        $global_payback->setUsersIn($simplified_balances);
+
+		                        if($global_payback->getUsersIn()->isEmpty()) {
+		                            $global_payback->setClosed(true);
+		                        }
+		                        else {
+		                            $global_payback->setClosed(false);
+		                        }
+
+		                        $global_payback->setDate(date('i'), date('G'), date('j'), date('n'), date('Y'));
+		                        $global_payback->save();
+
+		                        // Clear the cache
+		                        ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
+		                        array_map("unlink", $cached_files);
+
+		                        header('location: index.php?do=manage_paybacks&'.$get_redir);
+		                        exit();
+		                    }
+		              	}
                     }
                     else {
                         $tpl->assign('error', $errors['token_error'][LANG]);
@@ -1130,7 +1140,7 @@
                                     $balances[$user1->getId()][$user2->getId()] = '-';
                                 }
                                 else {
-                                    $balances[$user1->getId()][$user2->getId()] = -round($balances[$user2->getId()][$user1->getId()], 2);
+                                    $balances[$user1->getId()][$user2->getId()] = -$balances[$user2->getId()][$user1->getId()];
                                     $balances[$user2->getId()][$user1->getId()] = '-';
                                 }
                             }
@@ -1145,12 +1155,12 @@
                             if($invoices_list_balances !== false) {
                                 foreach($invoices_list_balances as $invoice) {
                                     if($invoice->getUsersIn()->inUsersIn($user1->getId())) {
-                                        $balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()] + $invoice->getAmountPerPerson($user1->getId()), 2);
+                                        $balances[$user1->getId()][$user2->getId()] = $balances[$user1->getId()][$user2->getId()] + $invoice->getAmountPerPerson($user1->getId(), false);
 
                                         $payback_balance = new Payback();
                                         $payback_balance = $payback_balance->load(array('invoice_id'=>$invoice->getId(), 'from_user'=>$user1->getId(), 'to_user'=>$user2->getId()), true);
                                         if($payback_balance !== false)
-                                            $balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()] - $payback_balance->getAmount(), 2);
+                                            $balances[$user1->getId()][$user2->getId()] = $balances[$user1->getId()][$user2->getId()] - $payback_balance->getAmount();
                                     }
                                 }
                             }
@@ -1161,12 +1171,12 @@
                             if($invoices_list_balances !== false) {
                                 foreach($invoices_list_balances as $invoice) {
                                     if($invoice->getUsersIn()->inUsersIn($user2->getId())) {
-                                        $balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()] - $invoice->getAmountPerPerson($user2->getId()), 2);
+                                        $balances[$user1->getId()][$user2->getId()] = $balances[$user1->getId()][$user2->getId()] - $invoice->getAmountPerPerson($user2->getId(), false);
 
                                         $payback_balance = new Payback();
                                         $payback_balance = $payback_balance->load(array('invoice_id'=>$invoice->getId(), 'from_user'=>$user2->getId(), 'to_user'=>$user1->getId()), true);
                                         if($payback_balance !== false)
-                                            $balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()] + $payback_balance->getAmount(), 2);
+                                            $balances[$user1->getId()][$user2->getId()] = $balances[$user1->getId()][$user2->getId()] + $payback_balance->getAmount();
                                     }
                                 }
                             }
@@ -1178,14 +1188,21 @@
                         }
                     }
                 }
+                foreach($users_list as $user1) {
+                    foreach($users_list as $user2) {
+                    	if($balances[$user1->getId()][$user2->getId()] != '-' && $balances[$user1->getId()][$user2->getId()] != 'X')
+                    		$balances[$user1->getId()][$user2->getId()] = round($balances[$user1->getId()][$user2->getId()], 2);
+                   	}
+              	}
 
                 if(!$current_user->getAdmin()) {
                     $user_balance = 0;
                     foreach($users_list as $user1) {
-                        $user_balance = round($user_balance - $balances[$current_user->getId()][$user1->getId()], 2);
-                        $user_balance = round($user_balance + $balances[$user1->getId()][$current_user->getId()], 2);
+                        $user_balance = $user_balance - $balances[$current_user->getId()][$user1->getId()];
+                        $user_balance = $user_balance + $balances[$user1->getId()][$current_user->getId()];
                     }
-                    $tpl->assign('user_balance', $user_balance);
+                    
+                    $tpl->assign('user_balance', round($user_balance,2));
                 }
 
                 $tpl->assign('users', secureDisplay($users_list));
