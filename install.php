@@ -25,6 +25,7 @@
     if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_password']) && !empty($_POST['mysql_db']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['currency']) && !empty($_POST['timezone']) && !empty($_POST['lang']) && !empty($_POST['template']) && !empty($_POST['admin_login']) && !empty($_POST['admin_password']) && check_token(600, 'install')) {
         $mysql_prefix = (!empty($_POST['mysql_prefix'])) ? $_POST['mysql_prefix'] : '';
         $current_template = $_POST['template'];
+        $current_lang = $_POST['lang'];
 
         try {
             $db = new PDO('mysql:host='.$_POST['mysql_host'].';dbname='.$_POST['mysql_db'], $_POST['mysql_login'], $_POST['mysql_password']);
@@ -127,7 +128,7 @@
     define('CURRENCY', '".$_POST['currency']."');
     define('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');
     define('TEMPLATE_DIR', 'tpl/".$_POST['template']."');
-    define('LANG', '".$_POST['lang']."');
+    define('LANG', 'i18n/".$_POST['lang']."');
 
     date_default_timezone_set('".$_POST['timezone']."');
     ";
@@ -159,6 +160,7 @@
     }
     else {
         $current_template = 'default';
+        $current_lang = 'en.php';
     }
 
     $token = generate_token('install');
@@ -209,7 +211,18 @@
                     <em>For example:</em> Europe/Paris. See the doc for more info.
                 </p>
                 <p><label for="email_webmaster">Webmaster's email (optionnal): </label><input type="text" name="email_webmaster" id="email_webmaster" <?php echo (!empty($_POST['currency']) ? 'value="'.htmlspecialchars($_POST['email_webmaster']).'"' : '');?>/></p>
-                <p><label for="lang">Lang: </label><select name="lang" id="lang"><option value="en">English</option><option value="fr">French</option></select></p>
+                <p>
+                    <label for="lang">Lang: </label>
+                    <select name="lang" id="lang">
+                        <?php
+                            foreach (listLangs() as $value) {
+                        ?>
+                                <option value="<?php echo $value['value'];?>" <?php echo ($value['value'] == $current_lang ? 'selected="selected"' : ''); ?>><?php echo $value['option']; ?></option>
+                        <?php
+                            }
+                        ?>
+                    </select>
+                </p>
                 <p>
                     <label for="template">Template : </label>
                     <select name="template" id="template">

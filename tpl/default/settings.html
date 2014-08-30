@@ -55,7 +55,14 @@
                 {/loop}
             </select
         </p>
-        <p><label for="lang">Lang: </label><select name="lang" id="lang">TODO</select></p>
+        <p>
+            <label for="lang">Lang: </label>
+            <select name="lang" id="lang">
+                {loop="$available_lang"}
+                    <option value="{$value['value']}" {if="$value['value'] == $current_lang"}selected="selected"{/if}>{$value['option']}</option>
+                {/loop}
+            </select>
+        </p>
         <p><label for="email_webmaster">Webmaster's email (optionnal): </label><input type="text" name="email_webmaster" id="email_webmaster" value="{$email_webmaster}"/></p>
     </fieldset>
     <p class="center"><input type="submit" value="Update settings"><input type="hidden" name="token" value="{$token}"/></p>

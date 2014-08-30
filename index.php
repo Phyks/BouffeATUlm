@@ -413,7 +413,7 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_password']) && !empty($_POST['mysql_db']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['currency']) && !empty($_POST['timezone']) && !empty($_POST['template'])) {
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['currency']) && !empty($_POST['timezone']) && !empty($_POST['template'])) {
                 if(check_token(600, 'settings')) {
                     if(!is_writable('data/')) {
                         $tpl>assign('error', $errors['write_error_data'][LANG]);
@@ -447,7 +447,7 @@
                                 elseif(strpos(trim($line), "TEMPLATE_DIR") !== false)
                                     $config[$line_number] = "\tdefine('TEMPLATE_DIR', 'tpl/".$_POST['template']."/');\n";
                                 elseif(strpos(trim($line), "LANG") !== false)
-                                    $config[$line_number] = "\tdefine('LANG', '".substr($_POST['template'], -2)."');\n";
+                                    $config[$line_number] = "\tdefine('LANG', 'i18n/".$_POST['lang']."');\n";
                                 elseif(strpos(trim($line), 'date_default_timezone_set') !== false)
                                     $config[$line_number] = "\tdate_default_timezone_set('".$_POST['timezone']."');\n";
                             }
@@ -480,7 +480,8 @@
             $tpl->assign('token', generate_token('settings'));
             $tpl->assign('templates', secureDisplay(listTemplates('tpl/')));
             $tpl->assign('current_template', htmlspecialchars(trim(substr(TEMPLATE_DIR, 4), '/')));
-            $tpl->assign('lang', htmlspecialchars(LANG));
+            $tpl->assign('current_lang', htmlspecialchars(LANG));
+            $tpl->assign('available_lang', secureDisplay(listLangs()));
             $tpl->draw('settings');
             break;
 

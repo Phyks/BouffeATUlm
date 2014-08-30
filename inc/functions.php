@@ -61,7 +61,7 @@
             return 18;
     }
 
-    function listTemplates($dir) {
+    function listTemplates($dir='tpl/') {
         if(strrpos($dir, '/') !== strlen($dir) - 1) {
             $dir .= '/';
         }
@@ -72,6 +72,33 @@
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != ".." && $entry != 'json' && is_dir($dir.$entry)) {
                     $return[] = array('value'=>$entry.'/', 'option'=>$entry);
+                }
+            }
+            closedir($handle);
+        }
+        return $return;
+    }
+
+    function listLangs($dir='i18n/') {
+        if(strrpos($dir, '/') !== strlen($dir) - 1) {
+            $dir .= '/';
+        }
+
+        $return = array();
+
+        if ($handle = opendir($dir)) {
+            while (false !== ($entry = readdir($handle))) {
+                if ($entry != "." && $entry != ".." && is_file($dir.$entry)) {
+                    $trad = file($dir.$entry);
+                    foreach ($trad as $line) {
+                        if (strstr($line, '// Provided lang')) {
+                            $lang = explode('=', $line);
+                            $lang = trim($lang[1]);
+
+                            $return[] = array('value'=>$entry, 'option'=>$lang);
+                            break;
+                        }
+                    }
                 }
             }
             closedir($handle);

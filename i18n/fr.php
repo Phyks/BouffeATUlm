@@ -1,0 +1,2 @@
+<?php
+// Provided lang = French
