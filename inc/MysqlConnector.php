@@ -9,8 +9,12 @@ class MysqlConnector {
     }
 
     public function connect() {
-        $this->connection = new PDO('mysql:host='.MYSQL_HOST.';dbname='.MYSQL_DB, MYSQL_LOGIN, MYSQL_PASSWORD);
-        $this->connection->query('SET NAMES utf8');
+        try {
+            $this->connection = new PDO('mysql:host='.MYSQL_HOST.';dbname='.MYSQL_DB, MYSQL_LOGIN, MYSQL_PASSWORD);
+            $this->connection->query('SET NAMES utf8');
+        } catch (Exception $e) {
+            exit ('Unable to access database.');
+        }
     }
 
     public function disconnect() {
@@ -22,9 +26,9 @@ class MysqlConnector {
     }
 
 	public static function getInstance() {
-		
+
 		if (self::$instance === null) {
-			self::$instance = new self(); 
+			self::$instance = new self();
 		}
 		return self::$instance;
 	}
