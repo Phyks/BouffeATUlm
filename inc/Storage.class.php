@@ -28,7 +28,7 @@ class Storage {
                 break;
 
             case 'key':
-                $return = 'INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY'; 
+                $return = 'INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY';
                 break;
 
             case 'float':
@@ -117,7 +117,7 @@ class Storage {
                         $value_array = substr($value_array, 2);
                     elseif(substr($value_array, 0, 1) == ">" || substr($value_array, 0, 1) == "<")
                         $value_array = substr($value_array, 1);
-                    
+
                     $query->bindValue(':'.$field.$key, $value_array);
                 }
             }
@@ -162,7 +162,7 @@ class Storage {
             $query .= ' WHERE id='.$this->id;
         }
         else {
-            $query = 'INSERT INTO '.MYSQL_PREFIX.$this->TABLE_NAME.'(';
+            $query = 'INSERT IGNORE INTO '.MYSQL_PREFIX.$this->TABLE_NAME.'(';
 
             $i = false;
             foreach($this->fields as $field=>$type) {
@@ -172,11 +172,11 @@ class Storage {
             }
 
             $query .= ') VALUES(';
-            
+
             $i = false;
             foreach($this->fields as $field=>$type) {
                 if($i) { $query .= ','; } else { $i = true; }
-                
+
                 $query .= ':'.$field;
             }
 
@@ -194,7 +194,7 @@ class Storage {
 
             $query->bindValue(':'.$field, $value);
         }
-        
+
         $query->execute();
 
         (empty($this->id) ? $this->setId($this->connection->lastInsertId()) : $this->setId($this->id));
@@ -209,7 +209,7 @@ class Storage {
         foreach($this->fields as $field=>$type) {
             if(!empty($this->$field)) {
                 if($i) { $query .= ' AND '; } else { $i = true; }
-                
+
                 $query .= $field.'=:'.$field;
             }
         }

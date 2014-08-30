@@ -101,7 +101,7 @@ class User extends Storage {
             case 2: // Global paybacks only
                 $this->notifications = 2;
                 break;
-            
+
             case 3: // Everything concerning you
                 $this->notifications = 3;
                 break;
@@ -137,7 +137,7 @@ class User extends Storage {
     public function exists() {
         $user_data = $this->load(array('login'=>$this->login), true);
 
-        if(count($user_data) == 1) { 
+        if(count($user_data) == 1) {
             return $user_data;
         }
         else {
@@ -173,7 +173,7 @@ class User extends Storage {
         $this->setStaySignedInToken($user_data['stay_signed_in_token']);
     }
 
-    // Check wether a user already exists or not 
+    // Check wether a user already exists or not
     // (a user = a unique login and display_name)
     // =========================================
     public function isUnique() {
