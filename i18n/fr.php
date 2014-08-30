@@ -1,2 +1,2 @@
 <?php
-// Provided lang = French
+// Provided lang = Français
