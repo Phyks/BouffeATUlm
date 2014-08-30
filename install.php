@@ -103,9 +103,6 @@
         if(!empty($_POST['email_webmaster']) && !filter_var($_POST['email_webmaster'], FILTER_VALIDATE_EMAIL)) {
             $error = "Webmaster's email address is invalid.";
         }
-        else {
-            $email_webmaster = !empty($_POST['email_webmaster']) ? $_POST['email_webmaster'] : '';
-        }
 
         if(empty($error)) {
             if(function_exists('mcrypt_create_iv')) {
@@ -128,7 +125,7 @@
     define('BASE_URL', '".$_POST['base_url']."');
     define('SALT', '".$salt."');
     define('CURRENCY', '".$_POST['currency']."');
-    define('EMAIL_WEBMASTER', '".$email_webmaster."');
+    define('EMAIL_WEBMASTER', '".$_POST['email_webmaster']."');
     define('TEMPLATE_DIR', 'tpl/".$_POST['template']."');
     define('LANG', '".$_POST['lang']."');
 

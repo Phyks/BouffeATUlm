@@ -29,7 +29,7 @@ class User extends Storage {
     }
 
     public function getDisplayName() {
-        return $this->display_name;
+        return (!empty($this->display_name) ? $this->display_name : $this->login);
     }
 
     public function getId() {

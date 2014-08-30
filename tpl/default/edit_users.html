@@ -29,13 +29,13 @@
 <h2>{$user_id != -1 ? 'Edit' : 'Add'} a user</h2>
 <form method="post" action="index.php?do={$user_id != -1 ? 'edit_users' : 'add_user'}" id="edit_user_form">
     <p>
-        <label for="login" class="label-block">Login : </label><input type="text" name="login" id="login" {if condition="$login_post != ''"} value="{$login_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''} {/if}/>
+        <label for="login" class="label-block">Login: </label><input type="text" name="login" id="login" {if condition="$login_post != ''"} value="{$login_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''} {/if}/>
     </p>
     <p>
-        <label for="display_name" class="label-block">Displayed name : </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
+        <label for="display_name" class="label-block">Displayed name (optionnal): </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
     </p>
     <p>
-        <label for="email" class="label-block">E-mail address : </label><input type="text" name="email" id="email" {if condition="$email_post != ''"} value="{$email_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getEmail().'"' : ''} {/if}/>
+        <label for="email" class="label-block">E-mail address (optionnal): </label><input type="text" name="email" id="email" {if condition="$email_post != ''"} value="{$email_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getEmail().'"' : ''} {/if}/>
     </p>
     <p>
         <label for="notifications" class="label-block">Notifications for </label>
@@ -46,9 +46,9 @@
         </select>
     </p>
     <p>
-        <label for="password" class="label-block">Password : </label><input type="password" name="password" id="password"/>  <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a>
+        <label for="password" class="label-block">Password: </label><input type="password" name="password" id="password"/>  <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a>
         {if condition="$user_id != -1"}
-            <br/><em>Note :</em> Leave blank this field if you don't want to edit password.
+            <br/><em>Note:</em> Leave blank this field if you don't want to edit password.
         {/if}
     </p>
     <p id="edit_user_admin_rights">
@@ -65,16 +65,16 @@
 
 {if condition="$user_id != -1"}
     <h2>Personal token for this user</h2>
-    <p>The personal token for this user to be used with the API is : {$user_data->getJsonToken()}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&user_id={$user_data->getId()}&amp;token={$token}">generate a new one</a>.</p>
+    <p>The personal token for this user to be used with the API is: {$user_data->getJsonToken()}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&user_id={$user_data->getId()}&amp;token={$token}">generate a new one</a>.</p>
 {/if}
 
 {elseif condition="$view == 'password'"}
 <h2>Edit your password</h2>
 <form method="post" action="index.php?do=password" id="edit_password_form">
-    <p><label for="password" class="label-block">New password : </label><input type="password" id="password" name="password"/> <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
-    <p><label for="password_confirm" class="label-block">Confirm new password : </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
+    <p><label for="password" class="label-block">New password: </label><input type="password" id="password" name="password"/> <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
+    <p><label for="password_confirm" class="label-block">Confirm new password: </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
     <p>
-        <label for="email" class="label-block">E-mail address : </label><input type="text" name="email" id="email" value="{$current_user->getEmail()}"/>
+        <label for="email" class="label-block">E-mail address: </label><input type="text" name="email" id="email" value="{$current_user->getEmail()}"/>
     </p>
     <p>
         <label for="notifications" class="label-block">Notifications for </label>
@@ -84,11 +84,11 @@
             <option value="3" {if condition="$current_user->getNotifications() == 3"}selected="selected"{/if}>everything involving you.</option>
         </select>
     </p>
-    <p><em>Note :</em> Leave blank the password fields if you don't want to edit password.</p>
+    <p><em>Note:</em> Leave blank the password fields if you don't want to edit password.</p>
     <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
 
 <h2>Your personal token to use the API</h2>
-<p>Your personal token to use the API is : {$json_token}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&amp;token={$token}">generate a new one</a>.</p>
+<p>Your personal token to use the API is: {$json_token}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&amp;token={$token}">generate a new one</a>.</p>
 {/if}
 {include="footer"}

@@ -54,7 +54,7 @@
     $tpl->assign('base_url', htmlspecialchars(BASE_URL));
     $tpl->assign('currency', htmlspecialchars(CURRENCY));
     $tpl->assign('email_webmaster', htmlspecialchars(EMAIL_WEBMASTER));
-    
+
     $current_user = new User();
     if(isset($_SESSION['current_user'])) {
         $current_user->sessionRestore($_SESSION['current_user'], true);
@@ -112,13 +112,13 @@
     }
     else {
         //If json token not available
-        
+
         // If not connected, redirect to connection page
         if($current_user === false && (empty($_GET['do']) OR $_GET['do'] != 'connect')) {
             header('location: index.php?do=connect&'.$get_redir);
             exit();
         }
-        
+
         // If IP has changed, logout
         if($current_user !== false && user_ip() != $_SESSION['ip']) {
             logout();
@@ -201,7 +201,7 @@
                         $error = true;
                         $tpl->assign('error', $errors['email_invalid'][LANG]);
                     }
-                    
+
                     $current_user->setNotifications($_POST['notifications']);
                     $current_user->save();
 
@@ -228,7 +228,7 @@
                 exit();
             }
 
-            if(!empty($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['email']) && (!empty($_POST['password'])  || !empty($_POST['user_id'])) && !empty($_POST['notifications']) && isset($_POST['admin'])) {
+            if(!empty($_POST['login']) && (!empty($_POST['password'])  || !empty($_POST['user_id'])) && !empty($_POST['notifications']) && isset($_POST['admin'])) {
                 if(check_token(600, 'edit_users')) {
                     $user = new User();
                     if(!empty($_POST['user_id'])) {
@@ -238,7 +238,7 @@
                         $user->newJsonToken();
                     }
                     $user->setLogin($_POST['login']);
-                    $user->setDisplayName($_POST['display_name']);
+                    $user->setDisplayName(!empty($_POST['display_name']) ? $_POST['display_name'] : '');
                     if(!empty($_POST['password'])) {
                         $user->setPassword($user->encrypt($_POST['password']));
                     }
@@ -270,7 +270,7 @@
                     $tpl->assign('error', $errors['token_error'][LANG]);
                 }
             }
- 
+
             if(!empty($_GET['user_id']) || $_GET['do'] == 'add_user') {
                 if(!empty($_GET['user_id'])) {
                     $user_id = (int) $_GET['user_id'];
@@ -304,7 +304,7 @@
                 $user_id = $current_user->getId();
             }
 
-            if(check_token(600, 'password') || check_token(600, 'edit_users')) {  
+            if(check_token(600, 'password') || check_token(600, 'edit_users')) {
                 $user = new User();
                 $user = $user->load(array('id'=>$user_id), true);
                 $user->newJsonToken();
@@ -312,7 +312,7 @@
 
                 if(empty($_GET['user_id']))
                     $_SESSION['current_user'] = $user->sessionStore();
-                
+
                 if(!empty($_GET['user_id']))
                     header('location: index.php?do=edit_users&user_id='.$user_id);
                 else
@@ -398,7 +398,7 @@
                     // Clear the cache
                     ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
                     array_map("unlink", $cached_files);
-        
+
                     header('location: index.php?'.$get_redir);
                     exit();
                 }
@@ -413,7 +413,7 @@
             break;
 
         case 'settings':
-            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['currency']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['timezone']) && !empty($_POST['email_webmaster']) && !empty($_POST['template'])) {
+            if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_password']) && !empty($_POST['mysql_db']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['currency']) && !empty($_POST['timezone']) && !empty($_POST['template'])) {
                 if(check_token(600, 'settings')) {
                     if(!is_writable('data/')) {
                         $tpl>assign('error', $errors['write_error_data'][LANG]);
@@ -478,9 +478,9 @@
             $tpl->assign('timezone', @date_default_timezone_get());
             $tpl->assign('show_settings', true);
             $tpl->assign('token', generate_token('settings'));
-            $tpl->assign('templates', listTemplates('tpl/'));
-            $tpl->assign('current_template', trim(substr(TEMPLATE_DIR, 4), '/'));
-            $tpl->assign('lang', LANG);
+            $tpl->assign('templates', secureDisplay(listTemplates('tpl/')));
+            $tpl->assign('current_template', htmlspecialchars(trim(substr(TEMPLATE_DIR, 4), '/')));
+            $tpl->assign('lang', htmlspecialchars(LANG));
             $tpl->draw('settings');
             break;
 
@@ -534,7 +534,7 @@
 
                             $invoice->setDate(0, int2ampm($_POST['date_hour']), $_POST['date_day'], $_POST['date_month'], $_POST['date_year']);
 
-                            
+
                             $invoice->setUsersIn($users_in);
 
                             $invoice->save();
@@ -655,7 +655,7 @@
                         $payback->setTo($_GET['to']);
 
                         $payback->save();
-                        
+
                         // Clear the cache
                         ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
                         array_map("unlink", $cached_files);
@@ -798,7 +798,7 @@
 
         case "see_paybacks":
             $global_paybacks = new GlobalPayback();
-    
+
             if(empty($_GET['id'])) {
                 $global_paybacks = $global_paybacks->load();
 
@@ -1034,7 +1034,7 @@
 		                                        $simplified_balances[$user1][$user2] = round(abs($value), 2);
 		                                        $balances[$user1] = round($balances[$user1] + abs($value), 2);
 		                                        $balances[$user2] = round($balances[$user2] - abs($value), 2);
-		                                    } 
+		                                    }
 		                                    break;
 		                                }
 		                            }
@@ -1068,7 +1068,7 @@
                         exit();
                     }
                 }
-                
+
                 $users_list = new User();
                 $users_list = $users_list->load();
 
@@ -1165,7 +1165,7 @@
                                 }
                             }
 
-                            // Then search for all invoices paid by 1 and check if user2 was in 
+                            // Then search for all invoices paid by 1 and check if user2 was in
                             $invoices_list_balances = new Invoice();
                             $invoices_list_balances = $invoices_list_balances->load(array('buyer'=>$user1->getId()));
                             if($invoices_list_balances !== false) {
@@ -1201,7 +1201,7 @@
                         $user_balance = $user_balance - $balances[$current_user->getId()][$user1->getId()];
                         $user_balance = $user_balance + $balances[$user1->getId()][$current_user->getId()];
                     }
-                    
+
                     $tpl->assign('user_balance', round($user_balance,2));
                 }
 
