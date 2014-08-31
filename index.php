@@ -31,6 +31,8 @@
     require_once('inc/CSRF.inc.php');
 
     session_start();
+    $i18n = array();
+    require_once(LANG);
 
     // Long lasting session inspired by the work from sbgodin for shaarli
     define('WEB_PATH', substr($_SERVER["REQUEST_URI"], 0, 1+strrpos($_SERVER["REQUEST_URI"], '/', 0)));
@@ -54,6 +56,7 @@
     $tpl->assign('base_url', htmlspecialchars(BASE_URL));
     $tpl->assign('currency', htmlspecialchars(CURRENCY));
     $tpl->assign('email_webmaster', htmlspecialchars(EMAIL_WEBMASTER));
+    $tpl->assign('i18n', $i18n);
 
     $current_user = new User();
     if(isset($_SESSION['current_user'])) {

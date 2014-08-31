@@ -1,17 +1,17 @@
 {include="header"}
 
 {if condition="$view == 'list_users'"}
-<h2>List of users</h2>
-<p class="center">You can also <a href="?do=add_user">add a user</a>.</p>
+<h2>{$i18n['users_list']}</h2>
+<p class="center">{$i18n['you_can_also']} <a href="?do=add_user">{$i18n['add_user']}</a>.</p>
 <table id="edit_users">
     <tr>
-        <th>Id</th>
-        <th>Login</th>
-        <th>Display Name</th>
-        <th>E-mail address</th>
-        <th>Is admin ?</th>
-        <th>Edit</th>
-        <th>Delete</th>
+        <th>{$i18n['id']}</th>
+        <th>{$i18n['login']}</th>
+        <th>{$i18n['display_name']}</th>
+        <th>{$i18n['email_address']}</th>
+        <th>{$i18n['is_admin']}{$i18n['before_double_ponctuation']}?</th>
+        <th>{$i18n['edit']}</th>
+        <th>{$i18n['delete']}</th>
     </tr>
     {loop="users"}
     <tr>
@@ -20,75 +20,75 @@
         <td>{$value->getDisplayName()}</td>
         <td>{$value->getEmail()}</td>
         <td>{$value->getAdmin() ? "Yes" : "No"}</td>
-        <td><a href="index.php?do=edit_users&user_id={$value->getId()}">Edit</a></td>
-        <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&amp;user_id={$value->getId()}&amp;token={$token}">Delete</a>{/if}</td>
+        <td><a href="index.php?do=edit_users&user_id={$value->getId()}">{$i18n['edit']}</a></td>
+        <td>{if condition="$value->getId() != $current_user->getId()"}<a href="index.php?do=delete_user&amp;user_id={$value->getId()}&amp;token={$token}">{$i18n['delete']}</a>{/if}</td>
     </tr>
     {/loop}
 </table>
 {elseif condition="$view == 'edit_user'"}
-<h2>{$user_id != -1 ? 'Edit' : 'Add'} a user</h2>
+<h2>{$user_id != -1 ? $i18n['edit'] : $i18n['add']} {$i18n['a_user']}</h2>
 <form method="post" action="index.php?do={$user_id != -1 ? 'edit_users' : 'add_user'}" id="edit_user_form">
     <p>
-        <label for="login" class="label-block">Login: </label><input type="text" name="login" id="login" {if condition="$login_post != ''"} value="{$login_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''} {/if}/>
+    <label for="login" class="label-block">{$i18n['login']}{$i18n['before_double_ponctuation']}: </label><input type="text" name="login" id="login" {if condition="$login_post != ''"} value="{$login_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getLogin().'"' : ''} {/if}/>
     </p>
     <p>
-        <label for="display_name" class="label-block">Displayed name (optionnal): </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
+    <label for="display_name" class="label-block">{$i18n['display_name']} ({$i18n['optionnal']}){$i18n['before_double_ponctuation']}: </label><input type="text" name="display_name" id="display_name" {if condition="$display_name_post != ''"} value="{$display_name_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getDisplayName().'"' : ''} {/if}/>
     </p>
     <p>
-        <label for="email" class="label-block">E-mail address (optionnal): </label><input type="text" name="email" id="email" {if condition="$email_post != ''"} value="{$email_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getEmail().'"' : ''} {/if}/>
+        <label for="email" class="label-block">{$i18n['email_address']} ({$i18n['optionnal']}){$i18n['before_double_ponctuation']}: </label><input type="text" name="email" id="email" {if condition="$email_post != ''"} value="{$email_post}" {else} {$user_id != -1 ? 'value="'.$user_data->getEmail().'"' : ''} {/if}/>
     </p>
     <p>
-        <label for="notifications" class="label-block">Notifications for </label>
+        <label for="notifications" class="label-block">{$i18n['notifications_for']} </label>
         <select name="notifications" id="notifications">
-            <option value="1" {if condition="$user_id != -1 && $user_data->getNotifications() == 1"}selected="selected"{/if}>nothing.</option>
-            <option value="2" {if condition="$user_id != -1 && $user_data->getNotifications() == 2"}selected="selected"{/if}>global paybacks only.</option>
-            <option value="3" {if condition="$user_id != -1 && $user_data->getNotifications() == 3"}selected="selected"{/if}>everything involving this user.</option>
+            <option value="1" {if condition="$user_id != -1 && $user_data->getNotifications() == 1"}selected="selected"{/if}>{$i18n['nothing']}.</option>
+            <option value="2" {if condition="$user_id != -1 && $user_data->getNotifications() == 2"}selected="selected"{/if}>{$i18n['notif_global_paybacks']}.</option>
+            <option value="3" {if condition="$user_id != -1 && $user_data->getNotifications() == 3"}selected="selected"{/if}>{$i18n['notif_everything']}.</option>
         </select>
     </p>
     <p>
-        <label for="password" class="label-block">Password: </label><input type="password" name="password" id="password"/>  <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a>
+    <label for="password" class="label-block">{$i18n['password']}{$i18n['before_double_ponctuation']}: </label><input type="password" name="password" id="password"/>  <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a>
         {if condition="$user_id != -1"}
-            <br/><em>Note:</em> Leave blank this field if you don't want to edit password.
+        <br/><em>{$i18n['note']}{$i18n['before_double_ponctuation']}:</em> {$i18n['note_dont_edit_passwords']}
         {/if}
     </p>
     <p id="edit_user_admin_rights">
-        Give admin rights to this user ?<br/>
-    <input type="radio" id="admin_yes" value="1" name="admin" {if condition="$admin_post == 1 || ($admin_post == -1 && $user_id != -1 && $user_data->getAdmin())"} checked{/if}/><label for="admin_yes">Yes</label><br/>
-    <input type="radio" id="admin_no" value="0" name="admin" {if condition="$admin_post == 0 || ($admin_post == -1 && ($user_id == -1 || !$user_data->getAdmin()))"} checked{/if}/><label for="admin_no">No</label>
+    {$i18n['give_admin_rights']}{$i18n['before_double_ponctuation']}?<br/>
+    <input type="radio" id="admin_yes" value="1" name="admin" {if condition="$admin_post == 1 || ($admin_post == -1 && $user_id != -1 && $user_data->getAdmin())"} checked{/if}/><label for="admin_yes">{$i18n['yes']}</label><br/>
+    <input type="radio" id="admin_no" value="0" name="admin" {if condition="$admin_post == 0 || ($admin_post == -1 && ($user_id == -1 || !$user_data->getAdmin()))"} checked{/if}/><label for="admin_no">{$i18n['no']}</label>
     </p>
     <p class="center">
-        <input type="submit" value="{$user_id != -1 ? 'Edit' : 'Add'}"/>
+    <input type="submit" value="{$user_id != -1 ? $i18n['edit'] : $i18n['add']}"/>
         {if condition="$user_id != -1"}<input type="hidden" name="user_id" value="{$user_id}"/>{/if}
         <input type="hidden" name="token" value="{$token}"/>
     </p>
 </form>
 
 {if condition="$user_id != -1"}
-    <h2>Personal token for this user</h2>
-    <p>The personal token for this user to be used with the API is: {$user_data->getJsonToken()}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&user_id={$user_data->getId()}&amp;token={$token}">generate a new one</a>.</p>
+<h2>{$i18n['personal_token_user']}</h2>
+<p>{$i18n['personal_token_user_is']}{$i18n['before_double_ponctuation']}: {$user_data->getJsonToken()}.<br/>{$i18n['compromised_token']} <a href="index.php?do=new_token&user_id={$user_data->getId()}&amp;token={$token}">{$i18n['generate_new_one']}</a>.</p>
 {/if}
 
 {elseif condition="$view == 'password'"}
-<h2>Edit your password</h2>
+<h2>{$i18n['edit_password']}</h2>
 <form method="post" action="index.php?do=password" id="edit_password_form">
-    <p><label for="password" class="label-block">New password: </label><input type="password" id="password" name="password"/> <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
-    <p><label for="password_confirm" class="label-block">Confirm new password: </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="Toggle visible"/></a></p>
+    <p><label for="password" class="label-block">{$i18n['new_password']}{$i18n['before_double_ponctuation']}: </label><input type="password" id="password" name="password"/> <a href="" onclick="toggle_password('password'); return false;"><img src="img/toggleVisible.png" alt="{$i18n['toggle_visible']}"/></a></p>
+    <p><label for="password_confirm" class="label-block">{$i18n['confirm_new_password']}{$i18n['before_double_ponctuation']}: </label><input type="password" id="password_confirm" name="password_confirm"/> <a href="" onclick="toggle_password('password_confirm'); return false;"><img src="img/toggleVisible.png" alt="{$i18n['toggle_visible']}"/></a></p>
     <p>
-        <label for="email" class="label-block">E-mail address: </label><input type="text" name="email" id="email" value="{$current_user->getEmail()}"/>
+    <label for="email" class="label-block">{$i18n['email_address']}{$i18n['before_double_ponctuation']}: </label><input type="text" name="email" id="email" value="{$current_user->getEmail()}"/>
     </p>
     <p>
-        <label for="notifications" class="label-block">Notifications for </label>
+    <label for="notifications" class="label-block">{$i18n['notifications_for']} </label>
         <select name="notifications" id="notifications">
-            <option value="1" {if condition="$current_user->getNotifications() == 1"}selected="selected"{/if}>nothing.</option>
-            <option value="2" {if condition="$current_user->getNotifications() == 2"}selected="selected"{/if}>global paybacks only.</option>
-            <option value="3" {if condition="$current_user->getNotifications() == 3"}selected="selected"{/if}>everything involving you.</option>
+            <option value="1" {if condition="$current_user->getNotifications() == 1"}selected="selected"{/if}>{$i18n['nothing']}.</option>
+            <option value="2" {if condition="$current_user->getNotifications() == 2"}selected="selected"{/if}>{$i18n['notif_global_paybacks']}.</option>
+            <option value="3" {if condition="$current_user->getNotifications() == 3"}selected="selected"{/if}>{$i18n['notif_everything']}.</option>
         </select>
     </p>
-    <p><em>Note:</em> Leave blank the password fields if you don't want to edit password.</p>
-    <p class="center"><input type="submit" value="Update"/><input type="hidden" name="token" value="{$token}"</p>
+    <p><em>{$i18n['note']}{$i18n['before_double_ponctuation']}:</em> {$i18n['note_dont_edit_passwords']}</p>
+    <p class="center"><input type="submit" value="{$i18n['update']}"/><input type="hidden" name="token" value="{$token}"</p>
 </form>
 
-<h2>Your personal token to use the API</h2>
-<p>Your personal token to use the API is: {$json_token}.<br/>If you think it might be compromised, you can <a href="index.php?do=new_token&amp;token={$token}">generate a new one</a>.</p>
+<h2>{$i18n['personal_token_title']}</h2>
+<p>{$i18n['personal_token_is']}{$i18n['before_double_ponctuation']}: {$json_token}.<br/>{$i18n['compromised_token']} <a href="index.php?do=new_token&amp;token={$token}">{$i18n['generate_new_one']}</a>.</p>
 {/if}
 {include="footer"}

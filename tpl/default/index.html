@@ -5,12 +5,12 @@
 {/if}
 
 <div id="quick_summary">
-    <h2>Balance</h2>
+    <h2>{$i18n['balance']}</h2>
     {if condition="$current_user->getAdmin()"}
-        <p class="center">Read <em>line</em> owes <em>case</em> {$currency} to <em>column</em>. You can click on links to confirm the payback.
-        <table id="balance_table"> 
+    <p class="center">{$i18n['home_table_caption']}
+        <table id="balance_table">
             <tr>
-                <th>Owes\To</th>
+                <th>{$i18n['owes']}\{$i18n['to']}</th>
                 {loop="users"}
                 <th>{$value->getDisplayName()}</th>
                 {/loop}
@@ -33,9 +33,9 @@
     {else}
         <table>
             <tr>
-                <th>Users</th>
-                <th>You owe him</th>
-                <th>He owes you</th>
+                <th>{$i18n['users']}</th>
+                <th>{$i18n['you_owe_him']}</th>
+                <th>{$i18n['he_owes_you']}/th>
             </tr>
             {loop="$users"}
                 {if condition="$balances[$value->getId()][$current_user->getId()] !== 'X' && $balances[$value->getId()][$current_user->getId()] !== '-'"}
@@ -53,28 +53,28 @@
                 {/if}
             {/loop}
         </table>
-        <p class="center">Balance : {if condition="$user_balance > 0"}+{/if}{$user_balance}{$currency}</p>
+        <p class="center">{$i18n['balance']}{$i18n['before_double_ponctuation']}: {if condition="$user_balance > 0"}+{/if}{$user_balance}{$currency}</p>
     {/if}
 </div>
 <div id="detailed_summary">
-    <h2>Detailed list of bills{if condition="$all == 0"} for last month{/if}</h2>
+    <h2>{$i18n['detailed_list_bills']}{if condition="$all == 0"} {$i18n['for_last_month']}{/if}</h2>
 
     {if condition="$all == 0"}
-        <p class="center"><a href="?all=1">Display all bills</a></p>
+    <p class="center"><a href="?all=1">{$i18n['display_all_bills']}</a></p>
     {else}
-        <p class="center"><a href="?all=0">Only display bills for last month</a></p>
+    <p class="center"><a href="?all=0">{$i18n['only_last_month_bills']}</a></p>
     {/if}
 
     {if condition="$invoices !== false && count($invoices)>=1"}
         <table id="list_expenses">
             <tr>
-                <th>Date</th>
-                <th>Paid by</th>
-                <th>Users in</th>
-                <th>Amount</th>
-                <th>What ?</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th>{$i18n['date']}</th>
+                <th>{$i18n['paid_by']}</th>
+                <th>{$i18n['users_in']}</th>
+                <th>{$i18n['amount']}</th>
+                <th>{$i18n['what']}{$i18n['before_double_ponctuation']}?</th>
+                <th>{$i18n['edit']}</th>
+                <th>{$i18n['delete']}</th>
             </tr>
             {loop="invoices"}
                 <tr>
@@ -84,34 +84,34 @@
                         {loop="$value->getUsersIn()->get()"}
                             {$users[$key2]->getDisplayName()}
                             {if condition="$value2 > 1"}
-                                ({$value2} guests)
+                                ({$value2} {$i18n['guests']})
                             {elseif condition="$value2 == 1"}
-                                ({$value2} guest)
+                                ({$value2} {$i18n['guest']})
                             {/if}
                             {if condition="$value1->getBuyer() != $key2"}
-                                - 
+                                -
                                 {if condition="$paybacks[$value1->getId()] === false || !in_array($key2, array_keys($paybacks[$value1->getId()]))"}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                        <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;token={$token}" title="Confirm payback">
+                                    <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;token={$token}" title="{$i18n['confirm_payback']}">
                                     {/if}
-                                        Remains {$value1->getAmountPerPerson($key2)} {$currency}
+                                        {$i18n['remains']} {$value1->getAmountPerPerson($key2)} {$currency}
                                     {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                         </a>
                                     {/if}
                                 {else}
                                     {if condition="$paybacks[$value1->getId()][$key2]->getAmount() == $value1->getAmountPerPerson($key2)"}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                            <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;token={$token}" title="Delete payback">
+                                            <a href="?do=delete_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;token={$token}" title="{$i18n['delete_payback']}">
                                         {/if}
-                                            Paid
+                                            {$i18n['paid']}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                             </a>
-                                        {/if}   
+                                        {/if}
                                     {else}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
-                                            <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}&amp;token={$token}" title="Confirm payback">
+                                            <a href="?do=confirm_payback&amp;from={$key2}&amp;to={$value1->getBuyer()}&amp;invoice_id={$value1->getId()}&amp;payback_id={$paybacks[$value1->getId()][$key2]->getId()}&amp;token={$token}" title="{$i18n['confirm_payback']}">
                                         {/if}
-                                            Remains {$value1->getAmountPerPerson($key2) - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
+                                            {$i18n['remains']} {$value1->getAmountPerPerson($key2) - $paybacks[$value1->getId()][$key2]->getAmount()}{$currency}
                                         {if condition="$current_user->getId() == $value1->getBuyer() || $current_user->getAdmin()"}
                                             </a>
                                         {/if}
@@ -125,14 +125,14 @@
                     <td>{$value->getWhat()}</td>
                     <td>
                         {if condition="$value->getBuyer() == $current_user->getId() || $current_user->getAdmin()"}
-                            <a href="index.php?do=edit_invoice&id={$value->getId()}">Edit</a>
+                            <a href="index.php?do=edit_invoice&id={$value->getId()}">{$i18n['edit']}</a>
                         {else}
                             -
                         {/if}
                     </td>
                     <td>
                         {if condition="$value->getBuyer() == $current_user->getId() || $current_user->getAdmin()"}
-                            <a href="index.php?do=delete_invoice&id={$value->getId()}&token={$token}">Delete</a>
+                            <a href="index.php?do=delete_invoice&id={$value->getId()}&token={$token}">{$i18n['delete']}</a>
                         {else}
                             -
                         {/if}
@@ -141,7 +141,7 @@
             {/loop}
         </table>
     {else}
-        <p class="center">No bills added.</p>
+    <p class="center">{$i18n['no_bills']}.</p>
     {/if}
 </div>
 {include="footer"}

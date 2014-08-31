@@ -1,30 +1,30 @@
 {include="header"}
 
-<h2>{if condition="$id != 0"}Edit{else}Add{/if} a bill</h2>
+<h2>{if condition="$id != 0"}{$i18n['edit']}{else}{$i18n['add']}{/if} {$i18n['a_bill']}</h2>
 
 <form method="post" action="index.php?do=new_invoice" id="invoice_form">
     <fieldset>
-        <legend>Expense</legend>
+        <legend>{$i18n['expense']}</legend>
         <p>
-            <label for="what">What ? </label>
+            <label for="what">{$i18n['what']}{$i18n['before_double_ponctuation']}? </label>
         </p>
         <textarea name="what" id="what" rows="10">{$what_post}</textarea>
         <p>
-            <label for="amount">Amount : </label>
+        <label for="amount">{$i18n['amount']}{$i18n['before_double_ponctuation']}: </label>
             <input type="text" name="amount" id="amount" {if condition="$amount_post != 0"} value="{$amount_post}" {/if} size="5"/> {$currency}
         </p>
         <p>
-            <label for="date_day">Date : </label>
+        <label for="date_day">{$i18n['date']}{$i18n['before_double_ponctuation']}: </label>
             <select name="date_day" id="date_day">
                 {loop="days"}
                 <option value="{$value}" {if condition="$value == $day_post"}selected{/if}>{$value}</option>
                 {/loop}
-            </select> / 
+            </select> /
             <select name="date_month" id="date_month" onchange="set_days_month_year();">
                 {loop="months"}
                 <option value="{$value}" {if condition="$value == $month_post"}selected{/if}>{$value}</option>
                 {/loop}
-            </select> / 
+            </select> /
             <select name="date_year" id="date_year" onchange="set_days_month_year();">
                 {loop="years"}
                     <option value="{$value}" {if condition="$value == $year_post"}selected{/if}>{$value}</option>
@@ -37,13 +37,13 @@
         </p>
     </fieldset>
     <fieldset>
-        <legend>Users in ?</legend>
+        <legend>{$i18n['users_in']}{$i18n['before_double_ponctuation']}?</legend>
         {loop="users"}
-        <input type="checkbox" name="users_in[]" value="{$value->getId()}" id="users_in_{$value->getId()}" {if condition="($current_user->getId() == $value->getId() && empty($users_in)) || in_array($value->getId(), array_keys($users_in))"} checked {/if}/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> and <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" {if condition="in_array($value->getId(), array_keys($users_in))"} value="{$users_in[$value->getId()]}" {else} value="0" {/if} onkeyup="guest_user_label({$value->getId()});"/><label for="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}_label"> guest</label>.<br/>
+        <input type="checkbox" name="users_in[]" value="{$value->getId()}" id="users_in_{$value->getId()}" {if condition="($current_user->getId() == $value->getId() && empty($users_in)) || in_array($value->getId(), array_keys($users_in))"} checked {/if}/> <label for="users_in_{$value->getId()}">{$value->getDisplayName()}</label> {$i18n['and']} <input type="text" name="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}" size="1" {if condition="in_array($value->getId(), array_keys($users_in))"} value="{$users_in[$value->getId()]}" {else} value="0" {/if} onkeyup="guest_user_label({$value->getId()});"/><label for="guest_user_{$value->getId()}" id="guest_user_{$value->getId()}_label"> {$i18n['guest']}<span id="guest_user_{$value->getId()}_label_plural"></span></label>.<br/>
         {/loop}
     </fieldset>
     <p class="center">
-        <input type="submit" value="{if condition="$id != 0"}Edit{else}Add{/if}"/>
+    <input type="submit" value="{if condition="$id != 0"}{$i18n['edit']}{else}{$i18n['add']}{/if}"/>
         {if condition="$id != 0"}<input type="hidden" name="id" value="{$id}"/>{/if}
         <input type="hidden" name="token" value="{$token}"/>
     </p>
