@@ -1,23 +1,4 @@
 <?php
-    // Error translation
-    $errors = array(
-        'unknown_username_password'=>array('fr'=>'Nom d\'utilisateur ou mot de passe inconnu.', 'en'=>'Unknown username or password.'),
-        'token_error'=>array('fr'=>'Erreur de token. Veuillez réessayer.', 'en'=>'Token error. Please resubmit the form.'),
-        'password_mismatch'=>array('fr'=>'Les deux mots de passe ne correspondent pas.', 'en'=>'The content of the two passwords fields doesn\'t match.'),
-        'user_already_exists'=>array('fr'=>'Un utilisateur avec le même login ou nom d\'affichage existe déjà. Choisissez un login ou un nom d\'affichage différent.', 'en'=>'A user with the same login or display name already exists. Choose a different login or display name.'),
-        'write_error_data'=>array('fr'=>'Le script ne peut pas écrire dans le dossier data/, vérifiez les permissions sur ce dossier.', 'en'=>'The script can\'t write in data/ dir, check permissions set on this folder.'),
-        'write_error_db_backups'=>array('fr'=>'Le script ne peut pas écrire dans le dossier db_backups/, vérifiez les permissions sur ce dossier.', 'en'=>'The script can\'t write in db_backup/ dir, check permissions set on this folder.'),
-        'db_dump_failed'=>array('fr'=>'Échec de la sauvegarde de la base de données. Aucune modification n\'a eu lieu.', 'en'=>'Unable to dump the database. No changes were made.'),
-        'unable_write_config'=>array('fr'=>'Impossible d\'écrire le fichier data/config.php. Vérifiez les permissions.', 'en'=>'Unable to write data/config.php file. Check permissions.'),
-        'negative_amount'=>array('fr'=>'Montant négatif non autorisé.', 'en'=>'Negative amount not allowed.'),
-        'template_error'=>array('fr'=>'Template non disponible.', 'en'=>'Template not available.'),
-        'unauthorized'=>array('fr'=>'Vous n\'avez pas le droit de faire cette action.', 'en'=>'You are not authorized to do that.'),
-        'no_users'=>array('fr'=>'Vous devez ajouter au moins un autre utilisateur.', 'en'=>'You must add at least one more user beside you.'),
-        'what_unknown'=>array('fr'=>'Vous devez renseigner un objet pour la dépense.', 'en'=>'You must add something to describe this invoice in "what" field.'),
-        'incorrect_amount'=>array('fr'=>'Montant incorrect ou nul.', 'en'=>'Incorrect amount or amount is zero.'),
-        'email_invalid'=>array('fr'=>'L\'adresse e-mail est invalide.', 'en'=>'Incorrect e-mail address.')
-    );
-
     // Include necessary files
     if(!file_exists('data/config.php')) { header('location: install.php'); exit(); }
     require_once('data/config.php');
@@ -71,7 +52,7 @@
             if(ban_canLogin() == false) {
                 setcookie('bouffeatulm_login', 0, 0, WEB_PATH);
                 setcookie('bouffeatulm_staySignedIn', 0, 0, WEB_PATH);
-                exit($errors['unknown_username_password'][LANG]);
+                exit($errors['unknown_username_password']);
             }
             else {
                 $user = $user->exists($_COOKIE['bouffeatulm_login']);
@@ -88,7 +69,7 @@
                     ban_loginFailed();
                     setcookie('bouffeatulm_login', 0, 0, WEB_PATH);
                     setcookie('bouffeatulm_staySignedIn', 0, 0, WEB_PATH);
-                    exit($errors['unknown_username_password'][LANG]);
+                    exit($errors['unknown_username_password']);
                 }
             }
         }
@@ -146,7 +127,7 @@
                 $user = new User();
                 $user->setLogin($_POST['login']);
                 if(ban_canLogin() == false) {
-                    $error = $errors['unknown_username_password'][LANG];
+                    $error = $errors['unknown_username_password'];
                 }
                 else {
                     $user = $user->exists($_POST['login']);
@@ -168,7 +149,7 @@
                     }
                     else {
                         ban_loginFailed();
-                        $error = $errors['unknown_username_password'][LANG];
+                        $error = $errors['unknown_username_password'];
                     }
                 }
             }
@@ -196,13 +177,13 @@
                         }
                         else {
                             $error = true;
-                            $tpl->assign('error', $errors['password_mismatch'][LANG]);
+                            $tpl->assign('error', $errors['password_mismatch']);
                         }
                     }
 
                     if($current_user->setEmail($_POST['email']) === false) {
                         $error = true;
-                        $tpl->assign('error', $errors['email_invalid'][LANG]);
+                        $tpl->assign('error', $errors['email_invalid']);
                     }
 
                     $current_user->setNotifications($_POST['notifications']);
@@ -214,7 +195,7 @@
                     }
                 }
                 else {
-                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('error', $errors['token_error']);
                 }
             }
 
@@ -262,15 +243,15 @@
                             exit();
                         }
                         else {
-                            $tpl->assign('error', $errors['user_already_exists'][LANG]);
+                            $tpl->assign('error', $errors['user_already_exists']);
                         }
                     }
                     else {
-                        $tpl->assign('error', $errors['email_invalid'][LANG]);
+                        $tpl->assign('error', $errors['email_invalid']);
                     }
                 }
                 else {
-                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('error', $errors['token_error']);
                 }
             }
 
@@ -323,7 +304,7 @@
                 exit();
             }
             else {
-                $tpl->assign('error', $errors['token_error'][LANG]);
+                $tpl->assign('error', $errors['token_error']);
                 $tpl->assign('block_error', true);
                 $tpl->draw('index');
                 exit();
@@ -384,7 +365,7 @@
                     exit();
                 }
                 else {
-                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('error', $errors['token_error']);
                     $tpl->assign('block_error', 'true');
                     $tpl->draw('index');
                     exit();
@@ -406,7 +387,7 @@
                     exit();
                 }
                 else {
-                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('error', $errors['token_error']);
                 }
             }
 
@@ -419,11 +400,11 @@
             if(!empty($_POST['mysql_host']) && !empty($_POST['mysql_login']) && !empty($_POST['mysql_db']) && !empty($_POST['instance_title']) && !empty($_POST['base_url']) && !empty($_POST['currency']) && !empty($_POST['timezone']) && !empty($_POST['template'])) {
                 if(check_token(600, 'settings')) {
                     if(!is_writable('data/')) {
-                        $tpl>assign('error', $errors['write_error_data'][LANG]);
+                        $tpl>assign('error', $errors['write_error_data']);
                     }
                     else {
                         if(!is_dir('tpl/'.$_POST['template'])) {
-                            $tpl->assign('error', $errors['template_error'][LANG]);
+                            $tpl->assign('error', $errors['template_error']);
                         }
                         else {
                             $config = file('data/config.php');
@@ -464,13 +445,13 @@
                                 exit();
                             }
                             else {
-                                $tpl->assign('error', $errors['unable_write_config'][LANG]);
+                                $tpl->assign('error', $errors['unable_write_config']);
                             }
                         }
                     }
                 }
                 else {
-                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('error', $errors['token_error']);
                 }
             }
 
@@ -518,11 +499,11 @@
             if(!empty($_POST['what']) && !empty($_POST['amount']) && (float) $_POST['amount'] != 0 && isset($_POST['date_hour']) && !empty($_POST['date_day']) && !empty($_POST['date_month']) && !empty($_POST['date_year']) && !empty($_POST['users_in'])) {
                 if(check_token(600, 'new_invoice')) {
                     if($_POST['amount'] <= 0) {
-                        $tpl->assign('error', $errors['negative_amount'][LANG]);
+                        $tpl->assign('error', $errors['negative_amount']);
                     }
                     else {
                         if(array_keys($users_in) == array($current_user->getId())) {
-                            $tpl->assign('error', $errors['no_users'][LANG]);
+                            $tpl->assign('error', $errors['no_users']);
                         }
                         else {
                             $invoice = new Invoice();
@@ -553,7 +534,7 @@
                     }
                 }
                 else {
-                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('error', $errors['token_error']);
                 }
             }
 
@@ -573,9 +554,9 @@
             $tpl->assign('users', secureDisplay($users_list));
 
             if(isset($_POST['what']) && empty($_POST['what']))
-                $tpl->assign('error', $errors['what_unknown'][LANG]);
+                $tpl->assign('error', $errors['what_unknown']);
             if(!empty($_POST['amount']) && (float) $_POST['amount'] == 0)
-                $tpl->assign('error', $errors['incorrect_amount'][LANG]);
+                $tpl->assign('error', $errors['incorrect_amount']);
 
             $tpl->assign('users_in', (!empty($users_in) ? $users_in : array()));
             $tpl->assign('id', (!empty($_GET['id']) ? (int) $_GET['id'] : 0));
@@ -610,14 +591,14 @@
                         exit();
                     }
                     else {
-                        $tpl->assign('error', $errors['unauthorized'][LANG]);
+                        $tpl->assign('error', $errors['unauthorized']);
                         $tpl->assign('block_error', true);
                         $tpl->draw('index');
                         exit();
                     }
                 }
                 else {
-                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('error', $errors['token_error']);
                     $tpl->assign('block_error', true);
                     $tpl->draw('index');
                     exit();
@@ -668,7 +649,7 @@
                         exit();
                     }
                     else {
-                        $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->assign('error', $errors['token_error']);
                         $tpl->assign('block_error', true);
                         $tpl->draw('index');
                         exit();
@@ -676,7 +657,7 @@
 
                 }
                 else {
-                    $tpl->assign('error', $errors['unauthorized'][LANG]);
+                    $tpl->assign('error', $errors['unauthorized']);
                     $tpl->assign('block_error', true);
                     $tpl->draw('index');
                     exit();
@@ -709,7 +690,7 @@
                         exit();
                     }
                     else {
-                        $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->assign('error', $errors['token_error']);
                         $tpl->assign('block_error', true);
                         $tpl->draw('index');
                         exit();
@@ -781,7 +762,7 @@
                         exit();
                     }
                     else {
-                        $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->assign('error', $errors['token_error']);
                         $tpl->assign('block_error', true);
                         $tpl->draw('index');
                         exit();
@@ -867,7 +848,7 @@
                     }
                 }
                 else {
-                    $tpl->assign('error', $errors['token_error'][LANG]);
+                    $tpl->assign('error', $errors['token_error']);
                     $tpl->assign('block_error', true);
                     $tpl->draw('index');
                     exit();
@@ -905,14 +886,14 @@
                             mkdir('db_backups');
                         }
                         if(!is_writeable('db_backups')) {
-                            $tpl->assign('error', $errors['write_error_db_backups'][LANG]);
+                            $tpl->assign('error', $errors['write_error_db_backups']);
                             $tpl->assign('block_error', true);
                             $tpl->draw('index');
                             exit();
                         }
                         else {
                             if(system(escapeshellcmd("mysqldump -q -h \"".MYSQL_HOST."\" -u \"".MYSQL_LOGIN."\" -p\"".MYSQL_PASSWORD."\" \"".MYSQL_DB."\" > db_backups/".date('d-m-Y_H:i'))) === FALSE) {
-		                        $tpl->assign('error', $errors['db_dump_failed'][LANG]);
+		                        $tpl->assign('error', $errors['db_dump_failed']);
 		                        $tpl->assign('block_error', true);
 		                        $tpl->draw('index');
 		                        exit();
@@ -1066,7 +1047,7 @@
 		              	}
                     }
                     else {
-                        $tpl->assign('error', $errors['token_error'][LANG]);
+                        $tpl->assign('error', $errors['token_error']);
                         $tpl->assign('block_error', true);
                         $tpl->draw('index');
                         exit();
