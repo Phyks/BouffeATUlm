@@ -471,6 +471,9 @@
 
         case 'new_invoice':
         case 'edit_invoice':
+            $users_list = new User();
+            $users_list = $users_list->load();
+
             if(!empty($_GET['id'])) {
                 $invoice = new Invoice();
                 $invoice = $invoice->load(array('id'=>(int) $_GET['id']), true);
@@ -508,14 +511,16 @@
                         else {
                             $invoice = new Invoice();
 
-                            if(!empty($_POST['id']))
+                            if(!empty($_POST['id'])) {
                                 $invoice->setId($_POST['id']);
+                            }
 
                             $invoice->setWhat($_POST['what']);
                             $invoice->setAmount($_POST['amount']);
 
-                            if(empty($_POST['id']))
+                            if(empty($_POST['id'])) {
                                 $invoice->setBuyer($current_user->getId());
+                            }
 
                             $invoice->setDate(0, int2ampm($_POST['date_hour']), $_POST['date_day'], $_POST['date_month'], $_POST['date_year']);
 
@@ -523,6 +528,26 @@
                             $invoice->setUsersIn($users_in);
 
                             $invoice->save();
+
+                            // Send notifications
+                            if (!empty($_POST['id'])) {
+                                $invoice = new Invoice();
+                                $invoice = $invoice->load(array('id'=>$_POST['id']), true);
+                                $buyer = $invoice->getBuyer();
+                            }
+                            else {
+                                $buyer = $current_user->getId();
+                            }
+                            foreach ($users_in as $user_in=>$guest) {
+                                if (empty($_POST['id']) && $user_in == $buyer) {
+                                    continue;
+                                }
+                                $user_in_details = new User();
+                                $user_in_details = $user_in_details->load(array('id'=>$user_in), true);
+                                if (!empty($user_in_details->getEmail()) && $user_in_details->getNotifications() === 3) {
+                                    sendmail($user_in_details, $subject, $msg, $from); // TODO notifs
+                                }
+                            }
 
                             // Clear the cache
                             ($cached_files = glob(raintpl::$cache_dir."*.rtpl.php")) or ($cached_files = array());
@@ -537,9 +562,6 @@
                     $tpl->assign('error', $errors['token_error']);
                 }
             }
-
-            $users_list = new User();
-            $users_list = $users_list->load();
 
             $tpl->assign('days', range(1,31));
             $tpl->assign('months', range(1, 12));

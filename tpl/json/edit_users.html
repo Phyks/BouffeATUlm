@@ -1,9 +1,0 @@
-{if condition="$error != ''"}
-    <p class="error">{$error}</p>
-{/if}
-
-{if condition="$view == 'list_users'"}
-    {function="json_encode(array_map(function($obj) { return $obj->sessionStore(false);}, $users))"}
-{else}
-    {if condition="LANG == 'en'"}Nothing to show.{else}Il n'y a rien à afficher.{/if}
-{/if}

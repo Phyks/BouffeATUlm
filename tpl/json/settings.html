@@ -1,6 +1,0 @@
-{if condition="!$show_settings"}
-{"notice":{function="json_encode($notice)"}}
-
-{else}
-{"mysql_host":{function="json_encode($mysql_host)"}, "mysql_login":{function="json_encode($mysql_login)"}, "mysql_db":{function="json_encode($mysql_db)"}, "mysql_prefix":{function="json_encode($mysql_prefix)"}, "instance_title":{function="json_encode($instance_title)"}, "base_url":{function="json_encode($base_url)"}, "currency":{function="json_encode($currency)"}, "timezone":{function="json_encode($timezone)"}, "templates":{function="json_encode(TwoDArrayToOneD($templates, 'value'))"}, "current_template":{function="json_encode($current_template)"}", "email_webmaster":{function="json_encode($email_webmaster)"}}
-{/if}
