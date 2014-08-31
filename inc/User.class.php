@@ -67,7 +67,11 @@ class User extends Storage {
     }
 
     public function setEmail($email) {
-        if(filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
+        if (empty($email)) {
+            $this->email = null;
+            return true;
+        }
+        elseif(filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
             $this->email = $email;
             return true;
         }
@@ -77,7 +81,7 @@ class User extends Storage {
     }
 
     public function setDisplayName($display_name) {
-        $this->display_name = $display_name;
+        $this->display_name = (!empty($display_name) ? $display_name : NULL);
     }
 
     public function setPassword($password) {
@@ -113,7 +117,7 @@ class User extends Storage {
     }
 
     public function setStaySignedInToken($token) {
-        $this->stay_signed_in_token = $token;
+        $this->stay_signed_in_token = (!empty($token) ? $token : NULL);
     }
 
     // Password functions
@@ -177,8 +181,18 @@ class User extends Storage {
     // (a user = a unique login and display_name)
     // =========================================
     public function isUnique() {
-        if($this->load(array('login'=>$this->login)) === false && $this->load(array('display_name'=>$this->display_name)) === false) {
-            return true;
+        if($this->load(array('login'=>$this->login)) === false) {
+            if (!empty($this->display_name)) {
+                if ($this->load(array('display_name'=>$this->display_name)) === false) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return true;
+            }
         }
         else {
             return false;

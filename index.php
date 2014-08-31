@@ -227,7 +227,7 @@
                         $user->setPassword($user->encrypt($_POST['password']));
                     }
                     $user->setAdmin($_POST['admin']);
-                    $user->setStaySignedInToken("");
+                    $user->setStaySignedInToken(NULL);
 
                     if($user->setEmail($_POST['email']) !== false) {
                         if(!empty($_POST['user_id']) || $user->isUnique()) {
@@ -1088,7 +1088,7 @@
 
                 // Only keep the invoices which concern the user (as buyer or user in) (only if user != admin)
                 // TODO : Optimize ?
-                if(!$current_user->getAdmin()) {
+                if(!$current_user->getAdmin() && $invoices_list !== false) {
                     foreach($invoices_list as $key=>$invoice) {
                         if($invoice->getBuyer() != $current_user->getId() && !$invoice->getUsersIn()->inUsersIn($current_user->getId())) {
                             unset($invoices_list[$key]);

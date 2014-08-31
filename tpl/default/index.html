@@ -35,7 +35,7 @@
             <tr>
                 <th>{$i18n['users']}</th>
                 <th>{$i18n['you_owe_him']}</th>
-                <th>{$i18n['he_owes_you']}/th>
+                <th>{$i18n['he_owes_you']}</th>
             </tr>
             {loop="$users"}
                 {if condition="$balances[$value->getId()][$current_user->getId()] !== 'X' && $balances[$value->getId()][$current_user->getId()] !== '-'"}
@@ -141,7 +141,7 @@
             {/loop}
         </table>
     {else}
-    <p class="center">{$i18n['no_bills']}.</p>
+    <p class="center">{$i18n['no_bills']}</p>
     {/if}
 </div>
 {include="footer"}
