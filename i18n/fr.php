@@ -121,7 +121,7 @@ $i18n['confirm'] = 'Confirmer';
 $i18n['a_bill'] = 'une dépense';
 $i18n['doesnt_exist'] = "n'existe pas";
 $i18n['deleted_user'] = 'Utilisateur supprimé';
-$i18n['confirm_payback'] = "Êtes-vous sûr de vouloir confirmer ce remboursement ? Cette action ne peut pas être annulée simplement.";
+$i18n['confirm_global_payback'] = "Êtes-vous sûr de vouloir confirmer ce remboursement ? Cette action ne peut pas être annulée simplement.";
 $i18n['go_back_list_global_paybacks'] = 'Retour à la liste des remboursements globaux';
 $i18n['submit'] = 'Envoyer';
 

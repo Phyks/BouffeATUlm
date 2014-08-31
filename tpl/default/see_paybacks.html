@@ -41,7 +41,7 @@
                         {else}
                             <td>
                                 {if condition="$table[$key1][$key2] != 0"}
-                                <a href="?do=confirm_global_paybacks&amp;from={$key1}&amp;to={$key2}&amp;payback_id={$global_paybacks->getId()}&amp;token={$token}" title="Confirm payback" onclick="return confirm("{$i18n['confirm_payback']}");">{$table[$key1][$key2]}</a>
+                                <a href="?do=confirm_global_paybacks&amp;from={$key1}&amp;to={$key2}&amp;payback_id={$global_paybacks->getId()}&amp;token={$token}" title="Confirm payback" onclick="return confirm("{$i18n['confirm_global_payback']}");">{$table[$key1][$key2]}</a>
                                 {else}
                                     -
                                 {/if}

@@ -1188,7 +1188,7 @@
                                 }
                             }
 
-                            if($balances[$user1->getId()][$user2->getId()] == 0) {
+                            if(abs($balances[$user1->getId()][$user2->getId()]) < 0.01) {
                                 $balances[$user1->getId()][$user2->getId()] = '-';
                                 $balances[$user2->getId()][$user1->getId()] = '-';
                             }
@@ -1209,7 +1209,7 @@
                         $user_balance = $user_balance + $balances[$user1->getId()][$current_user->getId()];
                     }
 
-                    $tpl->assign('user_balance', round($user_balance,2));
+                    $tpl->assign('user_balance', round($user_balance, 2));
                 }
 
                 $tpl->assign('users', secureDisplay($users_list));

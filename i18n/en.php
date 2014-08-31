@@ -121,7 +121,7 @@ $i18n['confirm'] = 'Confirm';
 $i18n['a_bill'] = 'a bill';
 $i18n['doesnt_exist'] = "doesn't exist";
 $i18n['deleted_user'] = 'Deleted user';
-$i18n['confirm_payback'] = "Are you sure you want to confirm this payback? This action can't be undone easily.";
+$i18n['confirm_global_payback'] = "Are you sure you want to confirm this payback? This action can't be undone easily.";
 $i18n['go_back_list_global_paybacks'] = 'Go back to global paybacks list';
 $i18n['submit'] = 'Submit';
 

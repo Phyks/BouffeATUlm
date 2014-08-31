@@ -75,8 +75,8 @@
                 amount INT(11),
                 from_user INT(11),
                 FOREIGN KEY (from_user) REFERENCES '.$mysql_prefix.'Users(id) ON DELETE CASCADE,
-                to_user INT(11)
-                FOREIGN KEY (to_user) REFERENCES '.$mysql_prefix.'Users(id) ON DELETE CASCADE,
+                to_user INT(11),
+                FOREIGN KEY (to_user) REFERENCES '.$mysql_prefix.'Users(id) ON DELETE CASCADE
             ) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci');
 
             // Create table "GlobalPaybacks"
