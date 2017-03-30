@@ -1,3 +1,6 @@
+**IMPORTANT**: This project is not maintained anymore and the code base is quite old and not very good. If you are looking for a similar software, you should probably have a look at [IHateMoney](https://github.com/spiral-project/ihatemoney) which has similar features and is maintained, although it is written in Python.
+
+
 Bouffe@Ulm
 ==========
 
